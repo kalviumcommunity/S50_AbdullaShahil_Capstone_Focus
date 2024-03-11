@@ -1,5 +1,20 @@
 ## S50_AbdullaShahil_Capstone_Focus
 
+## Table of Contents
+1. [Focus](#focus)
+2. [Problem Statement](#problem-statement)
+3. [Solution](#solution)
+4. [Key Features](#key-features)
+5. [Technologies Used](#technologies-used)
+6. [Daily Plan](#daily-plan)
+7. [Installation](#installation)
+8. [Usage](#usage)
+9. [Contributing](#contributing)
+10. [License](#license)
+11. [Acknowledgements](#acknowledgements)
+12. [Contact](#contact)
+
+
 # Focus
 Focus, the ultimate online platform for photographers. Showcase your creativity, connect with peers, and elevate your craft. Upload your best shots and collaborate seamlessly. Whether you're a beginner or a pro, Focus is your go-to destination for all things in photography.
 
@@ -58,9 +73,9 @@ Create Project Documentation
 
 ### Day 2:
 Make Low Fid design
-Make High Fid Design
 
 ### Day 3:
+Make High Fid Design
 Using Github to launch the Capstone project
 Setting up Dev Environment
 
