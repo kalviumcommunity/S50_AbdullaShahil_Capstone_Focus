@@ -7,12 +7,7 @@
 4. [Key Features](#key-features)
 5. [Technologies Used](#technologies-used)
 6. [Daily Plan](#daily-plan)
-7. [Installation](#installation)
-8. [Usage](#usage)
-9. [Contributing](#contributing)
-10. [License](#license)
-11. [Acknowledgements](#acknowledgements)
-12. [Contact](#contact)
+
 
 
 # Focus
