@@ -10,7 +10,7 @@
 
 
 
-# **Project Name: Focus**
+# Project Name: Focus
 Focus, the ultimate online platform for photographers. Showcase your creativity, connect with peers, and elevate your craft. Upload your best shots and collaborate seamlessly. Whether you're a beginner or a pro, Focus is your go-to destination for all things in photography.
 
 ## Problem statement
