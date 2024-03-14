@@ -144,4 +144,24 @@ input:focus {
     background-color: #303030;
     opacity: 8%;
   }
+
+  .grayclr{
+    color: #1E1E1E;
+  }
+  .graybg{
+    background-color: #1E1E1E;
+  }
   
+  .poppins{
+    font-family: 'poppins';
+  }
+
+  .join-focus{
+    background-size: contain;
+    
+  }
+
+  .bgblur{
+    backdrop-filter: blur(5px);
+  }
+
