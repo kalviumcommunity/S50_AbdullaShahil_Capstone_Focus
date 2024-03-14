@@ -38,6 +38,7 @@ function Signup() {
                                 <span className="hidden mb">Sign up with Google</span>
                             </div>
                         </button>
+                        
                         <br />
 
                         <center>
