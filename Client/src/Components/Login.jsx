@@ -72,7 +72,7 @@ function Login() {
                         {errors.password && <span className="error-span">{errors.password.message}</span>}
 
                         <br />
-                        <button className='login px-8 py-4 mt-2 font-bold text-lg rounded text-white bg-E49600'>Signup</button>
+                        <button className='login px-8 py-4 mt-2 font-bold text-lg rounded text-white bg-E49600'>Log in</button>
 
                     </form>
                 </center>
