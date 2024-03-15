@@ -1,10 +1,58 @@
 const express = require("express");
 const router = express.Router();
 const userModel = require("../Models/userModel");
+const Joi = require("joi");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 require('dotenv').config()
 
 router.use(express.json());
 
+const generateToken = (user) => {
+    return jwt.sign({ name: user.username }, process.env.SECRET_KEY, { expiresIn: "2h" })
+}
+
+const userJoiSchema = Joi.object({
+    username: Joi.string().alphanum().min(3).max(30).required(),
+    email: Joi.string().email().required(),
+    password: Joi.string().required(),
+});
+
+const putUserJoiSchema = Joi.object({
+    username: Joi.string().alphanum().min(3).max(30),
+    email: Joi.string().email(),
+    password: Joi.string(),
+}).min(1);
+
+const patchUserJoiSchema = Joi.object({
+    username: Joi.string().alphanum().min(3).max(30),
+    email: Joi.string().email(),
+    password: Joi.string(),
+}).min(1);
+
+function validateUser(req, res, next) {
+    const { error } = userJoiSchema.validate(req.body);
+    if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+    }
+    next();
+}
+
+function validatePutUser(req, res, next) {
+    const { error } = putUserJoiSchema.validate(req.body);
+    if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+    }
+    next();
+}
+
+function validatePatchUser(req, res, next) {
+    const { error } = patchUserJoiSchema.validate(req.body);
+    if (error) {
+        return res.status(400).json({ error: error.details[0].message });
+    }
+    next();
+}
 
 // GET all users
 router.get("/users", async (req, res) => {
@@ -16,7 +64,6 @@ router.get("/users", async (req, res) => {
         res.status(500).json({ message: "500-Internal server error" });
     }
 });
-
 
 // GET each user by ID
 router.get("/users/:id", async (req, res) => {
@@ -32,22 +79,27 @@ router.get("/users/:id", async (req, res) => {
     }
 });
 
-
 // POST a new user
-router.post("/users", async (req, res) => {
+router.post("/users", validateUser, async (req, res) => {
     try {
-        const userData = req.body;
-        const newUser = await userModel.create(userData);
-        res.status(201).json({ userData: newUser });
+        const { username, email, password } = req.body;
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = await userModel.create({
+            username,
+            email,
+            password: hashedPassword
+        });
+        const token = generateToken(newUser);
+
+        res.status(201).json({ userData: newUser, token: token });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal server error" });
     }
 });
 
-
 // PUT to update a user
-router.put("/users/:id", async (req, res) => {
+router.put("/users/:id", validatePutUser, async (req, res) => {
     try {
         const updatedUser = await userModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!updatedUser) {
@@ -60,9 +112,8 @@ router.put("/users/:id", async (req, res) => {
     }
 });
 
-
 // PATCH to partially update a user
-router.patch("/users/:id", async (req, res) => {
+router.patch("/users/:id", validatePatchUser, async (req, res) => {
     try {
         const updatedUser = await userModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!updatedUser) {

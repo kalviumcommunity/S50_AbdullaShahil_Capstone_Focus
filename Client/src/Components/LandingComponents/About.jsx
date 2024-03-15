@@ -1,4 +1,5 @@
 import Aboutimg from '../../assets/aboutImg.png';
+import { Link } from 'react-router-dom';
 
 function About() {
     return (
@@ -13,7 +14,7 @@ function About() {
                         Focus, your ultimate online platform for photographers. Showcase your creativity, connect with peers, and elevate your craft. Upload your best shots and collaborate seamlessly. Whether you're a beginner or a pro, Click Sphere is your go-to destination for all things in photography.
                     </p>
                     <p className="poppins font-light text-xl text-left mt-6">Capture. Connect. Collaborate.</p>
-                    <button className="text-left login px-10 py-5 mt-10 font-bold text-xl rounded text-white bg-E49600">Join now</button>
+                    <Link to='/signup'><button className='login px-10 py-5 mt-10 font-bold text-xl rounded text-white bg-E49600'>Join now</button></Link>
                 </div>
             </div>
         </div>

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
+import Cookies from 'js-cookie';
 import bg from '../assets/blurleaf-bg.png'
 import WhiteLogo from '../assets/focus-white.png'
 
@@ -8,11 +10,40 @@ import WhiteLogo from '../assets/focus-white.png'
 function Signup() {
 
     const { register, handleSubmit, formState: { errors }, watch } = useForm();
+    const [isSubmitted, setIsSubmitted] = useState(false);
+    const [signupStatus, setSignupStatus] = useState(null);
 
+    const navigate = useNavigate();
+    const checkPassword = watch('password', '');
+
+    const onSubmit = data => {
+        const { username, email, password } = data;
+        axios.post('http://localhost:4000/users', { username, email, password })
+            .then(response => {
+                console.log(response);
+                const { userData, token } = response.data;
+                Cookies.set('userData', JSON.stringify(userData));
+                Cookies.set('token', token, { expires: 1 });
+                setSignupStatus('success');
+                setIsSubmitted(true);
+                setTimeout(() => {
+                    navigate('/home');
+                }, 1000);
+            })
+            .catch(error => {
+                setTimeout(() => {
+                    navigate('/home');
+                }, 1000);
+                console.error(error);
+                setSignupStatus('failure');
+                setIsSubmitted(true);
+            });
+    };
+    
     return (
         <div className="h-screen w-screen bg flex justify-center items-center" style={{ backgroundImage: `url(${bg})` }}>
             <div className=" h-screen w-1/2  flex justify-center items-center">
-                <img className='logo h-16 pl-10' src={WhiteLogo} alt="" />
+                <img className='logo h-16 ' src={WhiteLogo} alt="" />
 
             </div>
 
@@ -20,8 +51,16 @@ function Signup() {
 
                 <center>
                     <h1 className="register-head mb-5 text-3xl font-bold text-white">Create an Account</h1>
-                    <form className=" w-[35vw] text-left rounded-lg bg-white p-8">
+                    <form className=" w-[35vw] text-left rounded-lg bg-white p-8" onSubmit={handleSubmit(onSubmit)}>
+                        {isSubmitted && signupStatus === 'success' && (
+                            <div className="pop p-2 bg-green-500 text-white rounded mb-5"><p className="registered-heading text-sm">Account created successfully</p></div>
+                        )}
 
+                        {isSubmitted && signupStatus === 'failure' && (
+                            <div className="pop p-2 bg-red-500 text-white  rounded mb-5"><p className="registered-heading text-sm">Failed to create account</p></div>
+                        )}
+
+                        <div className="">
                         <button className="gsi-material-button mb-5">
                             <div className="gsi-material-button-state"></div>
                             <div className="gsi-material-button-content-wrapper">
@@ -38,39 +77,41 @@ function Signup() {
                                 <span className="hidden mb">Sign up with Google</span>
                             </div>
                         </button>
-                        
+
+                        </div>
                         <br />
 
                         <center>
                             <h2 className="text-gray-400">Or</h2>
-                            </center>
-                            
+                        </center>
+
                         <label className="text-gray-600" htmlFor="username">User name</label>
                         <br />
-                        <input className="form-input  mb-5 border-b py-2 px-2 w-full md:w-96" {...register('username', {
+                        <input className="form-input  border-b py-2 px-2 w-full md:w-96" {...register('username', {
                             required: 'This Field is required',
                             minLength: { value: 5, message: 'Minimum 5 characters are required' },
                             maxLength: { value: 10, message: 'Maximum length is 10 characters' }
                         })} />
                         <br />
-                        {errors.username && <span className="error-span">{errors.username.message}</span>}
+                        {errors.username && <span className="error-span text-[1.5vh]  text-red-500">{errors.username.message}</span>}
 
-                        <label className="text-gray-600" htmlFor="email">Email</label>
+                        <br />
+                        <label className="text-gray-600 " htmlFor="email">Email</label>
                         <br />
 
-                        <input className="form-input mb-5 py-2 px-2 border-b w-full md:w-96 focus:outline-none " {...register('email', {
+                        <input className="form-input  py-2  border-b w-full md:w-96 focus:outline-none " {...register('email', {
                             required: 'This Field is required',
                             pattern: { value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: 'Invalid email' },
                             minLength: { value: 4, message: 'Minimum 4 characters are required' },
                             maxLength: { value: 30, message: 'Maximum length is 20 characters' }
                         })} />
                         <br />
-                        {errors.email && <span className="error-span">{errors.email.message}</span>}
+                        {errors.email && <span className="error-span text-[1.5vh]  text-red-500">{errors.email.message}</span>}
+                        <br />
 
                         <label className="text-gray-600" htmlFor="password">New Password</label>
                         <br />
-
-                        <input className="form-input mb-5 py-2 px-2 border-b w-full md:w-96" {...register('password', {
+                        <input className="form-input py-2 border-b w-full md:w-96" {...register('password', {
                             required: 'This Field is required',
                             minLength: { value: 10, message: 'Minimum 10 characters are required' },
                             maxLength: { value: 20, message: 'Maximum length is 20 characters' },
@@ -78,15 +119,15 @@ function Signup() {
                                 value: /^(?=.*[!@#$%^&*])/,
                                 message: 'Password must contain at least one special character',
                             }
-                        })} />
+                        })} type="password" id="password" />
                         <br />
-                        {errors.password && <span className="error-span">{errors.password.message}</span>}
-
-                        <label className="text-gray-600" htmlFor="repeat-password">Confirm Password</label>
+                        {errors.password && <span className="error-span text-[1.5vh]  text-red-500">{errors.password.message}</span>}
                         <br />
 
+                        <label className="text-gray-600" htmlFor="repeatPassword">Confirm Password</label>
+                        <br />
                         <input
-                            className="form-input border-b py-2 px-2 w-full md:w-96"
+                            className="form-input  border-b py-2 w-full md:w-96"
                             {...register('repeatPassword', {
                                 required: 'This Field is required',
                                 validate: value => value === checkPassword || 'Your Passwords do not match',
@@ -95,23 +136,12 @@ function Signup() {
                             id="repeatPassword"
                         />
                         <br />
-                        {errors.repeatPassword && <span className="error-span">{errors.repeatPassword.message}</span>}
+                        {errors.repeatPassword && <span className=" error-span text-[1.5vh] text-red-500">{errors.repeatPassword.message}</span>}
 
-                        <label className="terms" htmlFor="terms">
-                            <br />
 
-                            <input
-                                type="checkbox"
-                                id="terms"
-                                {...register('terms', { required: 'You must accept the terms and conditions' })}
-                            />
-                            &nbsp;&nbsp;Accept <span className="  underline">Terms and Conditions</span>
-                        </label>
+                       
                         <br />
-                        {errors.terms && <span className="error-terms" >{errors.terms.message}</span>}
-
-                        <br />
-                        <button className='login px-8 py-4 mt-2 font-bold text-lg rounded text-white bg-E49600'>Signup</button>
+                        <button className='login px-8 py-4 mt-4 font-bold text-lg rounded text-white bg-E49600' >Signup</button>
 
                     </form>
                 </center>
