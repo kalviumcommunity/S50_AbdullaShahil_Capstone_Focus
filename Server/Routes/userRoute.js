@@ -4,6 +4,7 @@ const userModel = require("../Models/userModel");
 const Joi = require("joi");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const profileModel = require("../Models/profileModel");
 require('dotenv').config()
 
 router.use(express.json());
@@ -84,10 +85,12 @@ router.post("/users", validateUser, async (req, res) => {
     try {
         const { username, email, password } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
+        const profile = await profileModel.create({name:username, email});
         const newUser = await userModel.create({
-            username,
-            email,
-            password: hashedPassword
+            username:username,
+            email:email,
+            password: hashedPassword,
+            profile:profile._id
         });
         const token = generateToken(newUser);
 

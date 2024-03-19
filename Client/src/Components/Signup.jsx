@@ -16,6 +16,11 @@ function Signup() {
     const navigate = useNavigate();
     const checkPassword = watch('password', '');
 
+
+    const toSignup = () => {
+        window.location.href = 'http://localhost:4000/auth/google';
+    }    
+
     const onSubmit = data => {
         const { username, email, password } = data;
         axios.post('http://localhost:4000/users', { username, email, password })
@@ -31,9 +36,6 @@ function Signup() {
                 }, 1000);
             })
             .catch(error => {
-                setTimeout(() => {
-                    navigate('/home');
-                }, 1000);
                 console.error(error);
                 setSignupStatus('failure');
                 setIsSubmitted(true);
@@ -61,7 +63,9 @@ function Signup() {
                         )}
 
                         <div className="">
-                        <button className="gsi-material-button mb-5">
+                        
+                        
+                        <button className="gsi-material-button mb-5" onClick={toSignup}>
                             <div className="gsi-material-button-state"></div>
                             <div className="gsi-material-button-content-wrapper">
                                 <div className="gsi-material-button-icon">
@@ -77,6 +81,7 @@ function Signup() {
                                 <span className="hidden mb">Sign up with Google</span>
                             </div>
                         </button>
+                        
 
                         </div>
                         <br />
