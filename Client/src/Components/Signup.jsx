@@ -12,20 +12,12 @@ function Signup() {
     const { register, handleSubmit, formState: { errors }, watch, reset } = useForm();
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [signupStatus, setSignupStatus] = useState(null);
-    const [isGoogleSignupClicked, setIsGoogleSignupClicked] = useState(false);
 
     const navigate = useNavigate();
     const checkPassword = watch('password', '');
 
-    useEffect(() => {
-        if (isGoogleSignupClicked) {
-            // Reset form validation errors
-            reset();
-        }
-    }, [isGoogleSignupClicked, reset]);
 
     const toSignup = () => {
-        setIsGoogleSignupClicked(true);
         window.location.href = 'http://localhost:4000/auth/google';
     }    
 
