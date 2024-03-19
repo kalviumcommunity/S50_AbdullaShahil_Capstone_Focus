@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
@@ -9,15 +9,23 @@ import WhiteLogo from '../assets/focus-white.png'
 
 function Signup() {
 
-    const { register, handleSubmit, formState: { errors }, watch } = useForm();
+    const { register, handleSubmit, formState: { errors }, watch, reset } = useForm();
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [signupStatus, setSignupStatus] = useState(null);
+    const [isGoogleSignupClicked, setIsGoogleSignupClicked] = useState(false);
 
     const navigate = useNavigate();
     const checkPassword = watch('password', '');
 
+    useEffect(() => {
+        if (isGoogleSignupClicked) {
+            // Reset form validation errors
+            reset();
+        }
+    }, [isGoogleSignupClicked, reset]);
 
     const toSignup = () => {
+        setIsGoogleSignupClicked(true);
         window.location.href = 'http://localhost:4000/auth/google';
     }    
 
@@ -62,10 +70,10 @@ function Signup() {
                             <div className="pop p-2 bg-red-500 text-white  rounded mb-5"><p className="registered-heading text-sm">Failed to create account</p></div>
                         )}
 
-                        <div className="">
+                        <div className="flex justify-center">
                         
                         
-                        <button className="gsi-material-button mb-5" onClick={toSignup}>
+                        <div className="gsi-material-button mb-5 w-1/2" onClick={toSignup}>
                             <div className="gsi-material-button-state"></div>
                             <div className="gsi-material-button-content-wrapper">
                                 <div className="gsi-material-button-icon">
@@ -80,7 +88,7 @@ function Signup() {
                                 <span className="gsi-material-button-contents mb">Sign up with Google</span>
                                 <span className="hidden mb">Sign up with Google</span>
                             </div>
-                        </button>
+                        </div>
                         
 
                         </div>
