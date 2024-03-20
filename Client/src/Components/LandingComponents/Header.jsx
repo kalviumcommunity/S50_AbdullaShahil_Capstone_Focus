@@ -1,12 +1,17 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import WhiteLogo from '../../assets/focus-white.png'
-import bg from '../../assets/leaf-bg.jpeg'
-import { useState } from 'react';
+import WhiteLogo from '../../assets/focus-white.png';
+import bg from '../../assets/leaf-bg.jpeg';
 import { Link as ScrollLink } from 'react-scroll';
-
 
 function Header() {
     const [showMenu, setShowMenu] = useState(false);
+
+    useEffect(() => {
+        return () => {
+            setShowMenu(false);
+        };
+    }, []);
 
     return (
         <div className="head h-screen w-screen flex flex-col justify-between " style={{ backgroundImage: `url(${bg})` }}>
@@ -41,5 +46,3 @@ function Header() {
 }
 
 export default Header;
-
-
