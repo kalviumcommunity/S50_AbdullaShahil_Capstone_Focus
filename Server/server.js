@@ -41,6 +41,11 @@ app.get("/auth/failure", (req, res) => {
   res.send('Signup failed')
 });
 
+app.get("/home", isLoggedIn, (req, res) => {
+  res.send("Welcome to the home page!");
+});
+
+
 app.use(express.json())
 app.use("/", userRouter);
 
