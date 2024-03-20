@@ -26,7 +26,6 @@ function isLoggedIn(req, res, next){
   req.user? next(): res.sendStatus(401);
 }
 
-
 app.get('/auth/google',
   passport.authenticate('google', { scope: ['email', 'profile'] })
 );
@@ -38,14 +37,14 @@ app.get('/auth/google/callback',
   })
 );
 
-
-app.get("home",isLoggedIn, (req, res) => {
-  res.send('protected route')
-});
-
 app.get("/auth/failure", (req, res) => {
   res.send('Signup failed')
 });
+
+app.get("/home", isLoggedIn, (req, res) => {
+  res.send("Welcome to the home page!");
+});
+
 
 app.use(express.json())
 app.use("/", userRouter);
