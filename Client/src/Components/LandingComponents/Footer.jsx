@@ -1,12 +1,10 @@
 
 function Footer() {
   return (
-    <div className='graybg mt-10 h-[10vh]'>
+    <div className='graybg h-[10vh] flex justify-center items-center mt-24'>
 
-      <center className="flex justify-center ">
-        <h1 className="text-white mt-6">Capture. Connect. Collaborate.
+        <h1 className=" font-thin text-white ">Capture. Connect. Collaborate.
         </h1>
-      </center>
 
     </div>
   )

@@ -5,7 +5,7 @@ import ProfileIMG3 from '../../assets/review3.jpeg'
 
 function UserReviews() {
     return (
-        <div className="p-10 pt-10 ">
+        <div name='reviews' className="p-10 pt-10 ">
 
             <div className='bg ' style={{ backgroundImage: `url(${bg})` }}>
 
