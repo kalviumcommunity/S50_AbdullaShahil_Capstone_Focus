@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useNavigate, Link } from 'react-router-dom';
 import bg from '../assets/blurleaf-bg.png'
@@ -9,7 +8,7 @@ function Login() {
 
     const { register, handleSubmit, formState: { errors }, watch } = useForm();
 
-    
+
     return (
         <div className="h-screen w-screen bg flex justify-center items-center" style={{ backgroundImage: `url(${bg})` }}>
             <div className=" hidden  h-screen w-1/2  lg:flex justify-center items-center">
