@@ -44,16 +44,16 @@ function Signup() {
     
     return (
         <div className="h-screen w-screen bg flex justify-center items-center" style={{ backgroundImage: `url(${bg})` }}>
-            <div className=" h-screen w-1/2  flex justify-center items-center">
+            <div className="hidden  h-screen w-1/2  lg:flex justify-center items-center">
                 <img className='logo h-16 ' src={WhiteLogo} alt="" />
 
             </div>
 
-            <div className="h-screen w-1/2 form-main  flex flex-col justify-center items-center ">
+            <div className="h-screen w-full lg:w-1/2 form-main flex lg:flex-col justify-center items-center">
 
                 <center>
                     <h1 className="register-head mb-5 text-3xl font-bold text-white">Create an Account</h1>
-                    <form className=" w-[35vw] text-left rounded-lg bg-white p-8" onSubmit={handleSubmit(onSubmit)}>
+                    <form className="w-[85vw] md:w-[70vw] lg:w-[35vw] text-left rounded-lg bg-white p-8" onSubmit={handleSubmit(onSubmit)}>
                         {isSubmitted && signupStatus === 'success' && (
                             <div className="pop p-2 bg-green-500 text-white rounded mb-5"><p className="registered-heading text-sm">Account created successfully</p></div>
                         )}
@@ -92,7 +92,7 @@ function Signup() {
 
                         <label className="text-gray-600" htmlFor="username">User name</label>
                         <br />
-                        <input className="form-input  border-b py-2 px-2 w-full md:w-96" {...register('username', {
+                        <input className="form-input mb-5 py-2 px-2 border-b w-full focus:outline-none " {...register('username', {
                             required: 'This Field is required',
                             minLength: { value: 5, message: 'Minimum 5 characters are required' },
                             maxLength: { value: 10, message: 'Maximum length is 10 characters' }
@@ -104,7 +104,7 @@ function Signup() {
                         <label className="text-gray-600 " htmlFor="email">Email</label>
                         <br />
 
-                        <input className="form-input  py-2  border-b w-full md:w-96 focus:outline-none " {...register('email', {
+                        <input className="form-input mb-5 py-2 px-2 border-b w-full focus:outline-none " {...register('email', {
                             required: 'This Field is required',
                             pattern: { value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: 'Invalid email' },
                             minLength: { value: 4, message: 'Minimum 4 characters are required' },
@@ -116,7 +116,7 @@ function Signup() {
 
                         <label className="text-gray-600" htmlFor="password">New Password</label>
                         <br />
-                        <input className="form-input py-2 border-b w-full md:w-96" {...register('password', {
+                        <input className="form-input mb-5 py-2 px-2 border-b w-full focus:outline-none " {...register('password', {
                             required: 'This Field is required',
                             minLength: { value: 10, message: 'Minimum 10 characters are required' },
                             maxLength: { value: 20, message: 'Maximum length is 20 characters' },
@@ -132,7 +132,7 @@ function Signup() {
                         <label className="text-gray-600" htmlFor="repeatPassword">Confirm Password</label>
                         <br />
                         <input
-                            className="form-input  border-b py-2 w-full md:w-96"
+                            className="form-input mb-5 py-2 px-2 border-b w-full focus:outline-none "
                             {...register('repeatPassword', {
                                 required: 'This Field is required',
                                 validate: value => value === checkPassword || 'Your Passwords do not match',

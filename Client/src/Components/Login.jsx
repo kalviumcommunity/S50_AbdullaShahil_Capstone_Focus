@@ -11,17 +11,18 @@ function Login() {
 
     return (
         <div className="h-screen w-screen bg flex justify-center items-center" style={{ backgroundImage: `url(${bg})` }}>
-            <div className=" h-screen w-1/2  flex justify-center items-center">
+            <div className=" hidden  h-screen w-1/2  lg:flex justify-center items-center">
                 <img className='logo h-16 pl-10' src={WhiteLogo} alt="" />
 
             </div>
 
-            <div className="h-screen w-1/2 form-main  flex flex-col justify-center items-center ">
+            <div className="h-screen w-full lg:w-1/2 form-main flex lg:flex-col justify-center items-center ">
 
                 <center>
                     <h1 className="register-head mb-5 text-3xl font-bold text-white">Login to your Account</h1>
-                    <form className=" w-[35vw] text-left rounded-lg bg-white p-8">
+                    <form className=" w-[85vw] md:w-[70vw] lg:w-[35vw] text-left rounded-lg bg-white p-8">
 
+                        <center>
                         <button className="gsi-material-button mb-5">
                             <div className="gsi-material-button-state"></div>
                             <div className="gsi-material-button-content-wrapper">
@@ -35,19 +36,17 @@ function Login() {
                                     </svg>
                                 </div>
                                 <span className="gsi-material-button-contents mb">Continue with Google</span>
-                                <span className="hidden mb">Continue with Google</span>
                             </div>
                         </button>
                         <br />
 
-                        <center>
                             <h2 className="text-gray-400">Or</h2>
                         </center>
 
                         <label className="text-gray-600" htmlFor="email">Email</label>
                         <br />
 
-                        <input className="form-input mb-5 py-2 px-2 border-b w-full md:w-96 focus:outline-none " {...register('email', {
+                        <input className="form-input mb-5 py-2 px-2 border-b w-full focus:outline-none " {...register('email', {
                             required: 'This Field is required',
                             pattern: { value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: 'Invalid email' },
                             minLength: { value: 4, message: 'Minimum 4 characters are required' },
@@ -59,7 +58,7 @@ function Login() {
                         <label className="text-gray-600" htmlFor="password">Password</label>
                         <br />
 
-                        <input className="form-input mb-5 py-2 px-2 border-b w-full md:w-96" {...register('password', {
+                        <input className="form-input mb-5 py-2 px-2 border-b w-full" {...register('password', {
                             required: 'This Field is required',
                             minLength: { value: 10, message: 'Minimum 10 characters are required' },
                             maxLength: { value: 20, message: 'Maximum length is 20 characters' },
