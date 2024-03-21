@@ -44,6 +44,22 @@ input:focus {
   outline: none;
 }
 
+.gradient1{
+  background: linear-gradient(to bottom right, #E49600, #BC7B00);
+}
+
+.gradient2{
+  background: linear-gradient(to top right, #101010, #414141);
+}
+
+.textgray{
+  color: #1E1E1E;
+}
+
+.transition{
+  transition: 0.3s;
+}
+
 
 .gsi-material-button {
   -moz-user-select: none;
