@@ -8,11 +8,11 @@ function Login() {
 
     const { register, handleSubmit, formState: { errors }, watch } = useForm();
 
-
     return (
         <div className="h-screen w-screen bg flex justify-center items-center" style={{ backgroundImage: `url(${bg})` }}>
             <div className=" hidden  h-screen w-1/2  lg:flex justify-center items-center">
                 <img className='logo h-16 pl-10' src={WhiteLogo} alt="" />
+                
 
             </div>
 
