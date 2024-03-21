@@ -12,7 +12,7 @@ function Login() {
         <div className="h-screen w-screen bg flex justify-center items-center" style={{ backgroundImage: `url(${bg})` }}>
             <div className=" hidden  h-screen w-1/2  lg:flex justify-center items-center">
                 <img className='logo h-16 pl-10' src={WhiteLogo} alt="" />
-                
+
 
             </div>
 
@@ -46,12 +46,19 @@ function Login() {
                         <label className="text-gray-600" htmlFor="email">Email</label>
                         <br />
 
-                        <input className="form-input mb-5 py-2 px-2 border-b w-full focus:outline-none " {...register('email', {
-                            required: 'This Field is required',
-                            pattern: { value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: 'Invalid email' },
-                            minLength: { value: 4, message: 'Minimum 4 characters are required' },
-                            maxLength: { value: 30, message: 'Maximum length is 20 characters' }
-                        })} />
+                        <input
+                            className="form-input mb-5 py-2 px-2 border-b w-full focus:outline-none"
+                            {...register('email', {
+                                required: 'This Field is required',
+                                pattern: { value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: 'Invalid email' },
+                                minLength: { value: 4, message: 'Minimum 4 characters are required' },
+                                maxLength: { value: 25, message: 'Maximum length is 25 characters' }
+                            })}
+                            type="email"
+                            id="email"
+                            autoComplete="email"
+                        />
+
                         <br />
                         {errors.email && <span className="error-span">{errors.email.message}</span>}
 
@@ -61,12 +68,12 @@ function Login() {
                         <input className="form-input mb-5 py-2 px-2 border-b w-full" {...register('password', {
                             required: 'This Field is required',
                             minLength: { value: 10, message: 'Minimum 10 characters are required' },
-                            maxLength: { value: 20, message: 'Maximum length is 20 characters' },
+                            maxLength: { value: 25, message: 'Maximum length is 25 characters' },
                             pattern: {
                                 value: /^(?=.*[!@#$%^&*])/,
                                 message: 'Password must contain at least one special character',
                             }
-                        })} />
+                        })} autoComplete="current-password" />
                         <br />
                         {errors.password && <span className="error-span">{errors.password.message}</span>}
 
