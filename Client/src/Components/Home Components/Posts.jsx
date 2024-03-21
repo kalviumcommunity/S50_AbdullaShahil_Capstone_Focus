@@ -25,9 +25,6 @@ function Posts() {
                   <h1>Release Year: <strong></strong></h1>
                 </div>
               </div>
-
- 
-
         
         </center>
   )
