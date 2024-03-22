@@ -23,13 +23,13 @@ function Login() {
             .then(response => {
                 console.log(response)
                 const { email, token } = response.data;
-                Cookies.set('email', email);
-                Cookies.set('token', token);
+                Cookies.set('email', email, { httpOnly: true, secure: true });
+                Cookies.set('token', token, { httpOnly: true, secure: true });
                 setSignupStatus('success');
 
                 setTimeout(() => {
                     navigate('/home');
-                }, 1000);
+                }, 200);
             })
             .catch(error => {
                 console.log(error)

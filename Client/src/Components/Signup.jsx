@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -10,8 +10,9 @@ import WhiteLogo from '../assets/focus-white.png'
 function Signup() {
 
     const [signupStatus, setSignupStatus] = useState(null);
-    const { register, handleSubmit, formState: { errors } } = useForm();
+    const { register, handleSubmit, formState: { errors }, watch } = useForm();
     const navigate = useNavigate();
+    const checkPassword = watch('password', '');
 
 
     const toSignup = () => {
@@ -19,31 +20,28 @@ function Signup() {
     }
 
     const onSubmit = (data) => {
-        const { email, password } = data;
-        axios.get('https://s50-weirdest-songs-ever-1.onrender.com/users')
+        const { username, email, password } = data;
+        axios.post('http://localhost:4000/users', { username, email, password })
             .then(response => {
-                const users = response.data;
-                const matchedUser = users.find(user => user.email === email && user.password === password);
-
-                if (matchedUser) {
-                    const dataString = JSON.stringify(matchedUser);
-                    Cookies.set('userData', dataString);
-
-                    console.log('success');
-                    setSignupStatus('success');
-                    setTimeout(() => {
-                        navigate('/home');
-                    }, 1000);
-
-                } else {
-                    setSignupStatus('failure');
-                    console.log("Invalid email or password");
-                }
+                console.log(response);
+                const { userData, token } = response.data;
+    
+                Cookies.set('userData', JSON.stringify(userData), { httpOnly: true, secure: true });
+                Cookies.set('token', token, { httpOnly: true, secure: true });
+    
+                setSignupStatus('success');
+                setTimeout(() => {
+                    navigate('/home');
+                }, 200);
             })
-            .catch(err => {
-                console.log(err);
+            .catch(error => {
+                console.log(error);
+                setSignupStatus('failure');
+                console.log(error.response.data.error);
             });
     };
+    
+
 
     return (
         <div className="h-screen w-screen bg flex justify-center items-center" style={{ backgroundImage: `url(${bg})` }}>
