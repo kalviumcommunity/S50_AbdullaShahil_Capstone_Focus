@@ -1,7 +1,7 @@
 
 function Navigation() {
     return (
-        <div className="border w-fit pl-10 pr-5 pt-10 ">
+        <div className="w-fit pl-10 pr-5 pt-10 ">
 
             <div className="flex  items-center pl-1">
                 <div className="add-btn gradient1 flex justify-center items-center bg-green-500 w-16 h-16 rounded-full">

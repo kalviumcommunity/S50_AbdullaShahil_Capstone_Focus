@@ -9,36 +9,39 @@ import WhiteLogo from '../assets/focus-white.png'
 
 function Signup() {
 
-    const { register, handleSubmit, formState: { errors }, watch } = useForm();
-    const [isSubmitted, setIsSubmitted] = useState(false);
     const [signupStatus, setSignupStatus] = useState(null);
-
+    const { register, handleSubmit, formState: { errors } } = useForm();
     const navigate = useNavigate();
-    const checkPassword = watch('password', '');
 
 
     const toSignup = () => {
         window.location.href = 'http://localhost:4000/auth/google';
     }
 
-    const onSubmit = data => {
-        const { username, email, password } = data;
-        axios.post('http://localhost:4000/users', { username, email, password })
+    const onSubmit = (data) => {
+        const { email, password } = data;
+        axios.get('https://s50-weirdest-songs-ever-1.onrender.com/users')
             .then(response => {
-                console.log(response);
-                const { userData, token } = response.data;
-                Cookies.set('userData', JSON.stringify(userData));
-                Cookies.set('token', token, { expires: 1 });
-                setSignupStatus('success');
-                setIsSubmitted(true);
-                setTimeout(() => {
-                    navigate('/home');
-                }, 1000);
+                const users = response.data;
+                const matchedUser = users.find(user => user.email === email && user.password === password);
+
+                if (matchedUser) {
+                    const dataString = JSON.stringify(matchedUser);
+                    Cookies.set('userData', dataString);
+
+                    console.log('success');
+                    setSignupStatus('success');
+                    setTimeout(() => {
+                        navigate('/home');
+                    }, 1000);
+
+                } else {
+                    setSignupStatus('failure');
+                    console.log("Invalid email or password");
+                }
             })
-            .catch(error => {
-                console.error(error);
-                setSignupStatus('failure');
-                setIsSubmitted(true);
+            .catch(err => {
+                console.log(err);
             });
     };
 
@@ -54,11 +57,11 @@ function Signup() {
                 <center>
                     <h1 className="register-head mb-5 text-3xl font-bold text-white">Create an Account</h1>
                     <form className="w-[85vw] md:w-[70vw] lg:w-[35vw] text-left rounded-lg bg-white p-8" onSubmit={handleSubmit(onSubmit)}>
-                        {isSubmitted && signupStatus === 'success' && (
+                        {signupStatus === 'success' && (
                             <div className="pop p-2 bg-green-500 text-white rounded mb-5"><p className="registered-heading text-sm">Account created successfully</p></div>
                         )}
 
-                        {isSubmitted && signupStatus === 'failure' && (
+                        {signupStatus === 'failure' && (
                             <div className="pop p-2 bg-red-500 text-white  rounded mb-5"><p className="registered-heading text-sm">Failed to create account</p></div>
                         )}
 
