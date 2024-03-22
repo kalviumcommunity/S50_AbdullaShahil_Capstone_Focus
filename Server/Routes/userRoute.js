@@ -85,12 +85,12 @@ router.post("/users", validateUser, async (req, res) => {
     try {
         const { username, email, password } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
-        const profile = await profileModel.create({name:username, email});
+        const profile = await profileModel.create({ name: username, email });
         const newUser = await userModel.create({
-            username:username,
-            email:email,
+            username: username,
+            email: email,
             password: hashedPassword,
-            profile:profile._id
+            profile: profile._id
         });
         const token = generateToken(newUser);
 
@@ -100,6 +100,30 @@ router.post("/users", validateUser, async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 });
+
+
+// POST REQUEST FOR LOGIN - TO CHECK IF THE EMAIL AND PASSWORD MATCHES
+router.post("/users/login", async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await userModel.findOne({ email });
+        if (!user) {
+            return res.status(401).json({ error: "Invalid email" });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ error: "Invalid password" });
+        }
+
+        const token = generateToken(user);
+        res.status(201).json({ email, token }); 
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
 
 // PUT to update a user
 router.put("/users/:id", validatePutUser, async (req, res) => {

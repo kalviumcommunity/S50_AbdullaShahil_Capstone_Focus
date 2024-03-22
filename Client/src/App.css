@@ -60,6 +60,10 @@ input:focus {
   transition: 0.3s;
 }
 
+.search:focus{
+  border: 1px solid rgb(96, 96, 96);
+}
+
 
 .gsi-material-button {
   -moz-user-select: none;
@@ -272,6 +276,7 @@ input:focus {
     margin-top: 10px;
     text-align: center;
   }
+
 
 
 }
