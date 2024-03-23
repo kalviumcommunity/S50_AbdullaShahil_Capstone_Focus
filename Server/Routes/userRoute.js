@@ -5,6 +5,7 @@ const Joi = require("joi");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const profileModel = require("../Models/profileModel");
+const { Cookie } = require("express-session");
 require('dotenv').config()
 
 router.use(express.json());
@@ -102,6 +103,27 @@ router.post("/users", validateUser, async (req, res) => {
 });
 
 
+const verifyToken = (req, res, next) => {
+    const token = req.body.token || req.query.token || req.headers["x-access-token"];
+    if (!token) {
+        return res.status(200).json({ error: "Token is not provided" });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.SECRET_KEY);
+        req.decoded = decoded;
+        next();
+    } catch (error) {
+        return res.status(401).json({ error: "Failed to authenticate token" });
+    }
+};
+
+// VALIDATE TOKEN
+router.post("/users/tokenvalidate", verifyToken, (req, res) => {
+    res.status(200).json({ valid: true, user: req.decoded });
+});
+
+
 // POST REQUEST FOR LOGIN - TO CHECK IF THE EMAIL AND PASSWORD MATCHES
 router.post("/users/login", async (req, res) => {
     try {
@@ -117,7 +139,7 @@ router.post("/users/login", async (req, res) => {
         }
 
         const token = generateToken(user);
-        res.status(201).json({ email, token }); 
+        res.status(201).json({ email, password, token });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal server error" });

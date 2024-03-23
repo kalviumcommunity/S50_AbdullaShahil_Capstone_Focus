@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom';
 import bg from '../assets/blurleaf-bg.png'
@@ -17,14 +17,32 @@ function Login() {
         window.location.href = 'http://localhost:4000/auth/google';
     }
 
+    useEffect(() => {
+        const fetchData = async () => {
+          const token = Cookies.get("token");
+          if (token) {
+            try {
+              await axios.post(
+                "http://localhost:4000/users/tokenvalidate", { token });
+              navigate("/home");
+            } catch (error) {
+              console.error("Error in post request", error.response.data.error);
+            }
+          }
+        };
+    
+        fetchData();
+      },[]);
+
     const onSubmit = (data) => {
         const { email, password } = data;
-        axios.post('http://localhost:4000/users/login', { email, password })
+        axios.post('http://localhost:4000/users/login', { email, password }, {withCredentials: true})
             .then(response => {
+
                 console.log(response)
                 const { email, token } = response.data;
-                Cookies.set('email', email, { httpOnly: true, secure: true });
-                Cookies.set('token', token, { httpOnly: true, secure: true });
+                Cookies.set('email', email, { httpOnly: false, secure: false });
+                Cookies.set('token', token, { httpOnly: false, secure: false });
                 setSignupStatus('success');
 
                 setTimeout(() => {
