@@ -26,8 +26,8 @@ function Signup() {
                 console.log(response);
                 const { userData, token } = response.data;
     
-                Cookies.set('userData', JSON.stringify(userData), { httpOnly: true, secure: true });
-                Cookies.set('token', token, { httpOnly: true, secure: true });
+                Cookies.set('userData', JSON.stringify(userData), { httpOnly: false, secure: false });
+                Cookies.set('token', token, { httpOnly: false, secure: false });
     
                 setSignupStatus('success');
                 setTimeout(() => {

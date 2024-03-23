@@ -9,21 +9,26 @@ require('./auth')
 const port = 4000;
 const app = express();
 
-app.use(session({ 
+app.use(session({
   secret: 'cats',
   resave: false,
   saveUninitialized: true,
-  cookie: {secure: false},
+  cookie: { secure: false },
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 connectDb();
-app.use(cors())
+app.use(cors(
+  {
+    origin: "http://localhost:5173",
+    credentials: true
+  }
+))
 
-function isLoggedIn(req, res, next){
-  req.user? next(): res.sendStatus(401);
+function isLoggedIn(req, res, next) {
+  req.user ? next() : res.sendStatus(401);
 }
 
 app.get('/auth/google',
