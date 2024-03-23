@@ -84,7 +84,7 @@ router.get("/users/:id", async (req, res) => {
 // POST a new user
 router.post("/users", validateUser, async (req, res) => {
     try {
-        const { username, email, password } = req.body;
+        const { username, email } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
         const profile = await profileModel.create({ name: username, email });
         const newUser = await userModel.create({
