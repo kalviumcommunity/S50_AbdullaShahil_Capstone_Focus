@@ -45,18 +45,27 @@ router.get("/posts/:id", async (req, res) => {
   }
 });
 
+
 // POST a new post with validation
-router.post("/posts", validatePost, async (req, res) => {
+
+const idSchema = Joi.string().required().regex(/^[0-9a-fA-F]{24}$/).message('ID must be a valid MongoDB ID');
+router.post("/posts", async (req, res) => {
   try {
+    const { error } = idSchema.validate(req.body.id);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+
     const newpost = new postModel(req.body);
     const result = await newpost.save();
-    await profileModel.findOneAndUpdate(
-      { id: req.body.id },
-      { $push: { posts: result._id } },
-      { new: true }
-    ).populate("posts").exec();
-    console.log(req.body)
-    console.log(req.body)
+
+    if (req.body.id) {
+      await profileModel.findOneAndUpdate(
+        { id: req.body.id },
+        { $push: { posts: result._id } },
+        { new: true }
+      ).populate("posts").exec();
+    }
 
     res.status(201).json(result);
   } catch (error) {
