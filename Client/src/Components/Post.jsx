@@ -35,7 +35,6 @@ function Post() {
       .catch(error => {
         if (error.response) {
           setErrorMessage('Submission failed. Please try again later.');
-          console.error(error.response);
         } else if (error.request) {
           setErrorMessage('Submission failed. Please check your internet connection.');
           console.error(error.request);
