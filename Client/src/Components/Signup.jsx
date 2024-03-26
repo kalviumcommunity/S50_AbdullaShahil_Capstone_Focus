@@ -20,8 +20,8 @@ function Signup() {
     }
 
     const onSubmit = (data) => {
-        const { username, email, password } = data;
-        axios.post('http://localhost:4000/users', { username, email, password })
+        const { name, email, password } = data;
+        axios.post('http://localhost:4000/users', { name, email, password })
             .then(response => {
                 console.log(response);
                 const { userData, token } = response.data;
@@ -91,15 +91,15 @@ function Signup() {
                             <h2 className="text-gray-400">Or</h2>
                         </center>
 
-                        <label className="text-gray-600" htmlFor="username">User name</label>
+                        <label className="text-gray-600" htmlFor="name">User name</label>
                         <br />
-                        <input className="form-input mb-5 py-2 px-2 border-b w-full focus:outline-none " {...register('username', {
+                        <input className="form-input mb-5 py-2 px-2 border-b w-full focus:outline-none " {...register('name', {
                             required: 'This Field is required',
                             minLength: { value: 5, message: 'Minimum 5 characters are required' },
                             maxLength: { value: 10, message: 'Maximum length is 10 characters' }
                         })} />
                         <br />
-                        {errors.username && <span className="error-span text-[1.5vh]  text-red-500">{errors.username.message}</span>}
+                        {errors.name && <span className="error-span text-[1.5vh]  text-red-500">{errors.name.message}</span>}
 
                         <br />
                         <label className="text-gray-600 " htmlFor="email">Email</label>

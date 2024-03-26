@@ -15,19 +15,19 @@ const generateToken = (user) => {
 }
 
 const userJoiSchema = Joi.object({
-    username: Joi.string().alphanum().min(3).max(30).required(),
+    name: Joi.string().alphanum().min(3).max(30).required(),
     email: Joi.string().email().required(),
     password: Joi.string().required(),
 });
 
 const putUserJoiSchema = Joi.object({
-    username: Joi.string().alphanum().min(3).max(30),
+    name: Joi.string().alphanum().min(3).max(30),
     email: Joi.string().email(),
     password: Joi.string(),
 }).min(1);
 
 const patchUserJoiSchema = Joi.object({
-    username: Joi.string().alphanum().min(3).max(30),
+    name: Joi.string().alphanum().min(3).max(30),
     email: Joi.string().email(),
     password: Joi.string(),
 }).min(1);
@@ -84,11 +84,12 @@ router.get("/users/:id", async (req, res) => {
 // POST a new user
 router.post("/users", validateUser, async (req, res) => {
     try {
-        const { username, email } = req.body;
+        const { name, email, password } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
-        const profile = await profileModel.create({ name: username, email });
+        const profile = (await profileModel.create({ name: name, email }));
+        const userCheck = await userModel.findOne({name: name});
         const newUser = await userModel.create({
-            username: username,
+            name: name,
             email: email,
             password: hashedPassword,
             profile: profile._id
@@ -128,7 +129,8 @@ router.post("/users/tokenvalidate", verifyToken, (req, res) => {
 router.post("/users/login", async (req, res) => {
     try {
         const { email, password } = req.body;
-        const user = await userModel.findOne({ email });
+        const user = await userModel.findOne({ email }).populate("profile").exec();
+        console.log("while login", user);
         if (!user) {
             return res.status(401).json({ error: "Invalid email" });
         }
@@ -139,12 +141,13 @@ router.post("/users/login", async (req, res) => {
         }
 
         const token = generateToken(user);
-        res.status(201).json({ email, password, token });
+        res.status(201).json({ email: user.email, name: user.name, token });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal server error" });
     }
 });
+
 
 
 // PUT to update a user

@@ -3,6 +3,7 @@ const session = require("express-session");
 const cors = require("cors");
 const connectDb = require("../Server/config/connect");
 const userRouter = require("./Routes/userRoute");
+const postRouter = require("./Routes/postRoute");
 const passport = require("passport");
 require('./auth')
 
@@ -53,6 +54,7 @@ app.get("/home", isLoggedIn, (req, res) => {
 
 app.use(express.json())
 app.use("/", userRouter);
+app.use("/", postRouter);
 
 app.listen(port, () => {
   console.log(`🚀 server running on PORT: ${port}`);

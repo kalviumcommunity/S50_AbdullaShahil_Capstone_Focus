@@ -3,6 +3,7 @@ import Landing from './Components/Landing';
 import Signup from './Components/Signup';
 import Login from './Components/Login'
 import Home from './Components/Home';
+import Post from './Components/Post';
 import './App.css'
 
 
@@ -14,6 +15,7 @@ function App() {
       <Route path='/signup' element={<Signup/>}/>
       <Route path='/login' element={<Login/>}/>
       <Route path='/home' element={<Home/>}/>
+      <Route path='/post' element={<Post/>}/>
     </Routes>
 
     </div>
