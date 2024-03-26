@@ -46,33 +46,34 @@ router.get("/posts/:id", async (req, res) => {
 });
 
 
-// POST a new post with validation
-
-const idSchema = Joi.string().required().regex(/^[0-9a-fA-F]{24}$/).message('ID must be a valid MongoDB ID');
-router.post("/posts", async (req, res) => {
+router.post("/posts", validatePost, async (req, res) => {
   try {
-    const { error } = idSchema.validate(req.body.id);
+    const { error } = postJoiSchema.validate(req.body);
     if (error) {
       return res.status(400).json({ error: error.details[0].message });
     }
 
-    const newpost = new postModel(req.body);
-    const result = await newpost.save();
+    const newPost = new postModel(req.body);
+    const result = await newPost.save();
 
-    if (req.body.id) {
+    const name = req.body.name;
+    if (name) {
       await profileModel.findOneAndUpdate(
-        { id: req.body.id },
+        { name },
         { $push: { posts: result._id } },
         { new: true }
-      ).populate("posts").exec();
+      );
+      const data = await profileModel.findOne({ name }).populate("posts").exec();
+      res.status(201).json(data);
+    } else {
+      res.status(400).json({ error: "Name not provided" });
     }
-
-    res.status(201).json(result);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
 
 
 
