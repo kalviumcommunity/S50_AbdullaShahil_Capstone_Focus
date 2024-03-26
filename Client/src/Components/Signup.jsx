@@ -27,6 +27,7 @@ function Signup() {
                 const { userData, token } = response.data;
     
                 Cookies.set('userData', JSON.stringify(userData), { httpOnly: false, secure: false });
+                Cookies.set('name', userData.name, { httpOnly: false, secure: false });
                 Cookies.set('token', token, { httpOnly: false, secure: false });
     
                 setSignupStatus('success');
@@ -37,7 +38,7 @@ function Signup() {
             .catch(error => {
                 console.log(error);
                 setSignupStatus('failure');
-                console.log(error.response.data.error);
+                console.log(error.response.data);
             });
     };
     

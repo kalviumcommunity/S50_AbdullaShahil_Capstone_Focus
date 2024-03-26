@@ -1,6 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 import { useState } from "react";
+import ProfileIMG2 from '../assets/review2.jpeg';
+import Header from './Home Components/Header'
+
 import Cookies from 'js-cookie';
 import axios from 'axios';
 function Post() {
@@ -15,6 +18,7 @@ function Post() {
 
   const onSubmit = data => {
     const { title, description, imageUrl } = data;
+
     axios.post('http://localhost:4000/posts', {
       name: username,
       title,
@@ -31,8 +35,7 @@ function Post() {
       .catch(error => {
         if (error.response) {
           setErrorMessage('Submission failed. Please try again later.');
-          console.error(error.response.data);
-          console.error(error.response.status);
+          console.error(error.response);
         } else if (error.request) {
           setErrorMessage('Submission failed. Please check your internet connection.');
           console.error(error.request);
@@ -46,11 +49,11 @@ function Post() {
   return (
     <div>
 
-
+      <Header />
       <div className=''>
         <center>
           <h2 className="register-head mb-5">Create new post</h2>
-          <form className="rounded-md w-2/4" onSubmit={handleSubmit(onSubmit)}>
+          <form className="posts border border-gray-300 rounded-md flex flex-col mb-10 p-5 lg:w-[45vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]" onSubmit={handleSubmit(onSubmit)}>
 
             {isSubmitted && !Object.keys(errors).length && (
               <div className="pop p-3 bg-green-500 text-white rounded mb-5">
@@ -63,6 +66,14 @@ function Post() {
                 </p>
               </div>
             }
+            <div className=' top-opt flex justify-between items-center mb-5'>
+              <div className='flex items-center w-[15vw]'>
+                <img className='h-12 w-12 rounded-full overflow-hidden' src={ProfileIMG2} alt="" />
+                <h3 className='post-username pl-4 font-light poppins'>Abhishek</h3>
+              </div>
+
+              <h1><strong>Nature</strong></h1>
+            </div>
 
             <label htmlFor="title">Song Title</label>
             <input className="form-input border mt-5" {...register('title', {
