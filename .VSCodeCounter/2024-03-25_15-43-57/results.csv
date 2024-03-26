@@ -1,0 +1,12 @@
+"filename", "language", "JavaScript", "JSON", "comment", "blank", "total"
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Server/Models/postModel.js", "JavaScript", 9, 0, 0, 4, 13
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Server/Models/profileModel.js", "JavaScript", 9, 0, 0, 4, 13
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Server/Models/userModel.js", "JavaScript", 16, 0, 0, 4, 20
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Server/Routes/postRoute.js", "JavaScript", 47, 0, 3, 9, 59
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Server/Routes/userRoute.js", "JavaScript", 162, 0, 8, 26, 196
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Server/auth.js", "JavaScript", 40, 0, 0, 5, 45
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Server/config/connect.js", "JavaScript", 12, 0, 0, 4, 16
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Server/docs.bruno/bruno.json", "JSON", 0, 9, 0, 0, 9
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Server/package.json", "JSON", 0, 25, 0, 1, 26
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Server/server.js", "JavaScript", 50, 0, 0, 15, 65
+"Total", "-", 345, 34, 11, 72, 462

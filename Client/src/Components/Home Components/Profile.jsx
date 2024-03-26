@@ -1,13 +1,16 @@
 import ProfileIMG2 from '../../assets/review2.jpeg'
 import ProfileIMG3 from '../../assets/review3.jpeg'
+import Cookies from 'js-cookie';
 
 function Profile() {
+    const username = Cookies.get("name");
+
     return (
         <div className='pl-5 pr-5 pt-10'>
 
             <div className="gradient2 p-2 pl-3 flex items-center border w-[18vw] h-[10vh] rounded-full shadow-[0px_0px_10px_rgba(0,0,0,0.08)]">
                 <img className='h-16 w-16 rounded-full overflow-hidden' src={ProfileIMG2} alt="" />
-                <h3 className='post-username pl-4  poppins text-white'>Abhishek</h3>
+                <h3 className='post-username pl-4  poppins text-white'>{username}</h3>
 
             </div>
 

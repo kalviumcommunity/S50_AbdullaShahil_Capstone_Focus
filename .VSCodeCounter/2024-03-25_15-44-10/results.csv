@@ -1,0 +1,28 @@
+"filename", "language", "JavaScript JSX", "CSS", "JSON", "Markdown", "JavaScript", "HTML", "comment", "blank", "total"
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/.eslintrc.cjs", "JavaScript", 0, 0, 0, 0, 21, 0, 0, 1, 22
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/README.md", "Markdown", 0, 0, 0, 5, 0, 0, 0, 4, 9
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/index.html", "HTML", 0, 0, 0, 0, 0, 13, 0, 1, 14
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/package-lock.json", "JSON", 0, 0, 5397, 0, 0, 0, 0, 1, 5398
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/package.json", "JSON", 0, 0, 34, 0, 0, 0, 0, 1, 35
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/postcss.config.js", "JavaScript", 0, 0, 0, 0, 6, 0, 0, 1, 7
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/src/App.css", "CSS", 0, 251, 0, 0, 0, 0, 0, 56, 307
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/src/App.jsx", "JavaScript JSX", 21, 0, 0, 0, 0, 0, 0, 4, 25
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/src/Components/Home Components/Header.jsx", "JavaScript JSX", 34, 0, 0, 0, 0, 0, 0, 14, 48
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/src/Components/Home Components/Navigation.jsx", "JavaScript JSX", 32, 0, 0, 0, 0, 0, 0, 9, 41
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/src/Components/Home Components/Posts.jsx", "JavaScript JSX", 68, 0, 0, 0, 0, 0, 0, 27, 95
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/src/Components/Home Components/Profile.jsx", "JavaScript JSX", 48, 0, 0, 0, 0, 0, 0, 18, 66
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/src/Components/Home.jsx", "JavaScript JSX", 17, 0, 0, 0, 0, 0, 0, 4, 21
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/src/Components/Landing.jsx", "JavaScript JSX", 17, 0, 0, 0, 0, 0, 0, 4, 21
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/src/Components/LandingComponents/About.jsx", "JavaScript JSX", 20, 0, 0, 0, 0, 0, 0, 5, 25
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/src/Components/LandingComponents/Footer.jsx", "JavaScript JSX", 9, 0, 0, 0, 0, 0, 0, 4, 13
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/src/Components/LandingComponents/Header.jsx", "JavaScript JSX", 39, 0, 0, 0, 0, 0, 0, 10, 49
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/src/Components/LandingComponents/UserReviews.jsx", "JavaScript JSX", 43, 0, 0, 0, 0, 0, 0, 16, 59
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/src/Components/LandingComponents/WhyFocus.jsx", "JavaScript JSX", 40, 0, 0, 0, 0, 0, 0, 9, 49
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/src/Components/Login.jsx", "JavaScript JSX", 120, 0, 0, 0, 0, 0, 0, 29, 149
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/src/Components/Post.jsx", "JavaScript JSX", 74, 0, 0, 0, 0, 0, 0, 8, 82
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/src/Components/Signup.jsx", "JavaScript JSX", 135, 0, 0, 0, 0, 0, 0, 33, 168
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/src/index.css", "CSS", 0, 3, 0, 0, 0, 0, 0, 1, 4
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/src/main.jsx", "JavaScript JSX", 12, 0, 0, 0, 0, 0, 0, 2, 14
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/tailwind.config.js", "JavaScript", 0, 0, 0, 0, 10, 0, 1, 0, 11
+"/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/vite.config.js", "JavaScript", 0, 0, 0, 0, 5, 0, 1, 2, 8
+"Total", "-", 729, 254, 5431, 5, 42, 13, 2, 264, 6740

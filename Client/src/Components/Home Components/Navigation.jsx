@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 
 function Navigation() {
     return (
@@ -5,10 +6,10 @@ function Navigation() {
 
             <div className="flex  items-center pl-1">
                 <div className="add-btn gradient1 flex justify-center items-center bg-green-500 w-16 h-16 rounded-full">
-                    <button
+                <Link to='/post'><button
                         className="plus pb-1 text-white text-4xl cursor-pointer outline-none hover:rotate-90 duration-300"
                         title="Add New"
-                    >+</button>
+                    >+</button></Link>
                 </div>
                 <h1 className="textgray pl-4 text-lg poppins">Create a Post</h1>
             </div>

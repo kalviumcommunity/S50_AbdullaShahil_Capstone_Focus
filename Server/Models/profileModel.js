@@ -5,6 +5,12 @@ const profileSchema = new mongoose.Schema({
   name: String,
   email: String,
   picture: String,
+  posts: [
+    {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Post'
+  },
+],
 });
 
 const profileModel = mongoose.model('Profile', profileSchema);
