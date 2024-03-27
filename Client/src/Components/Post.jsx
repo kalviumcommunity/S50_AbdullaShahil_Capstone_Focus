@@ -6,6 +6,7 @@ import Header from './Home Components/Header'
 
 import Cookies from 'js-cookie';
 import axios from 'axios';
+
 function Post() {
 
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -15,6 +16,9 @@ function Post() {
   const username = Cookies.get("name");
   const navigate = useNavigate();
 
+  const navigateHome = () => {
+    navigate('/home');
+  }
 
   const onSubmit = data => {
     const { title, description, imageUrl } = data;
@@ -28,6 +32,7 @@ function Post() {
       .then(response => {
         console.log(response);
         setIsSubmitted(true);
+        setErrorMessage('');
         setTimeout(() => {
           navigate('/home');
         }, 300);
@@ -47,64 +52,58 @@ function Post() {
 
   return (
     <div>
-
       <Header />
       <div className=''>
         <center>
-          <h2 className="register-head mb-5">Create new post</h2>
-          <form className="posts border border-gray-300 rounded-md flex flex-col mb-10 p-5 lg:w-[45vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]" onSubmit={handleSubmit(onSubmit)}>
-
+          <h2 className="register-head textgray text-2xl font-semibold mt-10">Create new post</h2>
+          <form className="posts border border-gray-300 rounded-md flex flex-col mt-10 p-5 lg:w-[45vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]" onSubmit={handleSubmit(onSubmit)}>
             {isSubmitted && !Object.keys(errors).length && (
               <div className="pop p-3 bg-green-500 text-white rounded mb-5">
                 <p className="registered-heading">Posted successfully</p>
               </div>
             )}
-            {errorMessage &&
+            {errorMessage && (
               <div className="pop p-3 bg-red-500 text-white rounded mb-5">
-                <p className="registered-heading">{errorMessage}
-                </p>
+                <p className="registered-heading">{errorMessage}</p>
               </div>
-            }
+            )}
             <div className=' top-opt flex justify-between items-center mb-5'>
               <div className='flex items-center w-[15vw]'>
                 <img className='h-12 w-12 rounded-full overflow-hidden' src={ProfileIMG2} alt="" />
-                <h3 className='post-username pl-4 font-light poppins'>Abhishek</h3>
+                <h3 className='post-username pl-4 font-normal poppins'>{username}</h3>
               </div>
-
-              <h1><strong>Nature</strong></h1>
+              <h1></h1>
             </div>
-
-            <label htmlFor="title">Song Title</label>
-            <input className="form-input border mt-5" {...register('title', {
+            <label className='text-left textgray mb-1 ' htmlFor="title">Title</label>
+            <input className="form-input bg-gray-100 p-3 rounded border" {...register('title', {
               required: 'This Field is required',
               minLength: { value: 5, message: 'Minimum 5 characters are required' },
               maxLength: { value: 20, message: 'Maximum length is 20 characters' }
-            })} placeholder="Enter the Song Title" id="title" />
+            })} placeholder="Enter the Title" id="title" />
             <br />
-            {errors.title && <span className="error-span">{errors.title.message}</span>}
-
-            <br />
-            <label htmlFor="description">Description</label>
-            <input className="form-input border mt-5" {...register('description', {
+            {errors.title && <span className=" text-left text-red-500">{errors.title.message}</span>}
+            <label className='text-left textgray mb-1 ' htmlFor="description">Description</label>
+            <textarea className="form-input bg-gray-100 p-3 rounded border" {...register('description', {
               required: 'This Field is required',
               minLength: { value: 3, message: 'Minimum 3 characters are required' },
-            })} placeholder="Enter the description " id="description" />
+            })} placeholder="Enter the description " id="description" maxLength={250} style={{ maxHeight: "200px" }} />
             <br />
-            {errors.description && <span className="error-span">{errors.description.message}</span>}
-
-            <label className='mt-minus' htmlFor="imageUrl">Image/Video URL</label>
+            {errors.description && <span className="text-left text-red-500">{errors.description.message}</span>}
+            <label className='text-left textgray mb-1 ' htmlFor="imageUrl">Image URL</label>
             <input
-              className="form-input border mt-5 mb-2"
+              className="form-input bg-gray-100 p-3 rounded border "
               {...register('imageUrl', {
                 required: 'This Field is required',
                 minLength: { value: 5, message: 'Minimum 5 characters are required' },
               })}
-              placeholder="Enter the Image/Video Link"
+              placeholder="Enter the Image Link"
               id="imageUrl"
             />
-
             <br />
-            <button className="submit-btn rounded bg-blue-400 p-2">Post</button>
+            <div className='flex items-center  w-full h-12'>
+              <button onClick={navigateHome} className="submit-btn font-bold textgray border rounded p-2 h-full w-1/2 mr-1">Cancel</button>
+              <button type="submit" className="submit-btn rounded text-white font-bold p-2 gradient1 h-full w-1/2">Post</button>
+            </div>
           </form>
         </center>
       </div>
@@ -112,4 +111,4 @@ function Post() {
   )
 }
 
-export default Post
+export default Post;

@@ -7,7 +7,7 @@ function Home() {
   return (
     <div>
       <Header />
-      <div className="flex">
+      <div className="flex justify-around">
         <Navigation />
         <Posts />
         <Profile />

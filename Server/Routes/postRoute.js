@@ -46,6 +46,7 @@ router.get("/posts/:id", async (req, res) => {
 });
 
 
+// POSTING - along with populating in profile
 router.post("/posts", validatePost, async (req, res) => {
   try {
     const { error } = postJoiSchema.validate(req.body);
