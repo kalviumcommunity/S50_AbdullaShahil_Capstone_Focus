@@ -4,6 +4,9 @@ const postModel = require("../Models/postModel");
 const profileModel = require("../Models/profileModel");
 const Joi = require("joi");
 
+const multer  = require('multer')
+const upload = multer({ dest: 'uploads/' })
+
 router.use(express.json());
 
 const postJoiSchema = Joi.object({

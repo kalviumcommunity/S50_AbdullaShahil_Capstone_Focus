@@ -298,6 +298,82 @@ ul.breadcrumb li span {
 }
 
 
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  backdrop-filter: blur(5px); /* Add blur effect to the background */
+  z-index: 999; /* Ensure the overlay stays on top */
+  pointer-events: auto; /* Allow pointer events on the overlay */
+}
+
+.logout-popup {
+  background-color: white;
+  height: 20%;
+  width: 30%;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+}
+
+.delete-popup{
+  padding: 6rem;
+}
+
+.logout-popup h2{
+  font-size: 20px;
+}
+
+.toggle-switch {
+  rotate: 180deg;
+  display: inline-block;
+  width: 40px;
+  height: 24px;
+}
+
+.toggle-switch .toggle-input {
+  display: none;
+}
+
+.toggle-switch .toggle-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 24px;
+  background-color: #4CAF50;
+  border-radius: 34px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.toggle-switch .toggle-label::before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  background-color: #fff;
+  box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s;
+}
+
+.toggle-switch .toggle-input:checked + .toggle-label {
+  background-color: #f31a1a;
+
+}
+
+.toggle-switch .toggle-input:checked + .toggle-label::before {
+  transform: translateX(16px);
+}
+
 
 @media (max-width: 1022px) {
   .hamburg-div {
