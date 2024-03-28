@@ -102,7 +102,7 @@ function Post() {
             <br />
             <div className='flex items-center  w-full h-12'>
               <button onClick={navigateHome} className="submit-btn font-bold textgray border rounded p-2 h-full w-1/2 mr-1">Cancel</button>
-              <button type="submit" className="submit-btn rounded text-white font-bold p-2 gradient1 h-full w-1/2">Post</button>
+              <button onClick={onSubmit}  className="submit-btn rounded text-white font-bold p-2 gradient1 h-full w-1/2">Post</button>
             </div>
           </form>
         </center>

@@ -51,6 +51,12 @@ app.get("/home", isLoggedIn, (req, res) => {
   res.send("Welcome to the home page!");
 });
 
+// app.get("/logout", (req, res) => {
+//   req.logout()
+//   req.session.destroy()
+//   res.send('byeee')
+// });
+
 
 app.use(express.json())
 app.use("/", userRouter);

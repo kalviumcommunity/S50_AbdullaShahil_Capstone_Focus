@@ -23,15 +23,15 @@ function Posts() {
 
   useEffect(() => {
       axios.get('http://localhost:4000/posts')
-        .then(response => {
-          console.log(response.data)
-          setPosts(response.data);
-          setIsLoading(false);
-        })
-        .catch(err => {
-          console.log(err);
-          setIsLoading(false);
-        });
+      .then(response => {
+        console.log(response.data)
+        setPosts(response.data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.log(err);
+        setIsLoading(false);
+      });
   }, []);
 
   return (
