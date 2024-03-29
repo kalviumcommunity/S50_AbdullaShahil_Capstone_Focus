@@ -36,8 +36,8 @@ function Posts() {
   return (
     <center className="h-[85vh]  pl-5 pr-5 pt-10 overflow-hidden">
       <input className='w-[30vw] search border border-gray-400 rounded-full px-8 py-4 mb-4' id="genreSelect" placeholder='Search...' />
-      <div className="pt-12 px-5 overflow-scroll h-[75vh]">
-
+      
+      <div className="  pt-12  grid justify-center grid-cols-1 lg:grid-cols-2 overflow-scroll h-[75vh]">
       {isLoading ? (
   Array.from({ length: 10 }).map((_, index) => (
     <div className='posts border border-gray-300 rounded-md flex flex-col mb-10 p-5 lg:w-[35vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]' key={index}>
