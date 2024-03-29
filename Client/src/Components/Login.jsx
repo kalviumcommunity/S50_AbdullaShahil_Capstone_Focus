@@ -138,7 +138,7 @@ function Login() {
                         {errors.password && <span className="error-span text-red-500 text-sm">{errors.password.message}</span>}
 
                         <br />
-                        <button className='login px-8 py-4 mt-4 font-bold text-lg  rounded text-white bg-E49600 hover:bg-gray-600 hover:'>Log in</button>
+                        <button type="submit" className='login px-8 py-4 mt-4 font-bold text-lg  rounded text-white bg-E49600 hover:bg-gray-600 hover:'>Log in</button>
 
                     </form>
                 </center>

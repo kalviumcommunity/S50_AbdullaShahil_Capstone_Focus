@@ -20,17 +20,17 @@ async function (request, accessToken, refreshToken, profile, done) {
         if (!existingProfile) {
             console.log(profile);
             const newProfile = new Profile({
-              id: profile.id,
-              name: profile.displayName,
-              picture: profile.picture,
-              email: profile.email,
+                id: profile.id,
+                name: profile.displayName,
+                picture: profile.picture,
+                email: profile.email,
             });
             
             const newUser = new User({
-              id: profile.id,
-              name: profile.displayName,
-              email: profile.email,
-              profile: newProfile._id
+                id: profile.id,
+                name: profile.displayName,
+                email: profile.email,
+                profile: newProfile._id
             });
             
             await newProfile.save();
@@ -38,13 +38,13 @@ async function (request, accessToken, refreshToken, profile, done) {
             
             request.res.cookie('userData', JSON.stringify(newProfile), { httpOnly: false });
             request.res.cookie('name', JSON.stringify(profile.given_name), { httpOnly: false });
-            console.log(newProfile)
+            console.log(newProfile);
             return done(null, newProfile);
-          } else {
-          console.log(profile);
+        } else {
+            console.log(profile);
             request.res.cookie('userData', JSON.stringify(existingProfile), { httpOnly: false });
             request.res.cookie('name', JSON.stringify(profile.given_name), { httpOnly: false });
-            console.log(existingProfile)
+            console.log(existingProfile);
             return done(null, existingProfile);
         }
     } catch (err) {
