@@ -39,7 +39,7 @@ app.get('/auth/google',
 app.get('/auth/google/callback',
   passport.authenticate('google', {
     successRedirect: 'http://localhost:5173/home',
-    failureRedirect: '/auth/failure'
+    failureRedirect: 'http://localhost:5173/signup'
   })
 );
 
@@ -51,11 +51,25 @@ app.get("/home", isLoggedIn, (req, res) => {
   res.send("Welcome to the home page!");
 });
 
-// app.get("/logout", (req, res) => {
-//   req.logout()
-//   req.session.destroy()
-//   res.send('byeee')
-// });
+app.get("/logout", (req, res) => {
+  req.logout(function(err) {
+    if (err) {
+      console.error('Error during logout:', err);
+      res.status(500).send('Error during logout');
+    } else {
+      req.session.destroy(function(err) {
+        if (err) {
+          console.error('Error destroying session:', err);
+          res.status(500).send('Error destroying session');
+        } else {
+          console.log('User logged out successfully');
+          res.send('User logged out successfully');
+        }
+      });
+    }
+  });
+});
+
 
 
 app.use(express.json())

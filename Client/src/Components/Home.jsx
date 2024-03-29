@@ -1,7 +1,7 @@
 import Header from "./Home Components/Header";
 import Navigation from "./Home Components/Navigation";
 import Posts from "./Home Components/Posts";
-import Profile from "./Home Components/Profile";
+import UserPanel from "./Home Components/UserPanel";
 
 function Home() {
   return (
@@ -10,7 +10,7 @@ function Home() {
       <div className="flex justify-around">
         <Navigation />
         <Posts />
-        <Profile />
+        <UserPanel />
       </div>
 
     </div>

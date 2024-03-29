@@ -1,34 +1,52 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useState } from 'react';
 import ProfileIMG2 from '../../assets/review2.jpeg'
 import ProfileIMG3 from '../../assets/review3.jpeg'
 import Cookies from 'js-cookie';
 
-function Profile() {
-    const username = Cookies.get("name");
+function UserPanel() {
+    const username = Cookies.get("name").replace(/\"/g, '');
     const [isLogoutPopupOpen, setIsLogoutPopupOpen] = useState(false);
     const navigate = useNavigate();
 
     const handleLogout = () => {
+        axios.get('http://localhost:4000/logout', {
+            withCredentials: true
+        })
+            .then(response => {
+                if (response.status === 200) {
+                    console.log('Logged out successfully');
+                } else {
+                    console.error('Logout failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error during logout:', error);
+            });
+
+        Cookies.remove('userData');
         Cookies.remove('email');
         Cookies.remove('name');
-        Cookies.remove('token');  
+        Cookies.remove('token');
         navigate('/');
         setIsLogoutPopupOpen(false);
     }
-    
+
     const handleNoClick = () => {
         setIsLogoutPopupOpen(false);
     };
+
 
     return (
         <div className='pl-5 pr-5 pt-10'>
 
             <div className="gradient2 p-2 pl-3 flex items-center justify-between border w-[18vw] h-[10vh] rounded-full shadow-[0px_0px_10px_rgba(0,0,0,0.08)] overflow-hidden">
                 <div className='flex items-center'>
-                <img className='h-16 w-16 rounded-full overflow-hidden' src={ProfileIMG2} alt="" />
-                <h3 className='post-username pl-4  poppins text-white'>{username}</h3>
+                    <img className='h-16 w-16 rounded-full overflow-hidden' src={ProfileIMG2} alt="" />
+                    <Link to='/profile'>
+                    <h3 className='post-username pl-4  poppins text-white'>{username}</h3>
+                    </Link>
                 </div>
 
                 <div className="toggle-switch mr-5">
@@ -103,4 +121,4 @@ function Profile() {
     )
 }
 
-export default Profile
+export default UserPanel

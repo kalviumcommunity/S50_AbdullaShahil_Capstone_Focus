@@ -4,6 +4,7 @@ import Signup from './Components/Signup';
 import Login from './Components/Login'
 import Home from './Components/Home';
 import Post from './Components/Post';
+import UserProfile from './Components/UserProfile';
 import './App.css'
 
 
@@ -16,6 +17,7 @@ function App() {
       <Route path='/login' element={<Login/>}/>
       <Route path='/home' element={<Home/>}/>
       <Route path='/post' element={<Post/>}/>
+      <Route path='/profile' element={<UserProfile/>}/>
     </Routes>
     </div>
   )

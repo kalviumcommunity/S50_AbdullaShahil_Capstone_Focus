@@ -13,10 +13,11 @@ function Login() {
     const navigate = useNavigate();
     const [signupStatus, setSignupStatus] = useState(null);
 
-    const toLogin = () => {
+    const toLogin = (event) => {
+        event.preventDefault(); 
         window.location.href = 'http://localhost:4000/auth/google';
     }
-
+    
     useEffect(() => {
         const fetchData = async () => {
           const token = Cookies.get("token");
@@ -82,7 +83,7 @@ function Login() {
                         )}
 
                         <center>
-                            <button className="gsi-material-button mb-5" onClick={toLogin}>
+                            <button className="gsi-material-button mb-5"  onClick={(event) => toLogin(event)}>
                                 <div className="gsi-material-button-state"></div>
                                 <div className="gsi-material-button-content-wrapper">
                                     <div className="gsi-material-button-icon">
@@ -106,7 +107,7 @@ function Login() {
                         <br />
 
                         <input
-                            className="form-input mb-5 py-2 px-2 border-b w-full focus:outline-none"
+                            className="form-input mb-2 py-2 px-2 border-b w-full focus:outline-none"
                             {...register('email', {
                                 required: 'This Field is required',
                                 pattern: { value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: 'Invalid email' },
@@ -119,12 +120,12 @@ function Login() {
                         />
 
                         <br />
-                        {errors.email && <span className="error-span">{errors.email.message}</span>}
+                        {errors.email && <span className="error-span text-red-500 text-sm">{errors.email.message}</span>}
 
-                        <label className="text-gray-600" htmlFor="password">Password</label>
                         <br />
+                        <label className="text-gray-600" htmlFor="password">Password</label>
 
-                        <input className="form-input mb-5 py-2 px-2 border-b w-full" {...register('password', {
+                        <input className="form-input mb-2 py-2 px-2 border-b w-full" {...register('password', {
                             required: 'This Field is required',
                             minLength: { value: 10, message: 'Minimum 10 characters are required' },
                             maxLength: { value: 25, message: 'Maximum length is 25 characters' },
@@ -134,10 +135,10 @@ function Login() {
                             }
                         })} type="password" autoComplete="current-password" />
                         <br />
-                        {errors.password && <span className="error-span">{errors.password.message}</span>}
+                        {errors.password && <span className="error-span text-red-500 text-sm">{errors.password.message}</span>}
 
                         <br />
-                        <button className='login px-8 py-4 mt-2 font-bold text-lg rounded text-white bg-E49600'>Log in</button>
+                        <button type="submit" className='login px-8 py-4 mt-4 font-bold text-lg  rounded text-white bg-E49600 hover:bg-gray-600 hover:'>Log in</button>
 
                     </form>
                 </center>

@@ -129,7 +129,6 @@ router.post("/users/login", async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await userModel.findOne({ email }).populate("profile").exec();
-        console.log("while login", user);
         if (!user) {
             return res.status(401).json({ error: "Invalid email" });
         }
