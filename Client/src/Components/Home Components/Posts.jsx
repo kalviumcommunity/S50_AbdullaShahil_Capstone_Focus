@@ -22,7 +22,7 @@ function Posts() {
   };
 
   useEffect(() => {
-      axios.get('http://localhost:4000/posts')
+    axios.get('http://localhost:4000/posts')
       .then(response => {
         setPosts(response.data);
         setIsLoading(false);
@@ -32,34 +32,35 @@ function Posts() {
         setIsLoading(false);
       });
   }, []);
+  
 
   return (
     <center className="h-[85vh]  pl-5 pr-5 pt-10 overflow-hidden">
       <input className='w-[30vw] search border border-gray-400 rounded-full px-8 py-4 mb-4' id="genreSelect" placeholder='Search...' />
       <div className="pt-12 px-5 overflow-scroll h-[75vh]">
 
-      {isLoading ? (
-  Array.from({ length: 10 }).map((_, index) => (
-    <div className='posts border border-gray-300 rounded-md flex flex-col mb-10 p-5 lg:w-[35vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]' key={index}>
-      <div className='flex justify-between items-center '>
-        <div className="flex justify-between items-center">
-          <ShimmerCircularImage size={50} />
-          <div style={{ width: '10px' }}></div>
-          <ShimmerBadge width={130} />
-        </div>
+        {isLoading ? (
+          Array.from({ length: 10 }).map((_, index) => (
+            <div className='posts border border-gray-300 rounded-md flex flex-col mb-10 p-5 lg:w-[35vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]' key={index}>
+              <div className='flex justify-between items-center '>
+                <div className="flex justify-between items-center">
+                  <ShimmerCircularImage size={50} />
+                  <div style={{ width: '10px' }}></div>
+                  <ShimmerBadge width={130} />
+                </div>
 
-        <ShimmerBadge width={70} />
-      </div>
-      <ShimmerThumbnail height={550} rounded />
-      <div className="rounded  p-2 flex items-center  justify-between  mt-1">
-        <ShimmerBadge width={200} />
-        <ShimmerButton size="md" />
-      </div>
+                <ShimmerBadge width={70} />
+              </div>
+              <ShimmerThumbnail height={550} rounded />
+              <div className="rounded  p-2 flex items-center  justify-between  mt-1">
+                <ShimmerBadge width={200} />
+                <ShimmerButton size="md" />
+              </div>
 
-      <ShimmerText />
-    </div>
-  ))
-) : (
+              <ShimmerText />
+            </div>
+          ))
+        ) : (
           posts.map((post, index) => {
             return (
               <div className="posts border border-gray-300 rounded-md flex flex-col mb-10 p-5 lg:w-[35vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]" key={index} >
@@ -71,7 +72,7 @@ function Posts() {
                   <h1>Nature</h1>
                 </div>
                 <div className="image-wrapper image-wrapper-4x3 rounded-md">
-                  <img src={post.imageUrl} alt="Image 4x3" className='rounded-md' />
+                  <img src={`data:image/png;base64, ${post.image}`} alt="Image 4x3" className='rounded-md' />
                 </div>
                 <div className="post-options  rounded  p-3 flex items-center  justify-between  mt-1">
                   <h1 className=' font-semibold text-xl textgray poppins'>{post.title}</h1>
