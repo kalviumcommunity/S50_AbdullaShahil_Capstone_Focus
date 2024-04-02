@@ -9,7 +9,7 @@ require('./auth')
 
 const port = 4000;
 const app = express();
-
+app.use(express.static('public'));
 app.use(session({
   secret: 'cats',
   resave: false,

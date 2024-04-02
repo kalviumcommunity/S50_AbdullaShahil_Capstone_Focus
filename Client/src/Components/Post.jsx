@@ -13,7 +13,7 @@ function Post() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const username = Cookies.get("name");
+  const name = Cookies.get("name");
   const navigate = useNavigate();
 
   const navigateHome = () => {
@@ -21,13 +21,21 @@ function Post() {
   }
 
   const onSubmit = data => {
-    const { title, description, imageUrl } = data;
+    const { title, description, image } = data;
+    console.log('image', image[0]);
 
-    axios.post('http://localhost:4000/posts', {
-      name: username,
-      title,
-      description,
-      imageUrl
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('image', image[0]);
+
+    console.log(formData);
+
+    axios.post('http://localhost:4000/posts', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
     })
       .then(response => {
         console.log(response);
@@ -70,7 +78,7 @@ function Post() {
             <div className=' top-opt flex justify-between items-center mb-5'>
               <div className='flex items-center w-[15vw]'>
                 <img className='h-12 w-12 rounded-full overflow-hidden' src={ProfileIMG2} alt="" />
-                <h3 className='post-username pl-4 font-normal poppins'>{username}</h3>
+                <h3 className='post-username pl-4 font-normal poppins'>{name}</h3>
               </div>
               <h1></h1>
             </div>
@@ -89,20 +97,21 @@ function Post() {
             })} placeholder="Enter the description " id="description" maxLength={250} style={{ maxHeight: "200px" }} />
             <br />
             {errors.description && <span className="text-left text-red-500">{errors.description.message}</span>}
-            <label className='text-left textgray mb-1 ' htmlFor="imageUrl">Image URL</label>
+            <label className="text-sm text-left textgray mb-1">Upload Image</label>
             <input
-              className="form-input bg-gray-100 p-3 rounded border "
-              {...register('imageUrl', {
+              type="file"
+              className="flex h-10 w-full rounded-md border border-input bg-white px-3 py-2 text-sm text-gray-400 file:border-0 file:bg-transparent file:text-gray-600 file:text-sm file:font-medium"
+              {...register('image', {
                 required: 'This Field is required',
-                minLength: { value: 5, message: 'Minimum 5 characters are required' },
               })}
-              placeholder="Enter the Image Link"
-              id="imageUrl"
+              id="image"
             />
+
             <br />
+            {errors.image && <span className="text-left text-red-500">{errors.image.message}</span>}
             <div className='flex items-center  w-full h-12'>
               <button onClick={navigateHome} className="submit-btn font-bold textgray border rounded p-2 h-full w-1/2 mr-1">Cancel</button>
-              <button onClick={onSubmit}  className="submit-btn rounded text-white font-bold p-2 gradient1 h-full w-1/2">Post</button>
+              <button onClick={onSubmit} className="submit-btn rounded text-white font-bold p-2 gradient1 h-full w-1/2">Post</button>
             </div>
           </form>
         </center>

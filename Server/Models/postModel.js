@@ -4,10 +4,9 @@ const postSchema = new mongoose.Schema({
   name: String,
   title: String,
   description: String,
-  imageUrl: String,
+  image: Buffer,
   comments: [String],
-  createdBy:
-    {
+  createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   },
