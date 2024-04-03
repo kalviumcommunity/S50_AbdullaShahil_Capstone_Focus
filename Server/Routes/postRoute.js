@@ -4,7 +4,6 @@ const postModel = require("../Models/postModel");
 const profileModel = require("../Models/profileModel");
 const Joi = require("joi");
 const multer = require('multer');
-const fs = require("fs");
 
 router.use(express.json());
 
@@ -75,9 +74,6 @@ const upload = multer({ storage: storage });
 // POSTING - along with populating in profile
 router.post("/posts", upload.single("image"), validatePost, async (req, res) => {
   try {
-    const bf = Buffer.from(req.file.buffer, "utf-8");
-    fs.writeFileSync("./b.png", bf)
-
     const newPostData = {
       name: req.body.name,
       title: req.body.title,

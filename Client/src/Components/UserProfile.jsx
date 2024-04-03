@@ -17,6 +17,8 @@ function UserProfile() {
         <div>
             <Header />
 
+            
+
             <div className='flex items-center justify-center mt-10'>
                 <center className=" flex items-center   ">
 
@@ -53,7 +55,8 @@ function UserProfile() {
 
             <hr className="mt-10 bg-black " />
 
-            <div className="flex justify-center mt-12">
+          <div className="bg-gray-100 pt-6">
+          <div className="flex justify-center mt-9">
                 <button className={`bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-l ${activeButton === 'One' ? 'gradient2' : ''
                     }`}
                     onClick={() => handleClick('One')}>Posts</button>
@@ -63,6 +66,15 @@ function UserProfile() {
             </div>
 
             {activeButton === 'One' && <Posts />}
+{activeButton === 'Two' && (
+    <>
+        <center className='h-[25vh] mt-2 border flex justify-center items-center'>
+            <h1 className=' text-xl'>In progress...</h1>
+        </center>
+    </>
+)}
+
+          </div>
         </div >
     )
 }
