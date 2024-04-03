@@ -22,7 +22,7 @@ function Posts() {
   };
 
   useEffect(() => {
-      axios.get('http://localhost:4000/posts')
+    axios.get('http://localhost:4000/posts')
       .then(response => {
         setPosts(response.data);
         setIsLoading(false);
@@ -34,13 +34,12 @@ function Posts() {
   }, []);
 
   return (
-    <center className="h-[85vh]  pl-5 pr-5 pt-10 overflow-hidden">
-      <input className='w-[30vw] search border border-gray-400 rounded-full px-8 py-4 mb-4' id="genreSelect" placeholder='Search...' />
-      
-      <div className="  pt-12  grid justify-center grid-cols-1 lg:grid-cols-2 overflow-scroll h-[75vh]">
+    <center className=" pt-12  overflow-hidden ">      
+      <div className="  pt-12   grid  grid-cols-1 lg:grid-cols-2 overflow-scroll h-[70vh]">
       {isLoading ? (
   Array.from({ length: 10 }).map((_, index) => (
-    <div className='posts border border-gray-300 rounded-md flex flex-col mb-10 p-5 lg:w-[35vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]' key={index}>
+   <center key={index}>
+     <div className='posts border border-gray-300 rounded-md flex flex-col mb-10 p-5 w-[85vw] lg:w-[35vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]'>
       <div className='flex justify-between items-center '>
         <div className="flex justify-between items-center">
           <ShimmerCircularImage size={50} />
@@ -58,20 +57,22 @@ function Posts() {
 
       <ShimmerText />
     </div>
+   </center>
   ))
 ) : (
           posts.map((post, index) => {
             return (
-              <div className="posts border border-gray-300 rounded-md flex flex-col mb-10 p-5 lg:w-[35vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]" key={index} >
+              <center key={index} className=''>
+                <div className="posts bg-white border border-gray-300 rounded-md flex flex-col mb-10 p-5 w-[85vw] md:w-[55vw] lg:w-[35vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]"  >
                 <div className='top-opt flex justify-between items-center mb-5'>
-                  <div className='flex items-center w-[15vw]'>
-                    <img className='h-12 w-12 rounded-full overflow-hidden' src={ProfileIMG2} alt="" />
+                  <div className='flex items-center w-[25vw] sm:w-[20vw] md:w-[15vw]'>
+                    <img className='h- w- md:h-12 md:w-12 rounded-full overflow-hidden' src={ProfileIMG2} alt="" />
                     <h3 className='post-username pl-4 font-light poppins'>{post.name}</h3>
                   </div>
                   <h1>Nature</h1>
                 </div>
                 <div className="image-wrapper image-wrapper-4x3 rounded-md">
-                  <img src={post.imageUrl} alt="Image 4x3" className='rounded-md' />
+                  <img src={`data:image/png;base64, ${post.image}`} alt="Image 4x3" className='rounded-md' />
                 </div>
                 <div className="post-options  rounded  p-3 flex items-center  justify-between  mt-1">
                   <h1 className=' font-semibold text-xl textgray poppins'>{post.title}</h1>
@@ -84,6 +85,7 @@ function Posts() {
                   <p className='text-left font-light text-gray-700 poppins text-sm'>{post.description}</p>
                 </div>
               </div>
+              </center>
             )
           })
         )}
