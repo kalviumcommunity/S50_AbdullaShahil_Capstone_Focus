@@ -59,7 +59,7 @@ function validatePatchUser(req, res, next) {
 const verifyToken = (req, res, next) => {
     const token = req.body.token || req.query.token || req.headers["x-access-token"];
     if (!token) {
-        return res.status(200).json({ error: "Token is not provided" });
+        return res.status(401).json({ error: "Unauthorized: Token is not provided" });
     }
     
     try {
@@ -67,18 +67,16 @@ const verifyToken = (req, res, next) => {
         req.decoded = decoded;
         next();
     } catch (error) {
-        return res.status(401).json({ error: "Failed to authenticate token" });
+        return res.status(403).json({ error: "Forbidden: Failed to authenticate token" });
     }
 };
 
 
 // GET each user by token
 router.post("/getUser", verifyToken, async (req, res) => {
-
     try {
-        const id = req.body.token; 
-        const udata= jwt.verify(id,process.env.SECRET_KEY)
-        const user = await userModel.findById( udata.user._id );
+        const userId = req.decoded.user._id;
+        const user = await userModel.findById(userId);
         console.log(user)
         if (!user) {
             return res.status(404).json({ error: "User not found" });
@@ -90,7 +88,6 @@ router.post("/getUser", verifyToken, async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 });
-
 
 
 // GET all users
