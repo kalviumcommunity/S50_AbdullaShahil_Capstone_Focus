@@ -11,7 +11,7 @@ require('dotenv').config()
 router.use(express.json());
 
 const generateToken = (user) => {
-    return jwt.sign({ name: user.username }, process.env.SECRET_KEY, { expiresIn: "2h" })
+    return jwt.sign({ user:user }, process.env.SECRET_KEY, { expiresIn: "2h" })
 }
 
 const userJoiSchema = Joi.object({
@@ -56,6 +56,43 @@ function validatePatchUser(req, res, next) {
     next();
 }
 
+const verifyToken = (req, res, next) => {
+    const token = req.body.token || req.query.token || req.headers["x-access-token"];
+    if (!token) {
+        return res.status(200).json({ error: "Token is not provided" });
+    }
+    
+    try {
+        const decoded = jwt.verify(token, process.env.SECRET_KEY);
+        req.decoded = decoded;
+        next();
+    } catch (error) {
+        return res.status(401).json({ error: "Failed to authenticate token" });
+    }
+};
+
+
+// GET each user by token
+router.post("/getUser", verifyToken, async (req, res) => {
+
+    try {
+        const id = req.body.token; 
+        const udata= jwt.verify(id,process.env.SECRET_KEY)
+        const user = await userModel.findById( udata.user._id );
+        console.log(user)
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.status(200).json({ valid: true, user });
+    } catch (error) {
+        console.error("Error fetching user:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+
+
 // GET all users
 router.get("/users", async (req, res) => {
     try {
@@ -81,6 +118,7 @@ router.get("/users/:id", async (req, res) => {
     }
 });
 
+
 // POST a new user
 router.post("/users", validateUser, async (req, res) => {
     try {
@@ -103,21 +141,6 @@ router.post("/users", validateUser, async (req, res) => {
 });
 
 
-const verifyToken = (req, res, next) => {
-    const token = req.body.token || req.query.token || req.headers["x-access-token"];
-    if (!token) {
-        return res.status(200).json({ error: "Token is not provided" });
-    }
-
-    try {
-        const decoded = jwt.verify(token, process.env.SECRET_KEY);
-        req.decoded = decoded;
-        next();
-    } catch (error) {
-        return res.status(401).json({ error: "Failed to authenticate token" });
-    }
-};
-
 // VALIDATE TOKEN
 router.post("/users/tokenvalidate", verifyToken, (req, res) => {
     res.status(200).json({ valid: true, user: req.decoded });
@@ -137,8 +160,9 @@ router.post("/users/login", async (req, res) => {
         if (!isPasswordValid) {
             return res.status(401).json({ error: "Invalid password" });
         }
-
         const token = generateToken(user);
+        const decoded = jwt.verify(token, process.env.SECRET_KEY);
+
         res.status(201).json({ email: user.email, name: user.name, token });
     } catch (error) {
         console.error(error);
