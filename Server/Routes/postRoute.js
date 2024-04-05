@@ -35,8 +35,7 @@ router.get("/posts", async (req, res) => {
     }
     
     const responseData = data.map( doc => ({
-      // name: doc.name,
-      name: doc.name.name, // Populate the name from the associated profile
+      name: doc.name.name,
       title: doc.title,
       description: doc.description,
       image: doc.image.toString('base64')
@@ -85,13 +84,12 @@ router.post("/posts", upload.single("image"), validatePost, async (req, res) => 
       return res.status(400).json({ error: "Name not provided" });
     }
 
-// Find the profile based on the provided name
-const profile = await profileModel.findOne({ name });
+    const profile = await profileModel.findOne({ name });
+
     if (!profile) {
       return res.status(404).json({ error: "Profile not found" });
     }
 
-    // Create new post data
     const newPostData = {
       name: profile._id,
       title,
@@ -99,15 +97,12 @@ const profile = await profileModel.findOne({ name });
       image: req.file.buffer
     };
 
-    // Create new post
     const newPost = new postModel(newPostData);
     const savedPost = await newPost.save();
 
-    // Update profile's posts array with the new post
     profile.posts.push(savedPost._id);
     await profile.save();
 
-    // Populate posts in the profile data and send the response
     const populatedProfile = await profileModel.findById(profile._id).populate("posts").exec();
     res.status(201).json(populatedProfile);
   } catch (error) {
@@ -115,6 +110,7 @@ const profile = await profileModel.findOne({ name });
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
 
 
 

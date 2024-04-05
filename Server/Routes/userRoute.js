@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const mongoose = require('mongoose');
 const userModel = require("../Models/userModel");
 const Joi = require("joi");
 const bcrypt = require("bcryptjs");
@@ -172,34 +173,47 @@ router.post("/users/login", async (req, res) => {
 
 // PUT to update a user
 router.put("/users/:id", validatePutUser, async (req, res) => {
-    try {
-        const userId = req.params.id;
-        const updatedUserData = req.body;
+    const userId = req.params.id;
+    const updatedUserData = req.body;
 
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
         // Update user
-        const updatedUser = await userModel.findByIdAndUpdate(userId, updatedUserData, { new: true });
+        const updatedUser = await userModel.findByIdAndUpdate(userId, updatedUserData, { new: true }).session(session);
         if (!updatedUser) {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(404).json({ error: "User not found" });
         }
 
         // Update profile
         if (updatedUser.profile) {
-            const updateProfile = await profileModel.findByIdAndUpdate(updatedUser.profile._id, updatedUserData);
+            const updateProfile = await profileModel.findByIdAndUpdate(updatedUser.profile._id, updatedUserData, { new: true }).session(session);
             if (!updateProfile) {
+                await session.abortTransaction();
+                session.endSession();
                 return res.status(404).json({ error: "Profile not found" });
             }
         } else {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(404).json({ error: "Profile not found" });
         }
 
-        
+        await session.commitTransaction();
+        session.endSession();
 
         res.json(updatedUser);
     } catch (error) {
         console.error("Error updating user:", error);
+        await session.abortTransaction();
+        session.endSession();
         res.status(500).json({ error: "Internal server error" });
     }
 });
+
 
 
 
