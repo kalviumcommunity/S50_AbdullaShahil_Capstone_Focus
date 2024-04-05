@@ -215,9 +215,6 @@ router.put("/users/:id", validatePutUser, async (req, res) => {
 });
 
 
-
-
-
 // PATCH to partially update a user
 router.patch("/users/:id", validatePatchUser, async (req, res) => {
     try {
