@@ -25,14 +25,17 @@ function validatePost(req, res, next) {
 // GET all posts
 router.get("/posts", async (req, res) => {
   try {
-    const data = await postModel.find();
+    const data = await postModel.find()
+    .populate({
+      path: 'name',
+    });
 
     if (!data || data.length === 0) {
       return res.status(404).json({ error: "No posts found" });
     }
     
-    const responseData = data.map(doc => ({
-      name: doc.name,
+    const responseData = data.map( doc => ({
+      name: doc.name.name,
       title: doc.title,
       description: doc.description,
       image: doc.image.toString('base64')
@@ -44,6 +47,7 @@ router.get("/posts", async (req, res) => {
     res.status(500).json({ message: "500-Internal server error" });
   }
 });
+
 
 // GET specific post by ID
 router.get("/posts/:id", async (req, res) => {
@@ -74,33 +78,40 @@ const upload = multer({ storage: storage });
 // POSTING - along with populating in profile
 router.post("/posts", upload.single("image"), validatePost, async (req, res) => {
   try {
+    const { title, description, name } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ error: "Name not provided" });
+    }
+
+    const profile = await profileModel.findOne({ name });
+
+    if (!profile) {
+      return res.status(404).json({ error: "Profile not found" });
+    }
+
     const newPostData = {
-      name: req.body.name,
-      title: req.body.title,
-      description: req.body.description,
+      name: profile._id,
+      title,
+      description,
       image: req.file.buffer
     };
 
     const newPost = new postModel(newPostData);
-    const result = await newPost.save();
+    const savedPost = await newPost.save();
 
-    const name = req.body.name;
-    if (name) {
-      await profileModel.findOneAndUpdate(
-        { name },
-        { $push: { posts: result._id } },
-        { new: true }
-      );
-      const data = await profileModel.findOne({ name }).populate("posts").exec();
-      res.status(201).json(data);
-    } else {
-      res.status(400).json({ error: "Name not provided" });
-    }
+    profile.posts.push(savedPost._id);
+    await profile.save();
+
+    const populatedProfile = await profileModel.findById(profile._id).populate("posts").exec();
+    res.status(201).json(populatedProfile);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+
 
 
 module.exports = router;

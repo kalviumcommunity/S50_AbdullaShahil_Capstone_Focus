@@ -29,6 +29,7 @@ function UserPanel() {
         Cookies.remove('email');
         Cookies.remove('name');
         Cookies.remove('token');
+        Cookies.remove('data');
         navigate('/');
         setIsLogoutPopupOpen(false);
     }
@@ -59,11 +60,11 @@ function UserPanel() {
             {isLogoutPopupOpen && (
                 <div>
                     <div className="overlay"></div>
-                    <div className="border logout-popup p-5 rounded flex flex-col justify-around ">
+                    <div className="border logout-popup p-5 rounded flex flex-col justify-around text-center">
                         <h2>Are you sure you want to logout?</h2>
-                        <div>
-                            <button onClick={handleLogout} className='py-3 px-5 mr-5 rounded bg-red-500 text-white font-bold hover:bg-red-400'>Yes</button>
-                            <button onClick={handleNoClick} className='py-3 px-5 ml-5 border rounded  text-black font-bold'>No</button>
+                        <div className=' flex justify-around'>
+                            <button onClick={handleLogout} className='py-3 px-5  rounded gradient1 text-white font-bold hover:bg-red-400'>Yes</button>
+                            <button onClick={handleNoClick} className='py-3 px-5  border rounded  text-black font-bold hover:bg-gray-50'>No</button>
                         </div>
                     </div>
                 </div>
