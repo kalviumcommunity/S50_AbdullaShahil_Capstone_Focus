@@ -29,6 +29,7 @@ function UserPanel() {
         Cookies.remove('email');
         Cookies.remove('name');
         Cookies.remove('token');
+        Cookies.remove('data');
         navigate('/');
         setIsLogoutPopupOpen(false);
     }

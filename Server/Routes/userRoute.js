@@ -11,7 +11,7 @@ require('dotenv').config()
 router.use(express.json());
 
 const generateToken = (user) => {
-    return jwt.sign({ user:user }, process.env.SECRET_KEY, { expiresIn: "2h" })
+    return jwt.sign({ user: user }, process.env.SECRET_KEY, { expiresIn: "2h" })
 }
 
 const userJoiSchema = Joi.object({
@@ -61,13 +61,14 @@ const verifyToken = (req, res, next) => {
     if (!token) {
         return res.status(401).json({ error: "Unauthorized: Token is not provided" });
     }
-    
+
     try {
         const decoded = jwt.verify(token, process.env.SECRET_KEY);
         req.decoded = decoded;
         next();
     } catch (error) {
-        return res.status(403).json({ error: "Forbidden: Failed to authenticate token" });
+        console.log(error)
+        return res.status(403).json({ error1: "Forbidden: Failed to authenticate token",error });
     }
 };
 
@@ -172,16 +173,36 @@ router.post("/users/login", async (req, res) => {
 // PUT to update a user
 router.put("/users/:id", validatePutUser, async (req, res) => {
     try {
-        const updatedUser = await userModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const userId = req.params.id;
+        const updatedUserData = req.body;
+
+        // Update user
+        const updatedUser = await userModel.findByIdAndUpdate(userId, updatedUserData, { new: true });
         if (!updatedUser) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(404).json({ error: "User not found" });
         }
+
+        // Update profile
+        if (updatedUser.profile) {
+            const updateProfile = await profileModel.findByIdAndUpdate(updatedUser.profile._id, updatedUserData);
+            if (!updateProfile) {
+                return res.status(404).json({ error: "Profile not found" });
+            }
+        } else {
+            return res.status(404).json({ error: "Profile not found" });
+        }
+
+        
+
         res.json(updatedUser);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Internal server error" });
+        console.error("Error updating user:", error);
+        res.status(500).json({ error: "Internal server error" });
     }
 });
+
+
+
 
 // PATCH to partially update a user
 router.patch("/users/:id", validatePatchUser, async (req, res) => {

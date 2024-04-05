@@ -42,7 +42,6 @@ function Login() {
 
                 console.log(response)
                 const { email, name, token } = response.data;
-                Cookies.set('email', email, { httpOnly: false, secure: false });
                 Cookies.set('name', name, { httpOnly: false, secure: false });
                 Cookies.set('token', token, { httpOnly: false, secure: false });
                 setSignupStatus('success');
