@@ -3,8 +3,7 @@ const mongoose = require('mongoose');
 const postSchema = new mongoose.Schema({
   name: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Profile', // Reference to the Profile model
-    // autopopulate: true // Automatically populate the name field with the name of the associated profile
+    ref: 'Profile',
   },
   title: String,
   description: String,
@@ -16,8 +15,6 @@ const postSchema = new mongoose.Schema({
   },
 });
 
-// Add autopopulate middleware
-// postSchema.plugin(require('mongoose-autopopulate'));
 
 const postModel = mongoose.model('Post', postSchema);
 
