@@ -99,7 +99,7 @@ function UserProfile() {
                             })} value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" id="name" disabled={!isEditable}/>
 
                         <br />
-                        {/* {errors.name && <span className=" text-left text-red-500">{errors.name.message}</span>} */}
+                        {errors.name && <span className=" text-left text-red-500">{errors.name.message}</span>}
                         <label className='text-left textgray mb-1 ' htmlFor="email">Email</label>
                             <input className="form-input bg-gray-100 p-3 rounded border" {...register('email', {
                                 required: 'This Field is required',
@@ -107,7 +107,7 @@ function UserProfile() {
                             })} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email " id="email" disabled={!isEditable}/>
 
                         <br />
-                        {/* {errors.email && <span className="text-left text-red-500">{errors.email.message}</span>} */}
+                        {errors.email && <span className="text-left text-red-500">{errors.email.message}</span>}
 
                         <div className=' w-full flex justify-between'>
                         <button onClick={handleEdit} className="submit-btn rounded text-white gradient2 font-bold p-2 h-[7vh] w-[13.5vw] ">{buttonText}</button>

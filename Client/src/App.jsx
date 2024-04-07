@@ -5,6 +5,7 @@ import Login from './Components/Login'
 import Home from './Components/Home';
 import Post from './Components/Post';
 import UserProfile from './Components/UserProfile';
+import Settings from './Components/Settings';
 import './App.css'
 
 
@@ -18,6 +19,7 @@ function App() {
       <Route path='/home' element={<Home/>}/>
       <Route path='/post' element={<Post/>}/>
       <Route path='/profile' element={<UserProfile/>}/>
+      <Route path='/settings' element={<Settings/>}/>
     </Routes>
     </div>
   )
