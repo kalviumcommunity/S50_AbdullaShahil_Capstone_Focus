@@ -12,7 +12,7 @@ require('dotenv').config()
 router.use(express.json());
 
 const generateToken = (user) => {
-    return jwt.sign({ user: user }, process.env.SECRET_KEY, { expiresIn: "2h" })
+    return jwt.sign({ user: user }, process.env.SECRET_KEY, { expiresIn: "5h" })
 }
 
 const userJoiSchema = Joi.object({
@@ -25,7 +25,9 @@ const putUserJoiSchema = Joi.object({
     name: Joi.string().alphanum().min(3).max(30),
     email: Joi.string().email(),
     password: Joi.string(),
+    newPassword: Joi.string(), 
 }).min(1);
+
 
 const patchUserJoiSchema = Joi.object({
     name: Joi.string().alphanum().min(3).max(30),
@@ -79,7 +81,6 @@ router.post("/getUser", verifyToken, async (req, res) => {
     try {
         const userId = req.decoded.user._id;
         const user = await userModel.findById(userId);
-        console.log(user)
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
@@ -160,7 +161,6 @@ router.post("/users/login", async (req, res) => {
             return res.status(401).json({ error: "Invalid password" });
         }
         const token = generateToken(user);
-        const decoded = jwt.verify(token, process.env.SECRET_KEY);
 
         res.status(201).json({ email: user.email, name: user.name, token });
     } catch (error) {
@@ -168,6 +168,38 @@ router.post("/users/login", async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 });
+
+// CHANGE PASSWORD
+router.put("/users/change/:id", validatePutUser, async (req, res) => {
+    const userId = req.params.id;
+    const { password, newPassword } = req.body;
+
+    try {
+        const user = await userModel.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ error: "Invalid password" });
+        }
+
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+        const updatedUser = await userModel.findByIdAndUpdate(userId, { password: hashedNewPassword }, { new: true });
+
+        if (!updatedUser) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+
+        res.json({ message: "Password updated successfully", user: updatedUser }); 
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
 
 
 
