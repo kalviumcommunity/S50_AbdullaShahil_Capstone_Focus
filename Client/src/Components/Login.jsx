@@ -74,11 +74,11 @@ function Login() {
                     <form className=" w-[85vw] md:w-[70vw] lg:w-[35vw] text-left rounded-lg bg-white p-8" onSubmit={handleSubmit(onSubmit)}>
 
                         {signupStatus === 'success' && (
-                            <div className="pop p-2 bg-green-500 text-white rounded mb-5"><p className="registered-heading text-sm">Account created successfully</p></div>
+                            <div className="pop p-2 bg-green-500 text-white rounded mb-5"><p className="registered-heading text-sm">Logged in successfully</p></div>
                         )}
 
                         {signupStatus === 'failure' && (
-                            <div className="pop p-2 bg-red-500 text-white  rounded mb-5"><p className="registered-heading text-sm">Failed to create account</p></div>
+                            <div className="pop p-2 bg-red-500 text-white  rounded mb-5"><p className="registered-heading text-sm">Login failed</p></div>
                         )}
 
                         <center>
