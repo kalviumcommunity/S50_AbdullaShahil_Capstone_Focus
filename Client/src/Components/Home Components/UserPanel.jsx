@@ -1,6 +1,6 @@
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ProfileIMG2 from '../../assets/review2.jpeg'
 import ProfileIMG3 from '../../assets/review3.jpeg'
 import Cookies from 'js-cookie';
@@ -8,7 +8,22 @@ import Cookies from 'js-cookie';
 function UserPanel() {
     const username = Cookies.get("name").replace(/\"/g, '');
     const [isLogoutPopupOpen, setIsLogoutPopupOpen] = useState(false);
+    const [suggestedUsers, setSuggestedUsers] = useState([]);
     const navigate = useNavigate();
+
+
+    useEffect(() => {
+        axios.get(`http://localhost:4000/users/otherUsers`)
+            .then(response => {
+                setSuggestedUsers(response.data);
+                console.log(response)
+            })
+            .catch(error => {
+                console.log("error: ", error);
+            });
+
+    }, []);
+
 
     const handleLogout = () => {
         axios.get('http://localhost:4000/logout', {
@@ -75,46 +90,17 @@ function UserPanel() {
             </center>
 
             <div className='border border-gray-400 suggestion-scroll h-[42vh] overflow-scroll p-2 shadow-[0px_0px_10px_rgba(0,0,0,0.08)] rounded-lg  '>
-                <div className=" cm-panel profile-panel bg-white rounded-md flex items-center p-5  h-20">
-                    <div className="profile-img w-14 h-14 rounded-full flex justify-center items-center overflow-hidden">
-                        <img src={ProfileIMG3} alt="Img" />
+                
+            {suggestedUsers.map((user, index) => (
+                    <div key={index} className="cm-panel profile-panel bg-white rounded-md flex items-center p-5 h-20">
+                        <div className="profile-img w-14 h-14 rounded-full flex justify-center items-center overflow-hidden">
+                            <img src={ProfileIMG3} alt="Profile" />
+                        </div>
+                        <h1 className='profile-name p-4'>{user.name}</h1>
                     </div>
-                    <h1 className='profile-name p-4'>Bilson</h1>
+                ))}
+            
 
-                </div>
-
-                <div className=" cm-panel profile-panel bg-white rounded-md flex items-center p-5  h-20">
-                    <div className="profile-img w-14 h-14 rounded-full flex justify-center items-center overflow-hidden">
-                        <img src={ProfileIMG3} alt="Img" />
-                    </div>
-                    <h1 className='profile-name p-4'>Samirjangha</h1>
-
-                </div>
-
-                <div className=" cm-panel profile-panel bg-white rounded-md flex items-center p-5  h-20">
-                    <div className="profile-img w-14 h-14 rounded-full flex justify-center items-center overflow-hidden">
-                        <img src={ProfileIMG3} alt="Img" />
-                    </div>
-                    <h1 className='profile-name p-4'>jack clicks</h1>
-
-                </div>
-
-                <div className=" cm-panel profile-panel bg-white rounded-md flex items-center p-5  h-20">
-                    <div className="profile-img w-14 h-14 rounded-full flex justify-center items-center overflow-hidden">
-                        <img src={ProfileIMG3} alt="Img" />
-                    </div>
-                    <h1 className='profile-name p-4'>himmayash</h1>
-
-                </div>
-
-
-                <div className=" cm-panel profile-panel bg-white rounded-md flex items-center p-5  h-20">
-                    <div className="profile-img w-14 h-14 rounded-full flex justify-center items-center overflow-hidden">
-                        <img src={ProfileIMG3} alt="Img" />
-                    </div>
-                    <h1 className='profile-name p-4'>himmayash</h1>
-
-                </div>
             </div>
 
 

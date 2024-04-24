@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const postModel = require("../Models/postModel");
 const profileModel = require("../Models/profileModel");
+const userModel = require("../Models/userModel");
 const Joi = require("joi");
 const multer = require('multer');
 
@@ -23,7 +24,7 @@ function validatePost(req, res, next) {
 }
 
 // GET all posts
-router.get("/posts", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const data = await postModel.find()
     .populate({
@@ -50,7 +51,7 @@ router.get("/posts", async (req, res) => {
 
 
 // GET specific post by ID
-router.get("/posts/:id", async (req, res) => {
+router.get("/:id", async (req, res) => {
   const id = req.params.id;
   try {
     const data = await postModel.findById(id);
@@ -62,6 +63,36 @@ router.get("/posts/:id", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+// GET specific post by USER ID
+router.get("/userPosts/:id", async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const user = await userModel.findById(id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+console.log(user)
+    const profileID = user.profile;
+
+    const profile = await profileModel.findById(profileID).populate("posts").exec();
+    
+    const posts = profile.posts;
+    const responseData = posts.map( post => ({
+      name: post.name.name,
+      title: post.title,
+      description: post.description,
+      image: post.image.toString('base64')
+    }));
+
+    res.json(responseData);
+
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 
 const storage = multer.memoryStorage({
   destination: function (req, file, cb) {
@@ -76,7 +107,7 @@ const storage = multer.memoryStorage({
 const upload = multer({ storage: storage });
 
 // POSTING - along with populating in profile
-router.post("/posts", upload.single("image"), validatePost, async (req, res) => {
+router.post("/", upload.single("image"), validatePost, async (req, res) => {
   try {
     const { title, description, name } = req.body;
 

@@ -73,8 +73,8 @@ app.get("/logout", (req, res) => {
 
 
 app.use(express.json())
-app.use("/", userRouter);
-app.use("/", postRouter);
+app.use("/users", userRouter);
+app.use("/posts", postRouter);
 
 app.listen(port, () => {
   console.log(`🚀 server running on PORT: ${port}`);
