@@ -94,7 +94,7 @@ router.post("/getUser", verifyToken, async (req, res) => {
 
 
 // GET all users
-router.get("/users", async (req, res) => {
+router.get("/", async (req, res) => {
     try {
         const data = await userModel.find();
         res.json(data);
@@ -104,8 +104,20 @@ router.get("/users", async (req, res) => {
     }
 });
 
+// GET users for suggestion
+router.get("/otherUsers", async (req, res) => {
+    try {
+        const data = await userModel.aggregate([{ $sample: { size: 5 } }]);
+        res.json(data);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "500-Internal server error" });
+    }
+});
+
+
 // GET each user by ID
-router.get("/users/:id", async (req, res) => {
+router.get("/:id", async (req, res) => {
     const id = req.params.id;
     try {
         const data = await userModel.findById(id);
@@ -119,8 +131,9 @@ router.get("/users/:id", async (req, res) => {
 });
 
 
+
 // POST a new user
-router.post("/users", validateUser, async (req, res) => {
+router.post("/", validateUser, async (req, res) => {
     try {
         const { name, email, password } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -142,13 +155,13 @@ router.post("/users", validateUser, async (req, res) => {
 
 
 // VALIDATE TOKEN
-router.post("/users/tokenvalidate", verifyToken, (req, res) => {
+router.post("/tokenvalidate", verifyToken, (req, res) => {
     res.status(200).json({ valid: true, user: req.decoded });
 });
 
 
 // POST REQUEST FOR LOGIN - TO CHECK IF THE EMAIL AND PASSWORD MATCHES
-router.post("/users/login", async (req, res) => {
+router.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await userModel.findOne({ email }).populate("profile").exec();
@@ -161,7 +174,7 @@ router.post("/users/login", async (req, res) => {
             return res.status(401).json({ error: "Invalid password" });
         }
         const token = generateToken(user);
-
+        
         res.status(201).json({ email: user.email, name: user.name, token });
     } catch (error) {
         console.error(error);
@@ -170,29 +183,31 @@ router.post("/users/login", async (req, res) => {
 });
 
 // CHANGE PASSWORD
-router.put("/users/change/:id", validatePutUser, async (req, res) => {
+router.put("/change/:id", validatePutUser, async (req, res) => {
     const userId = req.params.id;
     const { password, newPassword } = req.body;
-
+    
     try {
         const user = await userModel.findById(userId);
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
-
+        
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             return res.status(401).json({ error: "Invalid password" });
         }
-
+        
         const hashedNewPassword = await bcrypt.hash(newPassword, 10);
         const updatedUser = await userModel.findByIdAndUpdate(userId, { password: hashedNewPassword }, { new: true });
-
+        
+        console.log(updatedUser)
         if (!updatedUser) {
             return res.status(404).json({ error: "User not found" });
         }
-
-
+        
+        // const token = generateToken(updatedUser);
+        
         res.json({ message: "Password updated successfully", user: updatedUser }); 
     } catch (error) {
         console.error(error);
@@ -204,7 +219,7 @@ router.put("/users/change/:id", validatePutUser, async (req, res) => {
 
 
 // PUT to update a user
-router.put("/users/:id", validatePutUser, async (req, res) => {
+router.put("/:id", validatePutUser, async (req, res) => {
     const userId = req.params.id;
     const updatedUserData = req.body;
 
@@ -248,7 +263,7 @@ router.put("/users/:id", validatePutUser, async (req, res) => {
 
 
 // PATCH to partially update a user
-router.patch("/users/:id", validatePatchUser, async (req, res) => {
+router.patch("/:id", validatePatchUser, async (req, res) => {
     try {
         const updatedUser = await userModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!updatedUser) {
@@ -262,7 +277,7 @@ router.patch("/users/:id", validatePatchUser, async (req, res) => {
 });
 
 // DELETE a user
-router.delete("/users/:id", async (req, res) => {
+router.delete("/:id", async (req, res) => {
     try {
         const deletedUser = await userModel.findByIdAndDelete(req.params.id);
         if (!deletedUser) {

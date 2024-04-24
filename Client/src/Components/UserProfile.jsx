@@ -8,6 +8,7 @@ import prof from '../assets/reviewProfile.jpeg';
 
 function UserProfile() {
     const { register, handleSubmit, formState: { errors } } = useForm();
+
     const [activeButton, setActiveButton] = useState('One');
     const [userData, setUserData] = useState({});
     const [isEditable, setIsEditable] = useState(false);
@@ -15,7 +16,9 @@ function UserProfile() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [id, setId] = useState('');
+    const [posts, setPosts] = useState([]);
     const [buttonText, setButtonText] = useState('Edit'); 
+
     const username = Cookies.get("name").replace(/\"/g, '');
     const token = Cookies.get("token");
 
@@ -24,9 +27,8 @@ function UserProfile() {
     };
 
     useEffect(() => {
-        axios.post(`http://localhost:4000/getUser`, { token }, { withCredentials: true })
+        axios.post(`http://localhost:4000/users/getUser`, { token }, { withCredentials: true })
             .then(response => {
-                console.log(response);
                 const userData = response.data.user;
                 setUserData(userData);
                 setName(userData.name);
@@ -37,6 +39,19 @@ function UserProfile() {
                 console.error(err);
             });
     }, []);
+
+    useEffect(() => {
+        if (!id) {
+            return;
+        }
+        axios.get(`http://localhost:4000/posts/userPosts/${id}`)
+            .then(response => {
+                setPosts(response.data);
+            })
+            .catch(err => {
+                console.log("err", err);
+            });
+    }, [id]);
 
     const onSubmit = data => {
         const { name, email } = data;
@@ -70,12 +85,6 @@ function UserProfile() {
             setButtonText('Edit'); 
         }
     };
-    
-    
-
-    
-    
-    
 
     return (
         <div>
@@ -128,7 +137,7 @@ function UserProfile() {
                         onClick={() => handleClick('Two')}>Articles</button>
                 </div>
 
-                {activeButton === 'One' && <Posts />}
+                {activeButton === 'One' && <Posts posts={posts}/>}
                 {activeButton === 'Two' && (
                     <>
                         <center className='h-[25vh] mt-2 border flex justify-center items-center'>
