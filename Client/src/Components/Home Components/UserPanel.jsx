@@ -61,7 +61,7 @@ function UserPanel() {
                 <div className='flex items-center'>
                     <img className='h-16 w-16 rounded-full overflow-hidden' src={ProfileIMG2} alt="" />
                     <Link to='/profile'>
-                    <h3 className='post-username pl-4  poppins text-white'>{username}</h3>
+                        <h3 className='post-username pl-4  poppins text-white'>{username}</h3>
                     </Link>
                 </div>
 
@@ -90,8 +90,8 @@ function UserPanel() {
             </center>
 
             <div className='border border-gray-400 suggestion-scroll h-[42vh] overflow-scroll p-2 shadow-[0px_0px_10px_rgba(0,0,0,0.08)] rounded-lg  '>
-                
-            {suggestedUsers.map((user, index) => (
+
+                {suggestedUsers.map((user, index) => (
                     <div key={index} className="cm-panel profile-panel bg-white rounded-md flex items-center p-5 h-20">
                         <div className="profile-img w-14 h-14 rounded-full flex justify-center items-center overflow-hidden">
                             <img src={ProfileIMG3} alt="Profile" />
@@ -99,7 +99,7 @@ function UserPanel() {
                         <h1 className='profile-name p-4'>{user.name}</h1>
                     </div>
                 ))}
-            
+
 
             </div>
 

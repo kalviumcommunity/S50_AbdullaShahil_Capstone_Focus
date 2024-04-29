@@ -7,6 +7,11 @@ import Header from './Home Components/Header'
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
+import { ImageDB } from '../firebase';
+import { v4 } from "uuid";
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+
+
 function Post() {
 
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -19,44 +24,54 @@ function Post() {
   const navigateHome = () => {
     navigate('/home');
   }
-
+  
   const onSubmit = data => {
     const { title, description, image } = data;
     console.log('image', image[0]);
-
-    const formData = new FormData();
-    formData.append('name', name);
-    formData.append('title', title);
-    formData.append('description', description);
-    formData.append('image', image[0]);
-
-    console.log(formData);
-
-    axios.post('http://localhost:4000/posts', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    })
-      .then(response => {
-        console.log(response);
-        setIsSubmitted(true);
-        setErrorMessage('');
-        setTimeout(() => {
-          navigate('/home');
-        }, 300);
-      })
-      .catch(error => {
-        if (error.response) {
-          setErrorMessage('Submission failed. Please try again later.');
-        } else if (error.request) {
-          setErrorMessage('Submission failed. Please check your internet connection.');
-          console.error(error.request);
-        } else {
-          setErrorMessage('Submission failed. Please try again later.');
-          console.error('Error', error.message);
-        }
+  
+    const Image = ref(ImageDB, `Posts/${v4()}`)
+    uploadBytes(Image, image[0]).then(uploadTaskSnapshot => {
+      console.log("Image uploaded successfully:", uploadTaskSnapshot);
+  
+      getDownloadURL(uploadTaskSnapshot.ref).then(ImageUrl => {
+        console.log("Image URL:", ImageUrl);
+  
+        const payload = {
+          name: name,
+          title: title,
+          description: description,
+          image: ImageUrl
+        };
+  
+        axios.post('http://localhost:4000/posts', payload)
+          .then(response => {
+            console.log(response);
+            setIsSubmitted(true);
+            setErrorMessage('');
+            setTimeout(() => {
+              navigate('/home');
+            }, 300);
+          })
+          .catch(error => {
+            if (error.response) {
+              setErrorMessage('Submission failed. Please try again later.');
+            } else if (error.request) {
+              setErrorMessage('Submission failed. Please check your internet connection.');
+              console.error(error.request);
+            } else {
+              setErrorMessage('Submission failed. Please try again later.');
+              console.error('Error', error.message);
+            }
+          });
+  
+      }).catch(error => {
+        console.error("Failed to get image URL:", error);
       });
+    }).catch(error => {
+      console.error("Failed to upload image:", error);
+    });
   };
+
 
   return (
     <div>
