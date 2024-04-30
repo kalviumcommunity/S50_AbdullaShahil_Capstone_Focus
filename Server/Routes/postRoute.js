@@ -93,19 +93,7 @@ router.get("/userPosts/:id", async (req, res) => {
 });
 
 
-const storage = multer.memoryStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/')
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now()
-    cb(null, uniqueSuffix + file.originalname)
-  }
-});
 
-const upload = multer({ storage: storage });
-
-// upload.single("image")
 
 // POSTING - along with populating in profile
 router.post("/", validatePost, async (req, res) => {
