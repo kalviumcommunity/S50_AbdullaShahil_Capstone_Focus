@@ -7,7 +7,7 @@ const postSchema = new mongoose.Schema({
   },
   title: String,
   description: String,
-  image: Buffer,
+  image: String,
   comments: [String],
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,

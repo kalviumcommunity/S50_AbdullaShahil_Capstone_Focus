@@ -72,7 +72,7 @@ function Posts() {
                   <h1>Nature</h1>
                 </div>
                 <div className="image-wrapper image-wrapper-4x3 rounded-md">
-                  <img src={`data:image/png;base64, ${post.image}`} alt="Image 4x3" className='rounded-md' />
+                  <img src={post.image} alt="Image 4x3" className='rounded-md' />
                 </div>
                 <div className="post-options  rounded  p-3 flex items-center  justify-between  mt-1">
                   <h1 className=' font-semibold text-xl textgray poppins'>{post.title}</h1>

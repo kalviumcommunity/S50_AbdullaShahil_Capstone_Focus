@@ -12,7 +12,7 @@ const postJoiSchema = Joi.object({
   name: Joi.string().required(),
   title: Joi.string().required(),
   description: Joi.string().required(),
-  image: Joi.string(),
+  image: Joi.string().required(),
 });
 
 function validatePost(req, res, next) {
@@ -27,19 +27,19 @@ function validatePost(req, res, next) {
 router.get("/", async (req, res) => {
   try {
     const data = await postModel.find()
-    .populate({
-      path: 'name',
-    });
+      .populate({
+        path: 'name',
+      });
 
     if (!data || data.length === 0) {
       return res.status(404).json({ error: "No posts found" });
     }
-    
-    const responseData = data.map( doc => ({
+
+    const responseData = data.map(doc => ({
       name: doc.name.name,
       title: doc.title,
       description: doc.description,
-      image: doc.image.toString('base64')
+      image: doc.image
     }));
 
     res.json(responseData);
@@ -73,17 +73,16 @@ router.get("/userPosts/:id", async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-console.log(user)
-    const profileID = user.profile;
 
+    const profileID = user.profile;
     const profile = await profileModel.findById(profileID).populate("posts").exec();
-    
+
     const posts = profile.posts;
-    const responseData = posts.map( post => ({
+    const responseData = posts.map(post => ({
       name: post.name.name,
       title: post.title,
       description: post.description,
-      image: post.image.toString('base64')
+      image: post.image
     }));
 
     res.json(responseData);
@@ -94,29 +93,18 @@ console.log(user)
 });
 
 
-const storage = multer.memoryStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/')
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now()
-    cb(null, uniqueSuffix + file.originalname)
-  }
-});
 
-const upload = multer({ storage: storage });
 
 // POSTING - along with populating in profile
-router.post("/", upload.single("image"), validatePost, async (req, res) => {
+router.post("/", validatePost, async (req, res) => {
   try {
-    const { title, description, name } = req.body;
+    const { title, description, name, image } = req.body;
 
     if (!name) {
       return res.status(400).json({ error: "Name not provided" });
     }
 
     const profile = await profileModel.findOne({ name });
-
     if (!profile) {
       return res.status(404).json({ error: "Profile not found" });
     }
@@ -125,7 +113,7 @@ router.post("/", upload.single("image"), validatePost, async (req, res) => {
       name: profile._id,
       title,
       description,
-      image: req.file.buffer
+      image: image
     };
 
     const newPost = new postModel(newPostData);
