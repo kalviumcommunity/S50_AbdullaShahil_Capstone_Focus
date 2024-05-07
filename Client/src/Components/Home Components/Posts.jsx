@@ -7,10 +7,12 @@ import {
   ShimmerThumbnail,
   ShimmerBadge,
 } from "react-shimmer-effects";
+
 import ProfileIMG2 from '../../assets/review2.jpeg';
 import Heart from '../../assets/heart.png';
 import HeartActive from '../../assets/heartactive.png';
 import Comment from '../../assets/comment.png';
+
 
 function Posts() {
   const [isLiked, setIsLiked] = useState(false);
@@ -22,7 +24,7 @@ function Posts() {
   };
 
   useEffect(() => {
-    axios.get('http://localhost:4000/posts')
+    axios.get(`http://localhost:4000/posts`)
       .then(response => {
         setPosts(response.data);
         setIsLoading(false);
@@ -32,7 +34,8 @@ function Posts() {
         setIsLoading(false);
       });
   }, []);
-  
+
+
 
   return (
     <center className="h-[85vh]  pl-5 pr-5 pt-10 overflow-hidden">
@@ -88,6 +91,7 @@ function Posts() {
             )
           })
         )}
+
       </div>
     </center>
   )

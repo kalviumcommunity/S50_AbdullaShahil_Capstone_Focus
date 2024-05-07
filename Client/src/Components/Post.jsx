@@ -25,10 +25,9 @@ function Post() {
     navigate('/home');
   };
   const onSubmit = async (data) => {
-    console.log("hhh")
     try {
       setLoading(true);
-      
+
       const { title, description, image } = data;
       const Image = ref(ImageDB, `Posts/${v4()}`);
       await uploadBytes(Image, image[0]);
