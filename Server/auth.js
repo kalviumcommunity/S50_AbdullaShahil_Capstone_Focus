@@ -1,11 +1,17 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth2').Strategy;
 require('dotenv').config();
+const jwt = require("jsonwebtoken");
+
 const Profile = require('./Models/profileModel'); 
 const User = require('./Models/userModel'); 
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+
+const generateToken = (user) => {
+    return jwt.sign({ user: user }, process.env.SECRET_KEY, { expiresIn: "5h" })
+}
 
 passport.use(new GoogleStrategy({
     clientID: GOOGLE_CLIENT_ID,
@@ -18,7 +24,6 @@ async function (request, accessToken, refreshToken, profile, done) {
     try {
         const existingProfile = await Profile.findOne({ id: profile.id });
         if (!existingProfile) {
-            console.log(profile);
             const newProfile = new Profile({
                 id: profile.id,
                 name: profile.displayName,
@@ -36,15 +41,18 @@ async function (request, accessToken, refreshToken, profile, done) {
             await newProfile.save();
             await newUser.save();
             
-            request.res.cookie('userData', JSON.stringify(newProfile), { httpOnly: false });
-            request.res.cookie('name', JSON.stringify(profile.given_name), { httpOnly: false });
-            console.log(newProfile);
+            const token = generateToken(newProfile);
+
+            request.res.cookie('token', token, { httpOnly: false });
+            request.res.cookie('name', profile.displayName, { httpOnly: false });
+            
             return done(null, newProfile);
         } else {
-            console.log(profile);
-            request.res.cookie('userData', JSON.stringify(existingProfile), { httpOnly: false });
-            request.res.cookie('name', JSON.stringify(profile.given_name), { httpOnly: false });
-            console.log(existingProfile);
+            const token = generateToken(existingProfile);
+
+            request.res.cookie('token', token, { httpOnly: false });
+            request.res.cookie('name', profile.given_name, { httpOnly: false });
+            
             return done(null, existingProfile);
         }
     } catch (err) {

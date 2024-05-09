@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const postModel = require("../Models/postModel");
+const articleModel = require("../Models/articleModel");
 const profileModel = require("../Models/profileModel");
 const userModel = require("../Models/userModel");
 const Joi = require("joi");
@@ -11,8 +11,10 @@ const postJoiSchema = Joi.object({
   name: Joi.string().required(),
   title: Joi.string().required(),
   description: Joi.string().required(),
-  image: Joi.string().required(),
+  image: Joi.string().uri().required(),
+  category: Joi.string().required(),
 });
+
 
 function validatePost(req, res, next) {
   const { error } = postJoiSchema.validate(req.body);
@@ -22,23 +24,24 @@ function validatePost(req, res, next) {
   next();
 }
 
-// GET all posts
+// GET all articles
 router.get("/", async (req, res) => {
   try {
-    const data = await postModel.find()
+    const data = await articleModel.find()
       .populate({
         path: 'name',
       });
 
     if (!data || data.length === 0) {
-      return res.status(404).json({ error: "No posts found" });
+      return res.status(404).json({ error: "No articles found" });
     }
 
     const responseData = data.map(doc => ({
       name: doc.name.name,
       title: doc.title,
       description: doc.description,
-      image: doc.image
+      image: doc.image,
+      postedTime: doc.postedTime
     }));
 
     res.json(responseData);
@@ -48,12 +51,11 @@ router.get("/", async (req, res) => {
   }
 });
 
-
-// GET specific post by ID
+// GET specific article by ID
 router.get("/:id", async (req, res) => {
   const id = req.params.id;
   try {
-    const data = await postModel.findById(id);
+    const data = await articleModel.findById(id);
     if (!data) {
       return res.status(404).json({ error: "Post not found" });
     }
@@ -63,8 +65,8 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// GET specific post by USER ID
-router.get("/userPosts/:id", async (req, res) => {
+// GET specific articles by USER ID
+router.get("/userArticles/:id", async (req, res) => {
   const id = req.params.id;
 
   try {
@@ -74,14 +76,15 @@ router.get("/userPosts/:id", async (req, res) => {
     }
 
     const profileID = user.profile;
-    const profile = await profileModel.findById(profileID).populate("posts").exec();
+    const profile = await profileModel.findById(profileID).populate("articles").exec();
 
-    const posts = profile.posts;
-    const responseData = posts.map(post => ({
-      name: post.name.name,
-      title: post.title,
-      description: post.description,
-      image: post.image
+    const articles = profile.articles;
+    const responseData = articles.map(article => ({
+      name: user.name,
+      title: article.title,
+      description: article.description,
+      image: article.image,
+      postedTime: article.postedTime
     }));
 
     res.json(responseData);
@@ -93,6 +96,11 @@ router.get("/userPosts/:id", async (req, res) => {
 
 
 
+// Function to validate URL 
+function validateUrlFormat(url) {
+  const regex = /^(ftp|http|https):\/\/[^ "]+$/;
+  return regex.test(url);
+}
 
 // POSTING - along with populating in profile
 router.post("/", validatePost, async (req, res) => {
@@ -108,26 +116,33 @@ router.post("/", validatePost, async (req, res) => {
       return res.status(404).json({ error: "Profile not found" });
     }
 
-    const newPostData = {
+    // Validating URL format before saving
+    const isValidUrl = validateUrlFormat(image);
+    if (!isValidUrl) {
+      return res.status(400).json({ error: "Invalid image URL format" });
+    }
+
+    const newArticleData = {
       name: profile._id,
       title,
       description,
-      image: image
+      image: image,
     };
 
-    const newPost = new postModel(newPostData);
-    const savedPost = await newPost.save();
+    const newArticle = new articleModel(newArticleData);
+    const savedArticle = await newArticle.save();
 
-    profile.posts.push(savedPost._id);
+    profile.articles.push(savedArticle._id);
     await profile.save();
 
-    const populatedProfile = await profileModel.findById(profile._id).populate("posts").exec();
+    const populatedProfile = await profileModel.findById(profile._id).populate("articles").exec();
     res.status(201).json(populatedProfile);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
 
 
 

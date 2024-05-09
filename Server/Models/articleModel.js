@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const postSchema = new mongoose.Schema({
+const articleSchema = new mongoose.Schema({
   name: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Profile',
@@ -14,9 +14,12 @@ const postSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   },
+  postedTime: { // Add postedTime field to the schema
+    type: Date,
+    default: Date.now // Set default value to current date/time
+  }
 });
 
+const articleModel = mongoose.model('Article', articleSchema);
 
-const postModel = mongoose.model('Post', postSchema);
-
-module.exports = postModel;
+module.exports = articleModel;

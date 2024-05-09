@@ -11,6 +11,12 @@ const profileSchema = new mongoose.Schema({
     ref: 'Post'
   },
 ],
+  articles: [
+    {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Article'
+  },
+],
 });
 
 const profileModel = mongoose.model('Profile', profileSchema);

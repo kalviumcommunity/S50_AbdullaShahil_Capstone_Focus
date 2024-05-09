@@ -39,7 +39,6 @@ function Login() {
         const { email, password } = data;
         axios.post('http://localhost:4000/users/login', { email, password }, {withCredentials: true})
             .then(response => {
-
                 console.log(response)
                 const { email, name, token } = response.data;
                 Cookies.set('name', name, { httpOnly: false, secure: false });

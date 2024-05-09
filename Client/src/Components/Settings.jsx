@@ -14,7 +14,7 @@ function Settings() {
     <div>
       <Header />
       <div className="mx-4 min-h-[80vh] max-w-screen-xl sm:mx-8 xl:mx-auto">
-        <h1 className="border-b py-6 text-4xl font-semibold">Settings</h1>
+        <h1 className="border-b py-6 text-4xl font-medium">Settings</h1>
         <div className="grid grid-cols-8  pt-3 sm:grid-cols-10">
           <div className="relative my-4 w-56 sm:hidden">
             <input
@@ -46,7 +46,7 @@ function Settings() {
             <ul className="max-h-0 select-none flex-col overflow-hidden rounded-b-lg shadow-md transition-all duration-300 peer-checked:max-h-56 peer-checked:py-3">
               <li
                 className={`cursor-pointer px-3 py-2 text-sm text-slate-600 hover:bg-blue-700 hover:text-white ${
-                  activeComponent === "account" ? "font-semibold" : ""
+                  activeComponent === "account" ? "font-medium" : ""
                 }`}
                 onClick={() => handleItemClick("account")}
               >
@@ -54,7 +54,7 @@ function Settings() {
               </li>
               <li
                 className={`cursor-pointer px-3 py-2 text-sm text-slate-600 hover:bg-blue-700 hover:text-white ${
-                  activeComponent === "general" ? "font-semibold" : ""
+                  activeComponent === "general" ? "font-medium" : ""
                 }`}
                 onClick={() => handleItemClick("general")}
               >
