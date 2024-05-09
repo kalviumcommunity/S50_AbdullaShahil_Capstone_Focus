@@ -66,19 +66,19 @@ function Posts() {
         ) : (
           posts.map((post, index) => {
             return (
-              <div className="posts border border-gray-300 rounded-md flex flex-col mb-10 p-5 lg:w-[35vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]" key={index} >
+              <div className="posts border border-gray-400 rounded-md flex flex-col mb-10 p-5 lg:w-[35vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]" key={index} >
                 <div className='top-opt flex justify-between items-center mb-5'>
                   <div className='flex items-center w-[15vw]'>
                     <img className='h-12 w-12 rounded-full overflow-hidden' src={ProfileIMG2} alt="" />
                     <h3 className='post-username pl-4 font-light poppins'>{post.name}</h3>
                   </div>
-                  <h1>Nature</h1>
+                  <h1 className='font-light'>{post.category}</h1>
                 </div>
                 <div className="image-wrapper image-wrapper-4x3 rounded-md">
                   <img src={post.image} alt="Image 4x3" className='rounded-md' />
                 </div>
                 <div className="post-options  rounded  p-3 flex items-center  justify-between  mt-1">
-                  <h1 className=' font-semibold text-xl textgray poppins'>{post.title}</h1>
+                  <h1 className='font-semibold text-xl textgray poppins'>{post.title}</h1>
                   <div className='flex justify-between items-center'>
                     <img className='h-10 w-10 mr-1 rounded-full overflow-hidden' src={isLiked ? HeartActive : Heart} alt="" onClick={handleLikeClick} />
                     <img className='h-[2.1rem] w-[2.1rem] mb-[3px] overflow-hidden' src={Comment} alt="" />

@@ -64,7 +64,8 @@ function Posts({ posts }) {
                       <img className='h- w- md:h-12 md:w-12 rounded-full overflow-hidden' src={ProfileIMG2} alt="" />
                       <h3 className='post-username pl-4 font-light poppins'>{username}</h3>
                     </div>
-                    <h1>Nature</h1>
+                    <h1 className='font-light'>{post.category}</h1>
+
                   </div>
                   <div className="image-wrapper image-wrapper-4x3 rounded-md">
                     <img src={post.image} alt="Image 4x3" className='rounded-md' />

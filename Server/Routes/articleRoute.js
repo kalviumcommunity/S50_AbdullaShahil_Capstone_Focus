@@ -12,11 +12,11 @@ const postJoiSchema = Joi.object({
   title: Joi.string().required(),
   description: Joi.string().required(),
   image: Joi.string().uri().required(),
-  category: Joi.string().required(),
 });
 
 
 function validatePost(req, res, next) {
+  
   const { error } = postJoiSchema.validate(req.body);
   if (error) {
     return res.status(400).json({ error: error.details[0].message });
@@ -116,7 +116,6 @@ router.post("/", validatePost, async (req, res) => {
       return res.status(404).json({ error: "Profile not found" });
     }
 
-    // Validating URL format before saving
     const isValidUrl = validateUrlFormat(image);
     if (!isValidUrl) {
       return res.status(400).json({ error: "Invalid image URL format" });

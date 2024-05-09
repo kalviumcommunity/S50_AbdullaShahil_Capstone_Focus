@@ -382,6 +382,9 @@ overflow: hidden;
   transform: translateX(16px);
 }
 
+.pointer:hover{
+  cursor: pointer;
+}
 
 @media (max-width: 1022px) {
   .hamburg-div {

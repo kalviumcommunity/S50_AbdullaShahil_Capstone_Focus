@@ -12,6 +12,7 @@ const postJoiSchema = Joi.object({
   title: Joi.string().required(),
   description: Joi.string().required(),
   image: Joi.string().required(),
+  category: Joi.string().required(),
 });
 
 function validatePost(req, res, next) {
@@ -38,7 +39,8 @@ router.get("/", async (req, res) => {
       name: doc.name.name,
       title: doc.title,
       description: doc.description,
-      image: doc.image
+      image: doc.image,
+      category: doc.category
     }));
 
     res.json(responseData);
@@ -81,7 +83,8 @@ router.get("/userPosts/:id", async (req, res) => {
       name: post.name.name,
       title: post.title,
       description: post.description,
-      image: post.image
+      image: post.image,
+      category: post.category
     }));
 
     res.json(responseData);
@@ -97,7 +100,7 @@ router.get("/userPosts/:id", async (req, res) => {
 // POSTING - along with populating in profile
 router.post("/", validatePost, async (req, res) => {
   try {
-    const { title, description, name, image } = req.body;
+    const { title, description, name, image, category } = req.body;
 
     if (!name) {
       return res.status(400).json({ error: "Name not provided" });
@@ -112,7 +115,8 @@ router.post("/", validatePost, async (req, res) => {
       name: profile._id,
       title,
       description,
-      image: image
+      image: image,
+      category: category,
     };
 
     const newPost = new postModel(newPostData);
