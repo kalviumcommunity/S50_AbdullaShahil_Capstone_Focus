@@ -4,7 +4,6 @@ const postModel = require("../Models/postModel");
 const profileModel = require("../Models/profileModel");
 const userModel = require("../Models/userModel");
 const Joi = require("joi");
-const multer = require('multer');
 
 router.use(express.json());
 

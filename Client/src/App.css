@@ -291,6 +291,14 @@ ul.breadcrumb li span {
   object-fit: cover;
 }
 
+.article-image-wrapper{
+height: 45vh;
+width: 25vw;
+overflow: hidden;
+}
+
+
+
 .shimmer {
   background: #e2e3e4;
   background-image: linear-gradient(to right, #e2e3e4 0%, #f6f7f8 20%, #e2e3e4 40%, #e2e3e4 100%);

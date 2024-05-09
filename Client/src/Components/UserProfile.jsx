@@ -2,8 +2,13 @@ import { useState, useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import Cookies from 'js-cookie';
 import axios from 'axios';
+
+import { formatDistanceToNow } from 'date-fns';
+import { parseISO } from 'date-fns';
+
 import Header from "./Home Components/Header";
 import Posts from "./UserProfile Components/Posts";
+import Articles from "./UserProfile Components/Articles";
 import prof from '../assets/reviewProfile.jpeg';
 
 function UserProfile() {
@@ -17,11 +22,13 @@ function UserProfile() {
     const [email, setEmail] = useState('');
     const [id, setId] = useState('');
     const [posts, setPosts] = useState([]);
+    const [articles, setArticles] = useState([]);
+    
     const [buttonText, setButtonText] = useState('Edit'); 
-
+    
     const username = Cookies.get("name").replace(/\"/g, '');
     const token = Cookies.get("token");
-
+    
     const handleClick = (button) => {
         setActiveButton(button);
     };
@@ -46,18 +53,35 @@ function UserProfile() {
         }
         axios.get(`http://localhost:4000/posts/userPosts/${id}`)
             .then(response => {
+                console.log(response)
                 setPosts(response.data);
             })
             .catch(err => {
-                console.log("err", err);
+                console.log("error fetching posts", err);
             });
+
+        axios.get(`http://localhost:4000/articles/userArticles/${id}`)
+            .then(response => {
+                console.log(response.data)
+                const articlesWithRelativeTime = response.data.map(article => ({
+                    ...article,
+                    relativeTime: formatDistanceToNow(parseISO(article.postedTime), { addSuffix: true })
+                  }));
+                  console.log(articlesWithRelativeTime)
+                  setArticles(articlesWithRelativeTime);
+            })
+            .catch(err => {
+                console.log("error fetching articles", err);
+            });
+
     }, [id]);
+
+
 
     const onSubmit = data => {
         const { name, email } = data;
         axios.put(`http://localhost:4000/users/${id}`, { name, email })
             .then(response => {
-                console.log(response)
                 setIsEditable(false);
                 setButtonText('Edit');
                 setIsSubmitted(true); 
@@ -85,7 +109,7 @@ function UserProfile() {
             setButtonText('Edit'); 
         }
     };
-
+    
     return (
         <div>
             <Header />
@@ -136,15 +160,8 @@ function UserProfile() {
                     <button className={`bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-r ${activeButton === 'Two' ? 'gradient2' : ''}`}
                         onClick={() => handleClick('Two')}>Articles</button>
                 </div>
-
                 {activeButton === 'One' && <Posts posts={posts}/>}
-                {activeButton === 'Two' && (
-                    <>
-                        <center className='h-[25vh] mt-2 border flex justify-center items-center'>
-                            <h1 className=' text-xl'>In progress...</h1>
-                        </center>
-                    </>
-                )}
+                {activeButton === 'Two' && <Articles articles={articles}/>}                
             </div>
         </div>
     )

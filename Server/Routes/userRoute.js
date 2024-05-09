@@ -206,7 +206,6 @@ router.put("/change/:id", validatePutUser, async (req, res) => {
             return res.status(404).json({ error: "User not found" });
         }
         
-        // const token = generateToken(updatedUser);
         
         res.json({ message: "Password updated successfully", user: updatedUser }); 
     } catch (error) {

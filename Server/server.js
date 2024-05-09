@@ -4,6 +4,7 @@ const cors = require("cors");
 const connectDb = require("../Server/config/connect");
 const userRouter = require("./Routes/userRoute");
 const postRouter = require("./Routes/postRoute");
+const articleRouter = require("./Routes/articleRoute");
 const passport = require("passport");
 require('./auth')
 
@@ -75,6 +76,7 @@ app.get("/logout", (req, res) => {
 app.use(express.json())
 app.use("/users", userRouter);
 app.use("/posts", postRouter);
+app.use("/articles", articleRouter);
 
 app.listen(port, () => {
   console.log(`🚀 server running on PORT: ${port}`);
