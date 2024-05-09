@@ -34,7 +34,6 @@ function Articles() {
           relativeTime: formatDistanceToNow(parseISO(article.postedTime), { addSuffix: true })
         }));
         setArticles(articlesWithRelativeTime);
-        console.log(articlesWithRelativeTime)
         setIsLoading(false);
       })
       .catch(err => {
@@ -74,7 +73,7 @@ function Articles() {
         ) : (
           articles.map((article, index) => {
             return (
-              <div className="posts border border-gray-300 rounded-md flex flex-col mb-10 p-5 lg:w-[63vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]" key={index} >
+              <div className="posts border border-gray-400 rounded-md flex flex-col mb-10 p-5 lg:w-[63vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]" key={index} >
                 <div className='top-opt flex justify-between items-center mb-5'>
                   <div className='flex items-center w-[15vw]'>
                     <img className='h-12 w-12 rounded-full overflow-hidden' src={ProfileIMG2} alt="" />
@@ -99,7 +98,7 @@ function Articles() {
                         <p className=' font-light text-gray-700 poppins text-sm border border-gray-150 rounded-md p-1' style={{ textAlign: 'justify' }}>{article.description}</p>
                       </div>
 
-                      <div className='flex items-center justify-end'>
+                      <div className='flex items-center justify-end mt-2'>
                         <img className='h-10 w-10 mr-1 rounded-full overflow-hidden' src={isLiked ? HeartActive : Heart} alt="" onClick={handleLikeClick} />
                         <img className='h-[2.1rem] w-[2.1rem] mb-[3px] overflow-hidden' src={Comment} alt="" />
                       </div>

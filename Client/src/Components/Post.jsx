@@ -20,6 +20,7 @@ function Post() {
   const [loading, setLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [category, setCategory] = useState('');
   const name = Cookies.get('name');
 
   const navigate = useNavigate();
@@ -27,47 +28,52 @@ function Post() {
   const navigateHome = () => {
     navigate('/home');
   };
-  const onSubmit = async (data) => {
-    console.log(data)
-    // try {
-    //   setLoading(true);
 
-    //   const { title, description, image, category } = data;
-    //   const Image = ref(ImageDB, `Posts/${v4()}`);
-    //   await uploadBytes(Image, image[0]);
-    //   const imageUrl = await getDownloadURL(Image);
+  const handleChange = (value) => {
+    console.log('Selected Category:', value);
+    setCategory(value);
 
-    //   const payload = {
-    //     name: name,
-    //     title: title,
-    //     description: description,
-    //     image: imageUrl,
-    //     category: category,
-    //   };
-
-    //   await axios.post('http://localhost:4000/posts', payload);
-    //   setLoading(false);
-    //   setIsSubmitted(true);
-    //   setErrorMessage('');
-    //   console.log("POST REQUEST SUCCESSFUL")
-    //   setTimeout(() => {
-    //     navigate('/home');
-    //   }, 300);
-
-    // } catch (error) {
-    //   console.log(error)
-    //   setLoading(false);
-    //   setIsSubmitted(false);
-    //   if (error.request || error.response) {
-    //     setErrorMessage('Submission failed. Please try again later.');
-    //     console.error('Error', error.message);
-    //   } else {
-    //     setErrorMessage('Submission failed. Please check your network connection.');
-    //   }
-    // }
   };
 
+  const onSubmit = async (data) => {
+    try {
+      setLoading(true);
 
+      const { title, description, image } = data;
+      const Image = ref(ImageDB, `Posts/${v4()}`);
+      await uploadBytes(Image, image[0]);
+      const imageUrl = await getDownloadURL(Image);
+
+      const payload = {
+        name: name,
+        title: title,
+        description: description,
+        image: imageUrl,
+        category: category,
+      };
+      console.log(payload)
+
+      await axios.post('http://localhost:4000/posts', payload);
+      setLoading(false);
+      setIsSubmitted(true);
+      setErrorMessage('');
+      console.log("POST REQUEST SUCCESSFUL")
+      setTimeout(() => {
+        navigate('/home');
+      }, 300);
+
+    } catch (error) {
+      console.log(error)
+      setLoading(false);
+      setIsSubmitted(false);
+      if (error.request || error.response) {
+        setErrorMessage('Submission failed. Please try again later.');
+        console.error('Error', error.message);
+      } else {
+        setErrorMessage('Submission failed. Please check your network connection.');
+      }
+    }
+  };
 
 
   return (
@@ -76,7 +82,7 @@ function Post() {
       <div className=''>
         <center className=''>
           <h2 className="register-head textgray text-2xl font-semibold mt-10">Create a new post</h2>
-          <form className="posts border border-gray-300 rounded-md flex flex-col mt-10 p-6 lg:w-[45vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]" onSubmit={handleSubmit(onSubmit)}>
+          <form className="posts border border-gray-500 rounded-md flex flex-col mt-10 p-6 lg:w-[45vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]" onSubmit={handleSubmit(onSubmit)}>
             {isSubmitted && !errorMessage ? (
               <div className="pop p-3 bg-green-500 text-white rounded mb-5">
                 <p className="registered-heading">Posted successfully</p>
@@ -125,20 +131,24 @@ function Post() {
             <div className="flex items-center justify-between mb-5">
               <input
                 type="file"
-                className="flex h-10 w-[49%] rounded-md border border-gray-400 bg-white px-3 py-2 text-sm text-gray-400 file:border-0 file:bg-transparent file:text-gray-600 file:text-sm file:font-medium"
+                className="flex h-10 w-[49%] text-gray-800 rounded-lg border file:h-10 file:mr-4 file:py-2 file:px-5 items-center 
+                file:rounded-md file:bg-gray-700 border-gray-400 bg-white file:text-white hover:file:bg-gray-600 text-sm file:border-0  file:text-md file:font-bold file:cursor-pointer"
                 {...register('image', {
                   required: 'This Field is required',
                 })}
                 id="image"
               />
-
+              
               <br />
               {errors.image && <span className="text-left text-red-500">{errors.image.message}</span>}
 
               <div className='w-[49%]'>
-                <Select name="category" label="Select Category" {...register('category', {
-                  required: 'This Field is required',
-                })} id="category">
+                <Select
+                  label="Select Category"
+                  value={category}
+                  id="category"
+                  onChange={handleChange}
+                >
                   <Option value="Portraits">Portraits</Option>
                   <Option value="Landscapes">Landscapes</Option>
                   <Option value="Grayscales">Grayscales</Option>
@@ -146,21 +156,16 @@ function Post() {
                   <Option value="Minimal">Minimal</Option>
                 </Select>
 
-                {/* <select name="category" id=""label="Select Category" {...register('category', {
-                  required: 'This Field is required',
-                })}>
-                  <option value="Portraits">hi</option>
-                  <option value="Landscapes">jknkjb</option>
-                  <option value="Grayscales">kbjb</option>
-                </select> */}
+
               </div>
 
             </div>
 
             <div className='flex items-center  w-full h-12'>
-              <button onClick={navigateHome} className="submit-btn font-bold textgray border rounded p-2 h-full w-1/2 mr-1">Cancel</button>
-              <button className="submit-btn rounded text-white font-bold p-2 gradient1 h-full w-1/2">Post</button>
+              <button onClick={navigateHome} className="submit-btn font-bold bg-gray-800 text-white  rounded p-2 h-full w-1/2 mr-1 hover:bg-gray-600 transition">Cancel</button>
+              <button className="submit-btn rounded text-white font-bold p-2 gradient1 h-full w-1/2 hover:opacity-90 transition">Post</button>
             </div>
+
           </form>
         </center>
 
