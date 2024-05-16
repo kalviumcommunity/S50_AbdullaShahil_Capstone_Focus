@@ -45,6 +45,8 @@ function UserPanel() {
         Cookies.remove('name');
         Cookies.remove('token');
         Cookies.remove('data');
+        Cookies.remove('profileID');
+        Cookies.remove('userID');
         navigate('/');
         setIsLogoutPopupOpen(false);
     }

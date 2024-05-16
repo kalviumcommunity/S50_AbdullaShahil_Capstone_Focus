@@ -15,6 +15,23 @@ const postJoiSchema = Joi.object({
   category: Joi.string().required(),
 });
 
+const patchJoiSchema = Joi.object({
+  name: Joi.string(),
+  title: Joi.string(),
+  description: Joi.string(),
+  image: Joi.string(),
+  category: Joi.string(),
+  action: Joi.string().valid('like', 'unlike')
+}).min(1);
+
+function validatePatch(req, res, next) {
+  const { error } = patchJoiSchema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ error: error.details[0].message });
+  }
+  next();
+}
+
 function validatePost(req, res, next) {
   const { error } = postJoiSchema.validate(req.body);
   if (error) {
@@ -36,11 +53,13 @@ router.get("/", async (req, res) => {
     }
 
     const responseData = data.map(doc => ({
+      _id: doc._id,
       name: doc.name.name,
       title: doc.title,
       description: doc.description,
       image: doc.image,
-      category: doc.category
+      category: doc.category,
+      likes: doc.likes,
     }));
 
     res.json(responseData);
@@ -84,7 +103,8 @@ router.get("/userPosts/:id", async (req, res) => {
       title: post.title,
       description: post.description,
       image: post.image,
-      category: post.category
+      category: post.category,
+      likes: post.likes,
     }));
 
     res.json(responseData);
@@ -94,6 +114,57 @@ router.get("/userPosts/:id", async (req, res) => {
   }
 });
 
+
+// PATCH to update likes in a post
+router.patch("/like/:id", validatePatch, async (req, res) => {
+  const postId = req.params.id;
+  const { action } = req.body;
+
+  try {
+    const post = await postModel.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    // post.name = objectID of profile document
+    profileId = post.name
+
+    let updatedPost;
+
+    if (action === "like") {
+      if (!post.likes.includes(profileId)) {
+
+        updatedPost = await postModel.findByIdAndUpdate(
+          postId,
+          { $addToSet: { likes: profileId } },
+          { new: true }
+        );
+
+        console.log("added like")
+      } else {
+        return res.status(400).json({ message: "You already liked this post" });
+      }
+    } else if (action === "unlike") {
+      if (post.likes.includes(profileId)) {
+        updatedPost = await postModel.findByIdAndUpdate(
+          postId,
+          { $pull: { likes: profileId } },
+          { new: true }
+        );
+        console.log("removed like")
+      } else {
+        return res.status(400).json({ message: "You haven't liked this post" });
+      }
+    } else {
+      return res.status(400).json({ message: "Invalid action" });
+    }
+
+    res.json(updatedPost);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 
 

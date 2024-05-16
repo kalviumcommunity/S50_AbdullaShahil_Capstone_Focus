@@ -24,12 +24,14 @@ function Signup() {
         axios.post('http://localhost:4000/users', { name, email, password })
             .then(response => {
                 console.log(response);
-                const { userData, token } = response.data;
+                const { userData, token, userID, profileID } = response.data;
     
                 Cookies.set('userData', JSON.stringify(userData), { httpOnly: false, secure: false });
                 Cookies.set('name', userData.name, { httpOnly: false, secure: false });
                 Cookies.set('token', token, { httpOnly: false, secure: false });
-    
+                Cookies.set('userID', userID, { httpOnly: false, secure: false });
+                Cookies.set('profileID', profileID, { httpOnly: false, secure: false });
+
                 setSignupStatus('success');
                 setTimeout(() => {
                     navigate('/home');
