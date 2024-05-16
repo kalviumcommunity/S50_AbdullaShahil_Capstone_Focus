@@ -146,7 +146,7 @@ router.post("/", validateUser, async (req, res) => {
         });
         const token = generateToken(newUser);
 
-        res.status(201).json({ userData: newUser, token: token });
+        res.status(201).json({ userData: newUser, token: token, userID: user._id, profileID: profile._id });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal server error" });
@@ -174,8 +174,7 @@ router.post("/login", async (req, res) => {
             return res.status(401).json({ error: "Invalid password" });
         }
         const token = generateToken(user);
-        
-        res.status(201).json({ email: user.email, name: user.name, token });
+        res.status(201).json({ email: user.email, name: user.name, token, userID: user._id, profileID: user.profile._id });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal server error" });

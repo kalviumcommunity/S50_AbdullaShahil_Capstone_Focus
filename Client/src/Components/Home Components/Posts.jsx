@@ -7,6 +7,7 @@ import {
   ShimmerThumbnail,
   ShimmerBadge,
 } from "react-shimmer-effects";
+import Cookies from 'js-cookie';
 
 import ProfileIMG2 from '../../assets/review2.jpeg';
 import Heart from '../../assets/heart.png';
@@ -15,27 +16,49 @@ import Comment from '../../assets/comment.png';
 
 
 function Posts() {
-  const [isLiked, setIsLiked] = useState(false);
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [likedPosts, setLikedPosts] = useState({});
 
-  const handleLikeClick = () => {
-    setIsLiked(!isLiked);
-  };
+  const profileID = Cookies.get("profileID");
+  const initialLikedPosts = {}
 
   useEffect(() => {
     axios.get(`http://localhost:4000/posts`)
       .then(response => {
-        setPosts(response.data);
+        const fetchedPosts = response.data;
+
+        // Loop through fetched posts to set initial liked state
+        fetchedPosts.forEach(post => {
+          // Check if current user has liked the post
+          const isLikedByUser = post.likes.includes(profileID);
+          // Set liked state for this post
+          initialLikedPosts[post._id] = isLikedByUser;
+        });
+
+
+        // Set posts, likedPosts, and loading state
+        setPosts(fetchedPosts);
+        setLikedPosts(initialLikedPosts);
         setIsLoading(false);
       })
       .catch(err => {
         console.log(err);
         setIsLoading(false);
       });
-  }, []);
+  }, [profileID]); // Adding userId as a dependency so useEffect runs when userId changes
 
-
+  console.log(likedPosts)
+  const handleLikeClick = async (postId) => {
+    try {
+      const response = await axios.patch(`http://localhost:4000/posts/like/${postId}`, { action: !likedPosts[postId] ? 'like' : 'unlike' });
+      const updatedPost = response.data;
+      setPosts(posts.map(post => post._id === updatedPost._id ? updatedPost : post));
+      setLikedPosts({ ...likedPosts, [postId]: !likedPosts[postId] });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <center className="h-[85vh]  pl-5 pr-5 pt-10 overflow-hidden">
@@ -45,21 +68,19 @@ function Posts() {
         {isLoading ? (
           Array.from({ length: 10 }).map((_, index) => (
             <div className='posts border border-gray-300 rounded-md flex flex-col mb-10 p-5 lg:w-[35vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]' key={index}>
-              <div className='flex justify-between items-center '>
-                <div className="flex justify-between items-center">
+              <div className='top-opt flex justify-between items-center mb-5'>
+                <div className='flex items-center w-[15vw]'>
                   <ShimmerCircularImage size={50} />
                   <div style={{ width: '10px' }}></div>
                   <ShimmerBadge width={130} />
                 </div>
-
                 <ShimmerBadge width={70} />
               </div>
               <ShimmerThumbnail height={550} rounded />
-              <div className="rounded  p-2 flex items-center  justify-between  mt-1">
+              <div className="post-options  rounded  p-3 flex items-center  justify-between  mt-1">
                 <ShimmerBadge width={200} />
                 <ShimmerButton size="md" />
               </div>
-
               <ShimmerText />
             </div>
           ))
@@ -80,7 +101,13 @@ function Posts() {
                 <div className="post-options  rounded  p-3 flex items-center  justify-between  mt-1">
                   <h1 className='font-semibold text-xl textgray poppins'>{post.title}</h1>
                   <div className='flex justify-between items-center'>
-                    <img className='h-10 w-10 mr-1 rounded-full overflow-hidden' src={isLiked ? HeartActive : Heart} alt="" onClick={handleLikeClick} />
+                    <h2 className='mr-2 text-lg'>{post.likes.length}</h2>
+                    <img
+                      className='h-10 w-10 mr-1 rounded-full overflow-hidden cursor-pointer'
+                      src={likedPosts[post._id] ? HeartActive : Heart}
+                      alt=""
+                      onClick={() => handleLikeClick(post._id)}
+                    />
                     <img className='h-[2.1rem] w-[2.1rem] mb-[3px] overflow-hidden' src={Comment} alt="" />
                   </div>
                 </div>
