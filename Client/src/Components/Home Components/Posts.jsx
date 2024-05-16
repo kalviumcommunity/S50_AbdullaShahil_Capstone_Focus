@@ -42,12 +42,11 @@ function Posts() {
         console.log(err);
         setIsLoading(false);
       });
-  }, [profileID]);
+  }, []);
 
-  console.log(likedPosts)
   const handleLikeClick = async (postId) => {
     try {
-      const response = await axios.patch(`http://localhost:4000/posts/like/${postId}`, { action: !likedPosts[postId] ? 'like' : 'unlike' });
+      const response = await axios.patch(`http://localhost:4000/posts/like/${postId}`, { action: !likedPosts[postId] ? 'like' : 'unlike', profileID });
       const updatedPost = response.data;
       setPosts(posts.map(post => post._id === updatedPost._id ? updatedPost : post));
       setLikedPosts({ ...likedPosts, [postId]: !likedPosts[postId] });

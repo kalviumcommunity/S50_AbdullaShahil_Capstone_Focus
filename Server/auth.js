@@ -10,7 +10,7 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
 const generateToken = (user) => {
-    return jwt.sign({ user: user }, process.env.SECRET_KEY, { expiresIn: "5h" })
+    return jwt.sign({ user: user }, process.env.SECRET_KEY, { expiresIn: "5h" });
 }
 
 passport.use(new GoogleStrategy({
@@ -19,42 +19,40 @@ passport.use(new GoogleStrategy({
     callbackURL: "http://localhost:4000/auth/google/callback",
     passReqToCallback: true
 },
-
 async function (request, accessToken, refreshToken, profile, done) {
     try {
-        const existingProfile = await Profile.findOne({ id: profile.id });
-        if (!existingProfile) {
-            const newProfile = new Profile({
+        let profileDoc = await Profile.findOne({ id: profile.id });
+        let userDoc = null;
+
+        if (!profileDoc) {
+            profileDoc = new Profile({
                 id: profile.id,
                 name: profile.displayName,
                 picture: profile.picture,
                 email: profile.email,
             });
             
-            const newUser = new User({
+            userDoc = new User({
                 id: profile.id,
                 name: profile.displayName,
                 email: profile.email,
-                profile: newProfile._id
+                profile: profileDoc._id
             });
             
-            await newProfile.save();
-            await newUser.save();
-            
-            const token = generateToken(newProfile);
-
-            request.res.cookie('token', token, { httpOnly: false });
-            request.res.cookie('name', profile.displayName, { httpOnly: false });
-            
-            return done(null, newProfile);
+            await profileDoc.save();
+            await userDoc.save();
         } else {
-            const token = generateToken(existingProfile);
-
-            request.res.cookie('token', token, { httpOnly: false });
-            request.res.cookie('name', profile.given_name, { httpOnly: false });
-            
-            return done(null, existingProfile);
+            userDoc = await User.findOne({ profile: profileDoc._id });
         }
+
+        const token = generateToken(profileDoc);
+
+        request.res.cookie('token', token, { httpOnly: false });
+        request.res.cookie('name', profile.displayName.toString(), { httpOnly: false });
+        request.res.cookie('userID', userDoc._id.toString(), { httpOnly: false });
+        request.res.cookie('profileID', profileDoc._id.toString(), { httpOnly: false });
+
+        return done(null, profileDoc);
     } catch (err) {
         return done(err);
     }

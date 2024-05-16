@@ -21,7 +21,8 @@ const patchJoiSchema = Joi.object({
   description: Joi.string(),
   image: Joi.string(),
   category: Joi.string(),
-  action: Joi.string().valid('like', 'unlike')
+  action: Joi.string().valid('like', 'unlike'),
+  profileID: Joi.string()
 }).min(1);
 
 function validatePatch(req, res, next) {
@@ -118,7 +119,8 @@ router.get("/userPosts/:id", async (req, res) => {
 // PATCH to update likes in a post
 router.patch("/like/:id", validatePatch, async (req, res) => {
   const postId = req.params.id;
-  const { action } = req.body;
+  console.log(req.body)
+  const { action, profileID } = req.body;
 
   try {
     const post = await postModel.findById(postId);
@@ -126,17 +128,14 @@ router.patch("/like/:id", validatePatch, async (req, res) => {
       return res.status(404).json({ message: "Post not found" });
     }
 
-    // post.name = objectID of profile document
-    profileId = post.name
-
     let updatedPost;
 
     if (action === "like") {
-      if (!post.likes.includes(profileId)) {
+      if (!post.likes.includes(profileID)) {
 
         updatedPost = await postModel.findByIdAndUpdate(
           postId,
-          { $addToSet: { likes: profileId } },
+          { $addToSet: { likes: profileID } },
           { new: true }
         );
 
@@ -145,10 +144,10 @@ router.patch("/like/:id", validatePatch, async (req, res) => {
         return res.status(400).json({ message: "You already liked this post" });
       }
     } else if (action === "unlike") {
-      if (post.likes.includes(profileId)) {
+      if (post.likes.includes(profileID)) {
         updatedPost = await postModel.findByIdAndUpdate(
           postId,
-          { $pull: { likes: profileId } },
+          { $pull: { likes: profileID } },
           { new: true }
         );
         console.log("removed like")
