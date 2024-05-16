@@ -15,20 +15,13 @@ const postJoiSchema = Joi.object({
   category: Joi.string().required(),
 });
 
-// const patchJoiSchema = Joi.object({
-//   name: Joi.string(),
-//   title: Joi.string(),
-//   description: Joi.string(),
-//   image: Joi.string(),
-//   category: Joi.string(),
-// }).min(1);
 const patchJoiSchema = Joi.object({
   name: Joi.string(),
   title: Joi.string(),
   description: Joi.string(),
   image: Joi.string(),
   category: Joi.string(),
-  action: Joi.string().valid('like', 'unlike') // Assuming action can only be 'like' or 'unlike'
+  action: Joi.string().valid('like', 'unlike')
 }).min(1);
 
 function validatePatch(req, res, next) {
@@ -125,7 +118,6 @@ router.get("/userPosts/:id", async (req, res) => {
 // PATCH to update likes in a post
 router.patch("/like/:id", validatePatch, async (req, res) => {
   const postId = req.params.id;
-console.log(req.body)
   const { action } = req.body;
 
   try {
@@ -134,22 +126,31 @@ console.log(req.body)
       return res.status(404).json({ message: "Post not found" });
     }
 
+    // post.name = objectID of profile document
     profileId = post.name
 
     let updatedPost;
 
     if (action === "like") {
       if (!post.likes.includes(profileId)) {
-        post.likes.push(profileId);
-        updatedPost = await post.save();
+
+        updatedPost = await postModel.findByIdAndUpdate(
+          postId,
+          { $addToSet: { likes: profileId } },
+          { new: true }
+        );
+
         console.log("added like")
       } else {
         return res.status(400).json({ message: "You already liked this post" });
       }
     } else if (action === "unlike") {
       if (post.likes.includes(profileId)) {
-        post.likes.pull(profileId);
-        updatedPost = await post.save();
+        updatedPost = await postModel.findByIdAndUpdate(
+          postId,
+          { $pull: { likes: profileId } },
+          { new: true }
+        );
         console.log("removed like")
       } else {
         return res.status(400).json({ message: "You haven't liked this post" });

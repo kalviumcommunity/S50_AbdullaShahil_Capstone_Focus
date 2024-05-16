@@ -28,16 +28,12 @@ function Posts() {
       .then(response => {
         const fetchedPosts = response.data;
 
-        // Loop through fetched posts to set initial liked state
         fetchedPosts.forEach(post => {
-          // Check if current user has liked the post
           const isLikedByUser = post.likes.includes(profileID);
-          // Set liked state for this post
           initialLikedPosts[post._id] = isLikedByUser;
         });
 
 
-        // Set posts, likedPosts, and loading state
         setPosts(fetchedPosts);
         setLikedPosts(initialLikedPosts);
         setIsLoading(false);
@@ -46,7 +42,7 @@ function Posts() {
         console.log(err);
         setIsLoading(false);
       });
-  }, [profileID]); // Adding userId as a dependency so useEffect runs when userId changes
+  }, [profileID]);
 
   console.log(likedPosts)
   const handleLikeClick = async (postId) => {
@@ -61,9 +57,9 @@ function Posts() {
   };
 
   return (
-    <center className="h-[85vh]  pl-5 pr-5 pt-10 overflow-hidden">
+    <center className="h-[85vh]  pl-5 pr-5 pt-10 overflow-hidden ">
       <input className='w-[30vw] search border border-gray-400 rounded-full px-8 py-4 mb-4' id="genreSelect" placeholder='Search...' />
-      <div className="pt-12 px-5 overflow-scroll h-[75vh]">
+      <div className="pt-12 px-5  overflow-x-hidden overflow-y-scroll h-[75vh]">
 
         {isLoading ? (
           Array.from({ length: 10 }).map((_, index) => (
