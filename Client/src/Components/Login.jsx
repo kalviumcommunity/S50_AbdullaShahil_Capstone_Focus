@@ -20,8 +20,8 @@ function Login() {
     
     useEffect(() => {
         const fetchData = async () => {
-          const token = Cookies.get("token");
-          if (token) {
+            const token = Cookies.get("token")? Cookies.get("token") : localStorage.getItem('token');
+            if (token) {
             try {
               await axios.post(
                 "http://localhost:4000/users/tokenvalidate", { token });
@@ -39,10 +39,9 @@ function Login() {
         const { email, password } = data;
         axios.post('http://localhost:4000/users/login', { email, password }, {withCredentials: true})
             .then(response => {
-                console.log(response)
                 const { email, name, token, userID, profileID } = response.data;
+                localStorage.setItem('token', token);
                 Cookies.set('name', name, { httpOnly: false, secure: false });
-                Cookies.set('token', token, { httpOnly: false, secure: false });
                 Cookies.set('userID', userID, { httpOnly: false, secure: false });
                 Cookies.set('profileID', profileID, { httpOnly: false, secure: false });
                 setSignupStatus('success');

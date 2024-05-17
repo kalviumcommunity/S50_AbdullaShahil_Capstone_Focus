@@ -26,9 +26,10 @@ function UserProfile() {
     
     const [buttonText, setButtonText] = useState('Edit'); 
     
-    const username = Cookies.get("name").replace(/\"/g, '');
-    const token = Cookies.get("token");
-    
+    const username = Cookies.get("name") ? Cookies.get("name").replace(/\"/g, '') : '';
+    const token = Cookies.get("token")? Cookies.get("token") : localStorage.getItem('token');
+    const profileID = Cookies.get("profileID");
+
     const handleClick = (button) => {
         setActiveButton(button);
     };
@@ -47,11 +48,12 @@ function UserProfile() {
             });
     }, []);
 
+
     useEffect(() => {
-        if (!id) {
+        if (!profileID) {
             return;
         }
-        axios.get(`http://localhost:4000/posts/userPosts/${id}`)
+        axios.get(`http://localhost:4000/posts/userPosts/${profileID}`)
             .then(response => {
                 console.log(response)
                 setPosts(response.data);
@@ -60,7 +62,7 @@ function UserProfile() {
                 console.log("error fetching posts", err);
             });
 
-        axios.get(`http://localhost:4000/articles/userArticles/${id}`)
+        axios.get(`http://localhost:4000/articles/userArticles/${profileID}`)
             .then(response => {
                 console.log(response.data)
                 const articlesWithRelativeTime = response.data.map(article => ({

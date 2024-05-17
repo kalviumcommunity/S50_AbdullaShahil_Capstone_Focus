@@ -6,7 +6,7 @@ import ProfileIMG3 from '../../assets/review3.jpeg'
 import Cookies from 'js-cookie';
 
 function UserPanel() {
-    const username = Cookies.get("name").replace(/\"/g, '');
+    const username = Cookies.get("name") ? Cookies.get("name").replace(/\"/g, '') : '';
     const [isLogoutPopupOpen, setIsLogoutPopupOpen] = useState(false);
     const [suggestedUsers, setSuggestedUsers] = useState([]);
     const navigate = useNavigate();
@@ -43,6 +43,7 @@ function UserPanel() {
         Cookies.remove('userData');
         Cookies.remove('email');
         Cookies.remove('name');
+        localStorage.removeItem('token');
         Cookies.remove('token');
         Cookies.remove('data');
         Cookies.remove('profileID');

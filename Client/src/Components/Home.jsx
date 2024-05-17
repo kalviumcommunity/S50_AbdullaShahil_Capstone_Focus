@@ -11,7 +11,6 @@ import 'ldrs/ring'
 const postTemplate = "Create a post";
 const navigateTo = "/post";
 
-// Create a wrapper component for LazyNavigation to pass props
 function LazyNavigationWrapper() {
   return (
     <Suspense fallback={<l-ring

@@ -18,7 +18,8 @@ import Comment from '../../assets/comment.png';
 function Articles({ articles }) {
     const [isLiked, setIsLiked] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const username = Cookies.get("name").replace(/\"/g, '');
+    const username = Cookies.get("name") ? Cookies.get("name").replace(/\"/g, '') : '';
+    
     const handleLikeClick = () => {
         setIsLiked(!isLiked);
     };
@@ -65,7 +66,7 @@ function Articles({ articles }) {
                                 <div className='top-opt flex justify-between items-center mb-5'>
                                     <div className='flex items-center w-[15vw]'>
                                         <img className='h-12 w-12 rounded-full overflow-hidden' src={ProfileIMG2} alt="" />
-                                        <h3 className='post-username pl-4 font-light poppins'>{article.name}</h3>
+                                        <h3 className='post-username pl-4 font-light poppins'>{username}</h3>
                                     </div>
                                     <h3 className='font-light poppins text-gray-700'>{article.relativeTime}</h3>
                                 </div>

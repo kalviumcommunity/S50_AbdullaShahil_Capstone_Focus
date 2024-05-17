@@ -68,25 +68,20 @@ router.get("/:id", async (req, res) => {
 // GET specific articles by USER ID
 router.get("/userArticles/:id", async (req, res) => {
   const id = req.params.id;
-
+  console.log(id)
   try {
-    const user = await userModel.findById(id);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    const profileID = user.profile;
-    const profile = await profileModel.findById(profileID).populate("articles").exec();
+    const profile = await profileModel.findById(id).populate("articles").exec();
 
     const articles = profile.articles;
+    console.log(articles)
     const responseData = articles.map(article => ({
-      name: user.name,
+      name: article.name,
       title: article.title,
       description: article.description,
       image: article.image,
       postedTime: article.postedTime
     }));
-
+    console.log(responseData)
     res.json(responseData);
 
   } catch (error) {

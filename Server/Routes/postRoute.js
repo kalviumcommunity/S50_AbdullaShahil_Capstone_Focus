@@ -90,13 +90,8 @@ router.get("/userPosts/:id", async (req, res) => {
   const id = req.params.id;
 
   try {
-    const user = await userModel.findById(id);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
 
-    const profileID = user.profile;
-    const profile = await profileModel.findById(profileID).populate("posts").exec();
+    const profile = await profileModel.findById(id).populate("posts").exec();
 
     const posts = profile.posts;
     const responseData = posts.map(post => ({
@@ -159,6 +154,7 @@ router.patch("/like/:id", validatePatch, async (req, res) => {
     }
 
     res.json(updatedPost);
+    console.log(updatedPost)
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
