@@ -64,7 +64,6 @@ const verifyToken = (req, res, next) => {
     if (!token) {
         return res.status(401).json({ error: "Unauthorized: Token is not provided" });
     }
-
     try {
         const decoded = jwt.verify(token, process.env.SECRET_KEY);
         req.decoded = decoded;
@@ -79,11 +78,7 @@ const verifyToken = (req, res, next) => {
 // GET each user by token
 router.post("/getUser", verifyToken, async (req, res) => {
     try {
-        const userId = req.decoded.user._id;
-        const user = await userModel.findById(userId);
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
+        const user = req.decoded.user;
 
         res.status(200).json({ valid: true, user });
     } catch (error) {

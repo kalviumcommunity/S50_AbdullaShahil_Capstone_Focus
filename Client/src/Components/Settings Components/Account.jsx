@@ -16,7 +16,7 @@ function Account() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [passwordStatus, setPasswordStatus] = useState(null);
-  const token = Cookies.get("token");
+  const token = Cookies.get("token")? Cookies.get("token") : localStorage.getItem('token');
 
   useEffect(() => {
     axios.post(`http://localhost:4000/getUser`, { token }, { withCredentials: true })

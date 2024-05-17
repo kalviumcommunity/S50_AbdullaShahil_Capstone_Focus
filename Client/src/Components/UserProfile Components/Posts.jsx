@@ -16,7 +16,8 @@ import Comment from '../../assets/comment.png';
 function Posts({ posts }) {
   const [isLiked, setIsLiked] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const username = Cookies.get("name").replace(/\"/g, '');
+  const username = Cookies.get("name") ? Cookies.get("name").replace(/\"/g, '') : '';
+  
   const handleLikeClick = () => {
     setIsLiked(!isLiked);
   };
