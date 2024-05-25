@@ -141,7 +141,7 @@ router.post("/", validateUser, async (req, res) => {
         });
         const token = generateToken(newUser);
 
-        res.status(201).json({ userData: newUser, token: token, userID: user._id, profileID: profile._id });
+        res.status(201).json({ userData: newUser, token: token, userID: newUser._id, profileID: profile._id });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal server error" });

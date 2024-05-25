@@ -23,7 +23,7 @@ function UserProfile() {
     const [id, setId] = useState('');
     const [posts, setPosts] = useState([]);
     const [articles, setArticles] = useState([]);
-    
+
     const [buttonText, setButtonText] = useState('Edit'); 
     
     const username = Cookies.get("name") ? Cookies.get("name").replace(/\"/g, '') : '';

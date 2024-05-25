@@ -95,6 +95,7 @@ router.get("/userPosts/:id", async (req, res) => {
 
     const posts = profile.posts;
     const responseData = posts.map(post => ({
+      _id: post._id,
       name: post.name.name,
       title: post.title,
       description: post.description,
@@ -199,7 +200,58 @@ router.post("/", validatePost, async (req, res) => {
   }
 });
 
+// DELETE a post
+router.delete("/:id", async (req, res) => {
+  try {
+    // console.log(req)
+    const postID = req.params.id
+    const { profileid } = req.headers; // Ensure header key is lowercase
 
+    // Check if profileID is present in headers
+    if (!profileid) {
+      return res.status(400).json({ error: "Profile ID is required" });
+    }
 
+    console.log(profileid);
+
+    // Find the profile by ID
+    const profile = await profileModel.findById(profileid);
+    if (!profile) {
+      return res.status(404).json({ error: "Profile not found" });
+    }
+
+    console.log(profile);
+
+    const deletedPost = await postModel.findByIdAndDelete(postID);
+    console.log(deletedPost)
+    if (!deletedPost) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    // Remove the post ID from the profile ---> posts array
+    profile.posts = profile.posts.filter(id => id.toString() !== postID);
+    await profile.save();
+
+    res.json({ message: "Post deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// PUT to update a post
+router.put("/:id", async (req, res) => {
+  try {
+    console.log(req.params.id)
+    const updatedPost = await postModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updatedPost) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    res.json(updatedPost);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 module.exports = router;

@@ -94,8 +94,8 @@ function Articles() {
                     <div className='pl-3 w-[35vw] '>
                       <h1 className='font-semibold text-left text-xl textgray poppins mb-2'>{article.title}</h1>
 
-                      <div className='h-[37vh] overflow-scroll'>
-                        <p className=' font-light text-gray-700 poppins text-sm border border-gray-150 rounded-md p-1' style={{ textAlign: 'justify' }}>{article.description}</p>
+                      <div className='h-[37vh] overflow-y-scroll'>
+                        <p className=' font-light w-full text-gray-700 poppins text-sm border border-gray-150 rounded-md p-1' style={{ textAlign: 'justify' }}>{article.description}</p>
                       </div>
 
                       <div className='flex items-center justify-end mt-2'>

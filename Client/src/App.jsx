@@ -8,6 +8,7 @@ import Write from './Components/Write';
 import UserProfile from './Components/UserProfile';
 import Settings from './Components/Settings';
 import LensHub from './Components/LensHub';
+import EditPost from './Components/EditPost';
 import './App.css'
 
 
@@ -24,6 +25,7 @@ function App() {
       <Route path='/settings' element={<Settings/>}/>
       <Route path='/lenshub' element={<LensHub/>}/>
       <Route path='/write' element={<Write/>}/>
+      <Route path='/editPost/:id' element={<EditPost/>}/>
     </Routes>
     </div>
   )
