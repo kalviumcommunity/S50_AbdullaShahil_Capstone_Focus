@@ -245,7 +245,8 @@ router.put("/:id", validatePutUser, async (req, res) => {
         await session.commitTransaction();
         session.endSession();
 
-        res.json(updatedUser);
+        const token = generateToken(updatedUser);
+        res.json({ user: updatedUser, token });
     } catch (error) {
         console.error("Error updating user:", error);
         await session.abortTransaction();
