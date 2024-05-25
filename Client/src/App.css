@@ -291,6 +291,20 @@ ul.breadcrumb li span {
   object-fit: cover;
 }
 
+.existing-image-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.existing-image-wrapper img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .article-image-wrapper{
 height: 45vh;
 width: 25vw;
@@ -384,6 +398,32 @@ overflow: hidden;
 
 .pointer:hover{
   cursor: pointer;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+  backdrop-filter: blur(5px); /* Add blur effect to the background */
+  z-index: 999; /* Ensure the overlay stays on top */
+  pointer-events: auto; /* Allow pointer events on the overlay */
+}
+
+.delete-popup{
+  background-color: white;
+  width: 30%;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+}
+
+.delete-popup h2{
+  font-size: 20px;
 }
 
 @media (max-width: 1022px) {

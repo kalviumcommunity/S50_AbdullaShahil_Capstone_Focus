@@ -23,7 +23,7 @@ function UserProfile() {
     const [id, setId] = useState('');
     const [posts, setPosts] = useState([]);
     const [articles, setArticles] = useState([]);
-    
+
     const [buttonText, setButtonText] = useState('Edit'); 
     
     const username = Cookies.get("name") ? Cookies.get("name").replace(/\"/g, '') : '';
@@ -37,6 +37,7 @@ function UserProfile() {
     useEffect(() => {
         axios.post(`http://localhost:4000/users/getUser`, { token }, { withCredentials: true })
             .then(response => {
+                console.log("userrr",response.data)
                 const userData = response.data.user;
                 setUserData(userData);
                 setName(userData.name);
@@ -88,6 +89,7 @@ function UserProfile() {
                 setButtonText('Edit');
                 setIsSubmitted(true); 
                 Cookies.set("name", name);
+                localStorage.setItem("token", response.data.token);
             })
             .catch(error => {
                 console.error(error);

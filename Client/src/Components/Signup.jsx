@@ -40,7 +40,7 @@ function Signup() {
             .catch(error => {
                 console.log(error);
                 setSignupStatus('failure');
-                console.log(error.response.data);
+                console.log(error.response);
             });
     };
     

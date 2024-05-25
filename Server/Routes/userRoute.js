@@ -141,7 +141,7 @@ router.post("/", validateUser, async (req, res) => {
         });
         const token = generateToken(newUser);
 
-        res.status(201).json({ userData: newUser, token: token, userID: user._id, profileID: profile._id });
+        res.status(201).json({ userData: newUser, token: token, userID: newUser._id, profileID: profile._id });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal server error" });
@@ -245,7 +245,8 @@ router.put("/:id", validatePutUser, async (req, res) => {
         await session.commitTransaction();
         session.endSession();
 
-        res.json(updatedUser);
+        const token = generateToken(updatedUser);
+        res.json({ user: updatedUser, token });
     } catch (error) {
         console.error("Error updating user:", error);
         await session.abortTransaction();
