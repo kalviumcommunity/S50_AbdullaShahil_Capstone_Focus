@@ -6,22 +6,16 @@ meta {
 
 post {
   url: http://localhost:4000/posts/
-  body: multipartForm
+  body: json
   auth: none
 }
 
 body:json {
   {
-    "image": "File",
-    "name": "Jacky",
-    "title": "ddsddsd",
-    "description": "ddsdsddsdsd"
+        "name": "beeran222",
+      "title": "Foggy forecstttt",
+      "description": "Have a look at the breezifying forest.....C'mon!!",
+      "image": "https://firebasestorage.googleapis.com/v0/b/focus-8b1e0.appspot.com/o/Posts%2F45afd802-0c0f-4d57-aa72-f5fc215aa5c1?alt=media&token=54b2954d-114b-4fbe-919e-2e0a9ca3ebf4",
+      "category": "Portraits"
   }
-}
-
-body:multipart-form {
-  image: @file(/Users/macbookpro/Desktop/KALVIUM WEBSITES/CAPSTONE FOCUS/Client/src/assets/comment.png)
-  name: hellooo
-  title: tetsing
-  description: tetsingvvrevf
 }

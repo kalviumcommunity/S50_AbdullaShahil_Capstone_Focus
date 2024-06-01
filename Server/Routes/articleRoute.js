@@ -74,7 +74,7 @@ router.get("/userArticles/:id", async (req, res) => {
     const profile = await profileModel.findById(id).populate("articles").exec();
 
     const articles = profile.articles;
-    console.log("articles")
+    
     const responseData = articles.map(article => ({
       name: article.name,
       title: article.title,
