@@ -1,0 +1,19 @@
+meta {
+  name: Update post
+  type: http
+  seq: 7
+}
+
+put {
+  url: http://localhost:4000/posts/6639ed2df45263cf9f90bda4
+  body: json
+  auth: none
+}
+
+body:json {
+    {
+      "title": "Foggy forestttt",
+      "description": "Have a look at the breezifying forest.....C'mon!!",
+      "category": "Portraits"
+    }
+}

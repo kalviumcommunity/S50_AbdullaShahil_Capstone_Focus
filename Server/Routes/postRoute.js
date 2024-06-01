@@ -203,16 +203,13 @@ router.post("/", validatePost, async (req, res) => {
 // DELETE a post
 router.delete("/:id", async (req, res) => {
   try {
-    // console.log(req)
     const postID = req.params.id
-    const { profileid } = req.headers; // Ensure header key is lowercase
+    const { profileid } = req.headers; 
 
-    // Check if profileID is present in headers
     if (!profileid) {
       return res.status(400).json({ error: "Profile ID is required" });
     }
 
-    console.log(profileid);
 
     // Find the profile by ID
     const profile = await profileModel.findById(profileid);
@@ -220,10 +217,7 @@ router.delete("/:id", async (req, res) => {
       return res.status(404).json({ error: "Profile not found" });
     }
 
-    console.log(profile);
-
     const deletedPost = await postModel.findByIdAndDelete(postID);
-    console.log(deletedPost)
     if (!deletedPost) {
       return res.status(404).json({ message: "Post not found" });
     }
@@ -242,7 +236,6 @@ router.delete("/:id", async (req, res) => {
 // PUT to update a post
 router.put("/:id", async (req, res) => {
   try {
-    console.log(req.params.id)
     const updatedPost = await postModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!updatedPost) {
       return res.status(404).json({ message: "Post not found" });
