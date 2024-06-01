@@ -37,6 +37,7 @@ router.get("/", async (req, res) => {
     }
 
     const responseData = data.map(doc => ({
+      id: doc._id,
       name: doc.name.name,
       title: doc.title,
       description: doc.description,
@@ -65,7 +66,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// GET specific articles by USER ID
+// GET specific articles by Profile ID
 router.get("/userArticles/:id", async (req, res) => {
   const id = req.params.id;
   console.log(id)
@@ -73,7 +74,7 @@ router.get("/userArticles/:id", async (req, res) => {
     const profile = await profileModel.findById(id).populate("articles").exec();
 
     const articles = profile.articles;
-    console.log(articles)
+    console.log("articles")
     const responseData = articles.map(article => ({
       name: article.name,
       title: article.title,
@@ -136,9 +137,6 @@ router.post("/", validatePost, async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
-
-
 
 
 module.exports = router;

@@ -37,7 +37,6 @@ function UserProfile() {
     useEffect(() => {
         axios.post(`http://localhost:4000/users/getUser`, { token }, { withCredentials: true })
             .then(response => {
-                console.log("userrr",response.data)
                 const userData = response.data.user;
                 setUserData(userData);
                 setName(userData.name);
