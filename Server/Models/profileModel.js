@@ -17,6 +17,12 @@ const profileSchema = new mongoose.Schema({
     ref: 'Article'
   },
 ],
+communities: [
+  {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: 'Community'
+},
+],
 });
 
 const profileModel = mongoose.model('Profile', profileSchema);

@@ -426,6 +426,15 @@ overflow: hidden;
   font-size: 20px;
 }
 
+
+
+@keyframes close {
+  100% {
+    opacity: 1;
+  }
+}
+
+
 @media (max-width: 1022px) {
   .hamburg-div {
     position: fixed;
