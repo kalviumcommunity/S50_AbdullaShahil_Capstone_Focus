@@ -2,9 +2,12 @@ const express = require("express");
 const session = require("express-session");
 const cors = require("cors");
 const connectDb = require("../Server/config/connect");
+
 const userRouter = require("./Routes/userRoute");
 const postRouter = require("./Routes/postRoute");
 const articleRouter = require("./Routes/articleRoute");
+const communityRouter = require("./Routes/communityRoute")
+
 const passport = require("passport");
 require('./auth')
 
@@ -77,6 +80,7 @@ app.use(express.json())
 app.use("/users", userRouter);
 app.use("/posts", postRouter);
 app.use("/articles", articleRouter);
+app.use("/communities", communityRouter);
 
 app.listen(port, () => {
   console.log(`🚀 server running on PORT: ${port}`);

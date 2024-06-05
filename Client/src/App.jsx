@@ -10,6 +10,7 @@ import Settings from './Components/Settings';
 import LensHub from './Components/LensHub';
 import EditPost from './Components/EditPost';
 import Chats from './Components/Chats';
+import CreateCommunity from './Components/CreateCommunity';
 import './App.css'
 
 
@@ -28,6 +29,8 @@ function App() {
       <Route path='/write' element={<Write/>}/>
       <Route path='/editPost/:id' element={<EditPost/>}/>
       <Route path='/chats' element={<Chats/>}/>
+      <Route path='/createCommunity' element={<CreateCommunity/>}/>
+
     </Routes>
     </div>
   )

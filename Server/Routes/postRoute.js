@@ -44,26 +44,13 @@ function validatePost(req, res, next) {
 // GET all posts
 router.get("/", async (req, res) => {
   try {
-    const data = await postModel.find()
-      .populate({
-        path: 'name',
-      });
+    const communities = await postModel.find()
 
-    if (!data || data.length === 0) {
+    if (!communities || communities.length === 0) {
       return res.status(404).json({ error: "No posts found" });
     }
 
-    const responseData = data.map(doc => ({
-      _id: doc._id,
-      name: doc.name.name,
-      title: doc.title,
-      description: doc.description,
-      image: doc.image,
-      category: doc.category,
-      likes: doc.likes,
-    }));
-
-    res.json(responseData);
+    res.json(communities);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "500-Internal server error" });

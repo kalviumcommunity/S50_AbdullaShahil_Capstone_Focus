@@ -15,6 +15,10 @@ const navigate = useNavigate()
     navigate("/lenshub")
   }
 
+  const toChats = () => {
+    navigate("/chats")
+  }
+
     return (
         <div className="w-fit pl-10 pr-5 pt-10 ">
 
@@ -32,7 +36,7 @@ const navigate = useNavigate()
             <ul className='cm-panel category-list  text-left '>
               <li className='rounded'><button className='text-md py-2 pr-[7.2rem] text-white poppins px-4 transition text-left  mb-2 hover:bg-black rounded' onClick={toHome}>Home</button></li>
               <li className='rounded'><button className='text-md py-2 pr-[2.5rem] px-4 text-white poppins transition text-left  mb-2 hover:bg-black rounded' onClick={toLensHub}>Lens Hub</button></li>
-              <li className='rounded'><button className='text-md py-2 text-white poppins px-4 transition text-left  mb-2 hover:bg-black rounded'>Chats</button></li>
+              <li className='rounded'><button className='text-md py-2 text-white poppins px-4 transition text-left  mb-2 hover:bg-black rounded' onClick={toChats}>Chats</button></li>
               <li className='rounded'><button className='text-md py-2 text-white poppins px-4 transition text-left  hover:bg-black rounded' onClick={toSettings}>Account Settings</button></li>
             </ul>
           </div>
