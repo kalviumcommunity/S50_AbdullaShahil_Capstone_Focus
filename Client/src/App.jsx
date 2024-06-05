@@ -9,6 +9,7 @@ import UserProfile from './Components/UserProfile';
 import Settings from './Components/Settings';
 import LensHub from './Components/LensHub';
 import EditPost from './Components/EditPost';
+import Chats from './Components/Chats';
 import './App.css'
 
 
@@ -26,6 +27,7 @@ function App() {
       <Route path='/lenshub' element={<LensHub/>}/>
       <Route path='/write' element={<Write/>}/>
       <Route path='/editPost/:id' element={<EditPost/>}/>
+      <Route path='/chats' element={<Chats/>}/>
     </Routes>
     </div>
   )
