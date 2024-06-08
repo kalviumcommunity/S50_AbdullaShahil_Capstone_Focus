@@ -44,13 +44,32 @@ function validatePost(req, res, next) {
 // GET all posts
 router.get("/", async (req, res) => {
   try {
-    const communities = await postModel.find()
+    const posts = await postModel.find().lean(); // Using lean() for performance improvement
 
-    if (!communities || communities.length === 0) {
+    if (!posts || posts.length === 0) {
       return res.status(404).json({ error: "No posts found" });
     }
 
-    res.json(communities);
+    const profileIds = posts.map(post => post.name);
+
+    const profiles = await profileModel.find({ _id: { $in: profileIds } }).lean();
+
+    const profileMap = {};
+    profiles.forEach(profile => {
+      profileMap[profile._id] = profile.name;
+    });
+
+    const responseData = posts.map(post => ({
+      _id: post._id,
+      name: profileMap[post.name] || 'Unknown',
+      title: post.title,
+      description: post.description,
+      image: post.image,
+      category: post.category,
+      likes: post.likes,
+    }));
+
+    res.json(responseData);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "500-Internal server error" });

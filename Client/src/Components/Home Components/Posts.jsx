@@ -27,12 +27,10 @@ function Posts() {
     axios.get(`http://localhost:4000/posts`)
       .then(response => {
         const fetchedPosts = response.data;
-
         fetchedPosts.forEach(post => {
           const isLikedByUser = post.likes.includes(profileID);
           initialLikedPosts[post._id] = isLikedByUser;
         });
-
 
         setPosts(fetchedPosts);
         setLikedPosts(initialLikedPosts);

@@ -11,20 +11,39 @@ router.use(express.json());
 // GET ALL COMMUNITIES
 router.get("/", async (req, res) => {
   try {
-    const data = await communityModel.find()
-      .populate('admin', 'name') 
-      .exec();
+    const communities = await communityModel.find()
+      .populate('admin', 'name')
+      .populate('members', 'name')
+      .lean();
 
-    if (!data || data.length === 0) {
+    if (!communities || communities.length === 0) {
       return res.status(404).json({ error: "No communities found" });
     }
 
-    res.json(data);
+    const responseData = communities.map(community => ({
+      _id: community._id,
+      name: community.name,
+      members: community.members.map(member => ({
+        _id: member._id,
+        name: member.name
+      })), 
+      profileImg: community.profileImg,
+      admin: {
+        _id: community.admin._id,
+        name: community.admin.name
+      },
+      description: community.description
+    }));
+
+    res.json(responseData);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "500 - Internal server error" });
   }
 });
+
+
+
 
 // CREATE A NEW COMMUNITY
 router.post("/", async (req, res) => {
@@ -44,7 +63,7 @@ router.post("/", async (req, res) => {
       name: name,
       admin: profile._id,
       description: description,
-      profileImg: profileImg, 
+      profileImg: profileImg,
     };
 
     const newCommunity = new communityModel(newCommunityData);
@@ -63,5 +82,48 @@ router.post("/", async (req, res) => {
     res.status(500).json({ message: "500 - Internal server error" });
   }
 });
+
+
+// ADD MEMBERS
+router.patch("/addMember/:id", async (req, res) => {
+  try {
+    const communityId = req.params.id;
+    const userId = req.body.userId;
+
+    const community = await communityModel.findById(communityId);
+    if (!community) {
+      return res.status(404).json({ error: "Community not found" });
+    }
+
+    const user = await userModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    
+    const profileId = user.profile;
+    const profile = await profileModel.findById(profileId);
+    if (!profile) {
+      return res.status(404).json({ error: "Profile not found" });
+    }
+
+    if (community.members.includes(profileId)) {
+      return res.status(400).json({ error: "User is already a member of the community" });
+    }
+
+    community.members.push(profileId);
+
+    profile.communities.push(communityId);
+
+    await community.save();
+    await profile.save();
+
+    console.log("User added to community")
+    res.status(200).json({ message: "User added to community successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "500 - Internal server error" });
+  }
+});
+
 
 module.exports = router;
