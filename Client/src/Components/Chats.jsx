@@ -9,11 +9,13 @@ const ChatApp = () => {
     const navigate = useNavigate();
     const [allUsers, setAllUsers] = useState([]);
     const [communities, setCommunities] = useState([]);
-    const [activeChatType, setActiveChatType] = useState('personal'); 
-    const [activeChat, setActiveChat] = useState(null); 
+    const [activeChatType, setActiveChatType] = useState('personal');
+    const [activeChat, setActiveChat] = useState(null);
     const [messages, setMessages] = useState([]);
     const [messageInput, setMessageInput] = useState('');
-    const [viewInfo, setViewInfo] = useState(false); 
+    const [viewInfo, setViewInfo] = useState(false);
+    const [deletePopupOpen, setDeletePopupOpen] = useState(false);
+    const [addMemberPopupOpen, setAddMemberPopupOpen] = useState(false);
 
     const toHome = () => {
         navigate("/home");
@@ -53,7 +55,7 @@ const ChatApp = () => {
         axios.get(`http://localhost:4000/communities`)
             .then(response => {
                 setCommunities(response.data);
-                console.log(response.data);
+                console.log("communities", response.data);
             })
             .catch(error => {
                 console.log("error: ", error);
@@ -62,7 +64,7 @@ const ChatApp = () => {
 
     const handleChatClick = (chat) => {
         setActiveChat(chat);
-        setViewInfo(false); 
+        setViewInfo(false);
         setMessages([]);
     };
 
@@ -73,6 +75,41 @@ const ChatApp = () => {
     const closeChat = () => {
         setActiveChat(null);
         setViewInfo(false);
+    };
+
+    const handleDeleteCommunity = () => {
+        if (activeChat) {
+            axios.delete(`http://localhost:4000/communities/${activeChat._id}`)
+                .then(response => {
+                    setCommunities(communities.filter(community => community._id !== activeChat._id));
+                    setActiveChat(null);
+                    setDeletePopupOpen(false);
+                })
+                .catch(error => {
+                    console.log("Error deleting community: ", error);
+                });
+        }
+    };
+
+    const handleNoClick = () => {
+        setDeletePopupOpen(false);
+    };
+
+    const openAddMemberPopup = () => {
+        setAddMemberPopupOpen(true);
+    };
+
+    const handleAddMember = (userId) => {
+        if (activeChat) {
+            axios.patch(`http://localhost:4000/communities/addMember/${activeChat._id}`, { userId })
+                .then(response => {
+                    setActiveChat({ ...activeChat, members: response.data.members });
+                    setAddMemberPopupOpen(false);
+                })
+                .catch(error => {
+                    console.log("Error adding member: ", error);
+                });
+        }
     };
 
     return (
@@ -138,7 +175,7 @@ const ChatApp = () => {
                             <div key={community._id} className='flex items-center p-2 hover:bg-gray-100 rounded-lg transition hover:cursor-pointer' onClick={() => handleChatClick(community)}>
                                 <img
                                     className="w-16 h-16 border rounded-full mr-2"
-                                    src={community.profileImg}
+                                    src={community.profileImg || profilePic}
                                     alt="Community"
                                 />
                                 <h1 className='p-4 poppins text-md'>{community.name}</h1>
@@ -147,13 +184,57 @@ const ChatApp = () => {
                     </div>
                 </div>
 
+                {deletePopupOpen && (
+                    <div>
+                        <div className="overlay"></div>
+                        <div className="border logout-popup p-5 rounded flex flex-col justify-around text-center">
+                            <h2>Are you sure you want to delete?</h2>
+                            <div className='flex justify-around'>
+                                <button onClick={handleDeleteCommunity} className='py-3 px-5 rounded bg-red-600 text-white font-bold hover:bg-red-400'>Yes</button>
+                                <button onClick={handleNoClick} className='py-3 px-5 border rounded text-black font-bold hover:bg-gray-50'>No</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+                {addMemberPopupOpen && (
+                    <div>
+                        <div className="overlay"></div>
+                        <div className="border h-[60vh] logout-popup p-5 rounded-lg flex flex-col justify-around text-center">
+                            <h2 className='text-lg'>Add new members</h2>
+                            <div className='border border-gray-300 rounded-lg overflow-scroll'>
+                                <ul className='user-list'>
+                                    {allUsers.filter(user =>
+                                        activeChat &&
+                                        activeChat.admin &&
+                                        user.name !== activeChat.admin.name &&
+                                        !activeChat.members.some(member => member.name === user.name)
+                                    ).map(user => (
+                                        <li key={user._id} className='p-2'>
+                                            <button onClick={() => handleAddMember(user._id)} className='p-2 w-full flex items-center justify-left bg-gray-50 poppins text-gray-700 rounded hover:bg-gray-200 transition'>
+                                                <img
+                                                    className="w-16 h-16 border rounded-full mr-2"
+                                                    src={profilePic}
+                                                    alt="Profile"
+                                                />
+                                                <h1 className='p-4 poppins text-lg'>{user.name}</h1>
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                            <button onClick={() => setAddMemberPopupOpen(false)} className='gradient2 mt-4 py-2 px-4 border rounded text-white font-bold hover:opacity-90'>Cancel</button>
+                        </div>
+                    </div>
+                )}
+
+
                 <div className='chat-box mt-10 border border-gray-300 shadow-sm lg:w-[50vw] lg:h-[78vh] rounded-lg p-2'>
                     {activeChat ? (
                         <>
                             <div className='border-b flex items-center justify-between'>
                                 <div className='flex items-center p-2 rounded-lg mb-2 cursor-pointer' onClick={toggleViewInfo}>
                                     <img
-                                        className="w-16 h-16 border  rounded-full mr-2"
+                                        className="w-16 h-16 border rounded-full mr-2"
                                         src={activeChat.profileImg || profilePic}
                                         alt="Profile"
                                     />
@@ -165,8 +246,9 @@ const ChatApp = () => {
                                     <span className='mb-1'>&times;</span>
                                 </button>
                             </div>
+
                             {viewInfo ? (
-                                <div className='chat-info p-4'>
+                                <div className='chat-info p-4 rounded-lg h-[65vh]  overflow-scroll'>
                                     <img
                                         className="w-32 h-32 border rounded-full mx-auto my-4"
                                         src={activeChat.profileImg || profilePic}
@@ -174,6 +256,60 @@ const ChatApp = () => {
                                     />
                                     <center className='poppins text-xl font-semibold'>{activeChat.name}</center>
                                     <p className='poppins text-center text-md mt-2'>{activeChat.description || "No description available."}</p>
+
+                                    {activeChatType === 'groups' && (
+                                        <div className="flex flex-col items-center additional-info mt-4">
+                                            <div className='flex items-center justify-around w-[30vw]'>
+                                                <div className='gradient1 p-2 rounded-lg flex items-center hover:opacity-90 hover:cursor-pointer' onClick={openAddMemberPopup}>
+                                                    <button
+                                                        className="plus pb-1 ml-3 text-white text-3xl cursor-pointer outline-none hover:rotate-90 duration-300"
+                                                        title="Add New"
+                                                    >+</button>
+                                                    <h1 className='text-white poppins text-md ml-4 mr-2'>Add members</h1>
+                                                </div>
+
+                                                <button className='bg-red-600 p-4 text-white poppins rounded-lg text-md' onClick={() => setDeletePopupOpen(true)}>Delete Community</button>
+                                            </div>
+
+                                            <hr className='mt-5 mb-5 w-[40vw]' />
+                                            <div className='flex flex-col items-left w-full pl-3 rounded '>
+                                                <h1 className='poppins font-semibold text-lg text-left mb-2'>Admin</h1>
+
+                                                <div className=' gradient2 p-3 w-full flex items-center justify-left rounded-lg bg-gray-50 poppins text-gray-700 hover:bg-gray-200 transition'>
+                                                    <img
+                                                        className="w-16 h-16 border rounded-full mr-2"
+                                                        src={profilePic}
+                                                        alt="Profile"
+                                                    />
+                                                    <h1 className='p-4 poppins text-lg text-white'>{activeChat.admin.name}</h1>
+                                                </div>
+                                            </div>
+
+                                            <hr className='mt-5 mb-5 w-[40vw]' />
+                                            <div className='w-full'>
+                                                <h1 className='poppins text-lg font-semibold text-left mb-3'>Members</h1>
+                                                <ul className='w-full'>
+                                                    {activeChat.members?.map(member => (
+
+                                                        <div key={member._id} className='mb-2 p-3 w-full flex items-center justify-left rounded-lg bg-gray-700 poppins text-gray-700 hover:bg-gray-600 transition'>
+                                                            <img
+                                                                className="w-16 h-16 border rounded-full mr-2"
+                                                                src={profilePic}
+                                                                alt="Profile"
+                                                            />
+                                                            <h1 className='p-4 poppins text-lg text-white'>{member.name}</h1>
+                                                        </div>
+
+                                                    )) || <p>No members available.</p>}
+                                                </ul>
+                                            </div>
+                                            <hr className='mt-5 mb-3 w-[40vw]' />
+
+                                            <h1 className='p-4 poppins text-lg text-gray-600'>#FocusCommunity</h1>
+
+                                            
+                                        </div>
+                                    )}
                                 </div>
                             ) : (
                                 <>
@@ -201,6 +337,7 @@ const ChatApp = () => {
                                     </div>
                                 </>
                             )}
+
                         </>
                     ) : (
                         <div className='flex items-center justify-center lg:h-[78vh]'>
