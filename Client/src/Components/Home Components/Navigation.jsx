@@ -23,12 +23,12 @@ const navigate = useNavigate()
         <div className="w-fit pl-10 pr-5 pt-10 ">
 
             <div className="flex  items-center pl-1">
-                <div className="add-btn gradient1 flex justify-center items-center bg-green-500 w-16 h-16 rounded-full">
-                <Link to={props.navigateTo}><button
+            <Link to={props.navigateTo}><div className="add-btn gradient1 flex justify-center items-center bg-green-500 w-16 h-16 rounded-full">
+                <button
                         className="plus pb-1 text-white text-4xl cursor-pointer outline-none hover:rotate-90 duration-300"
                         title="Add New"
-                    >+</button></Link>
-                </div>
+                    >+</button>
+                </div></Link>
                 <h1 className="textgray pl-4 text-lg poppins">{props.template}</h1>
             </div>
 

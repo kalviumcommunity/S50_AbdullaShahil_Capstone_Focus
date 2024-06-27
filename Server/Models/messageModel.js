@@ -1,14 +1,16 @@
 const mongoose = require('mongoose');
 
 const messageSchema = new mongoose.Schema({
-    message: [
+    messages: [
         {
             name: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Profile'
+                type: String,  // Assuming you want to store the user's name as a string
+                required: true
             },
-            profilePic: String,
-            message: String,
+            message: {
+                type: String,
+                required: true
+            },
             postedTime: {
                 type: Date,
                 default: Date.now
@@ -17,7 +19,8 @@ const messageSchema = new mongoose.Schema({
     ],
     communityId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Community'
+        ref: 'Community',
+        required: true
     }
 });
 
