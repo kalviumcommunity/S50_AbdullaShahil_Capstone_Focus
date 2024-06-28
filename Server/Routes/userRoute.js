@@ -56,6 +56,7 @@ function validatePatchUser(req, res, next) {
     if (error) {
         return res.status(400).json({ error: error.details[0].message });
     }
+
     next();
 }
 
@@ -110,6 +111,17 @@ router.get("/otherUsers", async (req, res) => {
     }
 });
 
+// GET users for displaying in chat list
+router.get("/list/displayData", async (req, res) => {
+    try {
+        const data = await userModel.aggregate([{ $sample: { size: 5 } }]);
+        res.json(data);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "500-Internal server error" });
+    }
+});
+
 
 // GET each user by ID
 router.get("/:id", async (req, res) => {
@@ -119,7 +131,29 @@ router.get("/:id", async (req, res) => {
         if (!data) {
             return res.status(404).json({ error: "User not found" });
         }
+
+        const profile = await profileModel.findById(data.profile);
+
         res.json(data);
+    } catch (error) {
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+// GET each user's profile by userID
+router.get("/profile/:id", async (req, res) => {
+    const id = req.params.id;
+    try {
+        const user = await userModel.findById(id);
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const profile = await profileModel.findById(user.profile)
+        .select('_id name email communities')
+        .lean();
+
+        res.json(profile);
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });
     }

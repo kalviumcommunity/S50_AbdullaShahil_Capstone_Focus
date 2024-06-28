@@ -20,8 +20,8 @@ function Posts() {
   const [isLoading, setIsLoading] = useState(true);
   const [likedPosts, setLikedPosts] = useState({});
 
-  const profileID = Cookies.get("profileID");
   const initialLikedPosts = {}
+  const profileID = Cookies.get("profileID");
 
   useEffect(() => {
     axios.get(`http://localhost:4000/posts`)

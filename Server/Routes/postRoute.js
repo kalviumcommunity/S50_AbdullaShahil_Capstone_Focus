@@ -44,7 +44,7 @@ function validatePost(req, res, next) {
 // GET all posts
 router.get("/", async (req, res) => {
   try {
-    const posts = await postModel.find().lean(); // Using lean() for performance improvement
+    const posts = await postModel.find().lean();
 
     if (!posts || posts.length === 0) {
       return res.status(404).json({ error: "No posts found" });
@@ -121,7 +121,7 @@ router.get("/userPosts/:id", async (req, res) => {
 // PATCH to update likes in a post
 router.patch("/like/:id", validatePatch, async (req, res) => {
   const postId = req.params.id;
-  console.log(req.body)
+  console.log(req.body);
   const { action, profileID } = req.body;
 
   try {
@@ -134,14 +134,14 @@ router.patch("/like/:id", validatePatch, async (req, res) => {
 
     if (action === "like") {
       if (!post.likes.includes(profileID)) {
-
         updatedPost = await postModel.findByIdAndUpdate(
           postId,
           { $addToSet: { likes: profileID } },
           { new: true }
-        );
+        )      .populate('name', 'name')
 
-        console.log("added like")
+
+        console.log("added like");
       } else {
         return res.status(400).json({ message: "You already liked this post" });
       }
@@ -151,8 +151,9 @@ router.patch("/like/:id", validatePatch, async (req, res) => {
           postId,
           { $pull: { likes: profileID } },
           { new: true }
-        );
-        console.log("removed like")
+        )      .populate('name', 'name')
+
+        console.log("removed like");
       } else {
         return res.status(400).json({ message: "You haven't liked this post" });
       }
@@ -160,8 +161,16 @@ router.patch("/like/:id", validatePatch, async (req, res) => {
       return res.status(400).json({ message: "Invalid action" });
     }
 
-    res.json(updatedPost);
-    console.log(updatedPost)
+    const responseData = {
+      _id: updatedPost._id,
+      name: updatedPost.name.name,
+      title: updatedPost.title,
+      description: updatedPost.description,
+      image: updatedPost.image,
+      category: updatedPost.category,
+      likes: updatedPost.likes,
+    };
+    res.json(responseData);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });

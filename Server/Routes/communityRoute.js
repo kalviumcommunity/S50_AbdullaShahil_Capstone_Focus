@@ -5,6 +5,7 @@ const Joi = require("joi");
 const communityModel = require("../Models/communityModel");
 const profileModel = require("../Models/profileModel");
 const userModel = require("../Models/userModel");
+const messageModel = require("../Models/messageModel")
 
 router.use(express.json());
 
@@ -42,6 +43,45 @@ router.get("/", async (req, res) => {
   }
 });
 
+// GET A SINGLE COMMUNITY
+router.get("/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const community = await communityModel.findById(id)
+      .populate('admin', 'name')
+      .populate('members', 'name')
+      .lean();
+
+    if (!community) {
+      return res.status(404).json({ error: "Community not found" });
+    }
+
+    res.json(community);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "500 - Internal server error" });
+  }
+});
+
+// GET COMMUNITY LISTS (NAME, PROFILE IMG AND ID)
+router.get("/list/displayData", async (req, res) => {
+  try {
+    const communities = await communityModel.find()
+      .select('_id name profileImg')
+      .lean();
+
+    if (!communities || communities.length === 0) {
+      return res.status(404).json({ error: "No communities found" });
+    }
+
+    res.json(communities);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "500 - Internal server error" });
+  }
+});
 
 
 
@@ -111,7 +151,6 @@ router.patch("/addMember/:id", async (req, res) => {
     }
 
     community.members.push(profileId);
-
     profile.communities.push(communityId);
 
     await community.save();
@@ -122,6 +161,21 @@ router.patch("/addMember/:id", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "500 - Internal server error" });
+  }
+});
+
+// DELETE a Community
+router.delete("/:id", async (req, res) => {
+  try {
+    const communityId = req.params.id
+      const deletedCommunity = await communityModel.findByIdAndDelete(communityId);
+      if (!deletedCommunity) {
+          return res.status(404).json({ message: "Community not found" });
+      }
+      res.json({ message: "Community deleted successfully" });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Internal server error" });
   }
 });
 
