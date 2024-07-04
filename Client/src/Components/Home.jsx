@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import Header from './Home Components/Header';
 import Posts from './Home Components/Posts';
 
@@ -11,7 +11,7 @@ import 'ldrs/ring'
 const postTemplate = "Create a post";
 const navigateTo = "/post";
 
-function LazyNavigationWrapper() {
+function LazyNavigationWrapper({ setPostCategory }) {
   return (
     <Suspense fallback={<l-ring
       size="40"
@@ -20,18 +20,20 @@ function LazyNavigationWrapper() {
       speed="2"
       color="#2E93FF"
     ></l-ring>}>
-      <LazyNavigation template={postTemplate} navigateTo={navigateTo} />
+      <LazyNavigation type="post" template={postTemplate} navigateTo={navigateTo} setPostCategory={setPostCategory} />
     </Suspense>
   );
 }
 
 function Home() {
+  const [postCategory, setPostCategory] = useState(null);
+
   return (
     <div>
       <Header />
       <div className="flex justify-around">
-        <LazyNavigationWrapper />
-        <Posts />
+        <LazyNavigationWrapper setPostCategory={setPostCategory} />
+        <Posts postCategory={postCategory} />
         <Suspense fallback={<l-ring
           size="40"
           stroke="5"

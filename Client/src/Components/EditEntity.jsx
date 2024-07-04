@@ -4,17 +4,14 @@ import { Select, Option } from "@material-tailwind/react";
 import { useForm } from 'react-hook-form';
 import Cookies from 'js-cookie';
 import axios from 'axios';
-import { v4 } from 'uuid';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import Header from './Home Components/Header';
 import ProfileIMG2 from '../assets/review2.jpeg';
-import { ImageDB } from '../firebase';
 
 import 'ldrs/tailspin';
 import 'ldrs/ring';
 
-function EditPost() {
-  const { id } = useParams();
+function EditEntity() {
+  const { type, id } = useParams();
   const navigate = useNavigate();
   const { register, handleSubmit, setValue, formState: { errors } } = useForm();
   const [loading, setLoading] = useState(false);
@@ -25,19 +22,22 @@ function EditPost() {
   const name = Cookies.get('name')?.replace(/\"/g, '');
 
   useEffect(() => {
-    // Fetch the existing post data
-    axios.get(`http://localhost:4000/posts/${id}`)
-      .then(response => {
-        const post = response.data;
-        setValue('title', post.title);
-        setValue('description', post.description);
-        setCategory(post.category);
-        setExistingImage(post.image);
-      })
-      .catch(error => {
-        console.error('Error fetching post data', error);
-      });
-  }, [id, setValue]);
+    const fetchEntity = async () => {
+      try {
+        const response = await axios.get(`http://localhost:4000/${type}s/${id}`);
+        console.log(response.data)
+        const entity = response.data;
+        setValue('title', entity.title);
+        setValue('description', entity.description);
+        setCategory(entity.category);
+        setExistingImage(entity.image);
+      } catch (error) {
+        console.error(`Error fetching ${type} data`, error);
+      }
+    };
+
+    fetchEntity();
+  }, [id, setValue, type]);
 
   const handleCategoryChange = (value) => {
     setCategory(value);
@@ -48,24 +48,22 @@ function EditPost() {
   };
 
   const onSubmit = async (data) => {
+    setLoading(true);
     try {
-      setLoading(true);
       const { title, description } = data;
-
       const payload = {
-        title: title,
-        description: description,
-        category: category,
+        title,
+        description,
+        category,
       };
 
-      await axios.put(`http://localhost:4000/posts/${id}`, payload);
+      await axios.put(`http://localhost:4000/${type}s/${id}`, payload);
       setLoading(false);
       setIsSubmitted(true);
       setErrorMessage('');
       setTimeout(() => {
         navigate('/home');
       }, 300);
-
     } catch (error) {
       console.error(error);
       setLoading(false);
@@ -79,7 +77,7 @@ function EditPost() {
       <Header />
       <div className=''>
         <center className=''>
-          <h2 className="register-head textgray text-2xl font-semibold mt-10">Edit the post</h2>
+          <h2 className="register-head textgray text-2xl font-semibold mt-10">Edit the {type}</h2>
           <form className="posts border border-gray-500 rounded-md flex flex-col mt-10 p-6 lg:w-[55vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]" onSubmit={handleSubmit(onSubmit)}>
             {isSubmitted && !errorMessage ? (
               <div className="pop p-3 bg-green-500 text-white rounded mb-5">
@@ -119,12 +117,13 @@ function EditPost() {
                 <textarea className="form-input bg-gray-100 p-3 rounded border border-gray-400 mb-3" {...register('description', {
                   required: 'This Field is required',
                   minLength: { value: 3, message: 'Minimum 3 characters are required' },
-                })} placeholder="Enter the description" id="description" maxLength={250} style={{ maxHeight: "200px", minHeight:"93px" }} />
+                })} placeholder="Enter the description" id="description" maxLength={250} style={{ maxHeight: "200px", minHeight: "93px" }} />
                 <br />
                 {errors.description && <span className="text-left text-red-500">{errors.description.message}</span>}
 
 
-                  <div className=' mb-5'>
+                <div className='mb-5'>
+                  {type === 'post' ? (
                     <Select
                       label="Select Category"
                       value={category}
@@ -137,7 +136,22 @@ function EditPost() {
                       <Option value="Macro">Macro</Option>
                       <Option value="Minimal">Minimal</Option>
                     </Select>
-                  </div>
+                  ) : (
+                    <Select
+                      label="Select Category"
+                      value={category}
+                      id="category"
+                      onChange={handleCategoryChange}
+                    >
+                      <Option value="Spotlights">Spotlights</Option>
+                      <Option value="Tips and Tricks">Tips and Tricks</Option>
+                      <Option value="News and Trends">News and Trends</Option>
+                    </Select>
+                  )}
+                </div>
+
+
+
 
                 <div className='flex items-center w-full h-12'>
                   <button onClick={navigateHome} className="submit-btn font-bold bg-gray-800 text-white rounded p-2 h-full w-1/2 mr-1 hover:bg-gray-600 transition">Cancel</button>
@@ -152,4 +166,4 @@ function EditPost() {
   );
 }
 
-export default EditPost;
+export default EditEntity;

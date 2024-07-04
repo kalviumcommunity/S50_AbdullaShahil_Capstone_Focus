@@ -17,7 +17,11 @@ const articleSchema = new mongoose.Schema({
   postedTime: { 
     type: Date,
     default: Date.now 
-  }
+  },
+  likes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Profile',
+  }]
 });
 
 const articleModel = mongoose.model('Article', articleSchema);
