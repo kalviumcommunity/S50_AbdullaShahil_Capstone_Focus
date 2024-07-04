@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -21,11 +21,20 @@ import {
   MenuItem,
 } from "@material-tailwind/react";
 
-function Posts({ posts, likedPosts, toggleLike, isLoading }) {
+function Posts({ posts, likedPosts, toggleLike }) {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [deletePostId, setDeletePostId] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
   const profileID = Cookies.get('profileID');
   const navigate = useNavigate();
+  const username = Cookies.get("name").replace(/\"/g, '');
+
+  useEffect(() => {
+    if (posts && posts.length > 0) {
+        setIsLoading(false);
+    }
+}, [posts]);
 
   const handleDelete = () => {
     axios.delete(`http://localhost:4000/posts/${deletePostId}`, {
@@ -44,10 +53,9 @@ function Posts({ posts, likedPosts, toggleLike, isLoading }) {
   };
 
   const EditPost = (id) => {
-    navigate(`/editPost/${id}`);
+    navigate(`/edit/post/${id}`);
   }
 
-  const username = Cookies.get("name").replace(/\"/g, '');
 
   return (
     <center className="pt-12 overflow-hidden">

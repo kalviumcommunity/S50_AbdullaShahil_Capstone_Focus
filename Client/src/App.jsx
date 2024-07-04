@@ -8,7 +8,7 @@ import Write from './Components/Write';
 import UserProfile from './Components/UserProfile';
 import Settings from './Components/Settings';
 import LensHub from './Components/LensHub';
-import EditPost from './Components/EditPost';
+import EditEntity from './Components/EditEntity';
 import Chats from './Components/Chats';
 import CreateCommunity from './Components/CreateCommunity';
 import './App.css'
@@ -27,7 +27,7 @@ function App() {
       <Route path='/settings' element={<Settings/>}/>
       <Route path='/lenshub' element={<LensHub/>}/>
       <Route path='/write' element={<Write/>}/>
-      <Route path='/editPost/:id' element={<EditPost/>}/>
+      <Route path='/edit/:type/:id' element={<EditEntity/>}/>
       <Route path='/chats' element={<Chats/>}/>
       <Route path='/createCommunity' element={<CreateCommunity/>}/>
 

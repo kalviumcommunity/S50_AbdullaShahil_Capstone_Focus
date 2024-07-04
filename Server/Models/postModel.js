@@ -14,16 +14,15 @@ const postSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   },
+  postedTime: { 
+    type: Date,
+    default: Date.now 
+  },
   likes: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Profile',
   }],
 });
-
-postSchema.virtual('count').get(function() {
-  return this.likes.length;
-});
-postSchema.set('toJSON', { virtuals: true });
 
 const postModel = mongoose.model('Post', postSchema);
 

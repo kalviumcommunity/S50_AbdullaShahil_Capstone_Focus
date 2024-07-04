@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useForm } from "react-hook-form";
 import Cookies from 'js-cookie';
 import axios from 'axios';
@@ -17,32 +17,33 @@ function UserProfile() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [id, setId] = useState('');
-    const [posts, setPosts] = useState([]);
-    const [articles, setArticles] = useState([]);
     const [buttonText, setButtonText] = useState('Edit'); 
-    const [likedPosts, setLikedPosts] = useState({});
     const [isLoading, setIsLoading] = useState(true);
+    const [posts, setPosts] = useState([]);
+    const [likedPosts, setLikedPosts] = useState({});
+    const [articles, setArticles] = useState([]);
+    const [likedArticles, setLikedArticles] = useState({});
 
-    const username = Cookies.get("name") ? Cookies.get("name").replace(/\"/g, '') : '';
-    const token = Cookies.get("token") ? Cookies.get("token") : localStorage.getItem('token');
+    const username = Cookies.get("name")?.replace(/\"/g, '') || '';
+    const token = Cookies.get("token") || localStorage.getItem('token');
     const profileID = Cookies.get("profileID");
 
-    const handleClick = (button) => {
-        setActiveButton(button);
-    };
+    const handleClick = (button) => setActiveButton(button);
 
     useEffect(() => {
-        axios.post(`http://localhost:4000/users/getUser`, { token }, { withCredentials: true })
-            .then(response => {
+        const fetchUserData = async () => {
+            try {
+                const response = await axios.post(`http://localhost:4000/users/getUser`, { token }, { withCredentials: true });
                 const userData = response.data.user;
                 setUserData(userData);
                 setName(userData.name);
                 setEmail(userData.email);
                 setId(userData._id);
-            })
-            .catch(err => {
+            } catch (err) {
                 console.error(err);
-            });
+            }
+        };
+        fetchUserData();
     }, [token]);
 
     useEffect(() => {
@@ -56,13 +57,11 @@ function UserProfile() {
                 ]);
 
                 const fetchedPosts = postsResponse.data;
-                const initialLikedPosts = {};
-
-                fetchedPosts.forEach(post => {
-                    const isLikedByUser = post.likes.includes(profileID);
-                    initialLikedPosts[post._id] = isLikedByUser;
-                });
-
+                const initialLikedPosts = fetchedPosts.reduce((acc, post) => {
+                    acc[post._id] = post.likes.includes(profileID);
+                    return acc;
+                }, {});
+                
                 setPosts(fetchedPosts);
                 setLikedPosts(initialLikedPosts);
                 setIsLoading(false);
@@ -71,7 +70,13 @@ function UserProfile() {
                     ...article,
                     relativeTime: formatDistanceToNow(parseISO(article.postedTime), { addSuffix: true })
                 }));
+                const initialLikedArticles = articlesWithRelativeTime.reduce((acc, article) => {
+                    acc[article._id] = article.likes.includes(profileID);
+                    return acc;
+                }, {});
+                
                 setArticles(articlesWithRelativeTime);
+                setLikedArticles(initialLikedArticles);
             } catch (err) {
                 console.error("Error fetching posts and articles", err);
                 setIsLoading(false);
@@ -81,40 +86,35 @@ function UserProfile() {
         fetchPostsAndArticles();
     }, [profileID]);
 
-    const toggleLike = async (postId) => {
-        const isLiked = likedPosts[postId];
+    const toggleLike = useCallback(async (id, type) => {
+        const isLiked = type === 'post' ? likedPosts[id] : likedArticles[id];
         try {
-            const response = await axios.patch(`http://localhost:4000/posts/like/${postId}`, { action: !isLiked ? 'like' : 'unlike', profileID });
-            console.log(response)
-            setLikedPosts(prevLikedPosts => ({
-                ...prevLikedPosts,
-                [postId]: !isLiked
-            }));
+            const endpoint = type === 'post' ? `posts/like/${id}` : `articles/like/${id}`;
+            const response = await axios.patch(`http://localhost:4000/${endpoint}`, { action: isLiked ? 'unlike' : 'like', profileID });
 
-            setPosts(prevPosts =>
-                prevPosts.map(post =>
-                    post._id === postId
-                        ? { ...post, likes: response.data.likes }
-                        : post
-                )
-            );
+            if (type === 'post') {
+                setLikedPosts(prev => ({ ...prev, [id]: !isLiked }));
+                setPosts(prev => prev.map(item => item._id === id ? { ...item, likes: response.data.likes } : item));
+            } else {
+                setLikedArticles(prev => ({ ...prev, [id]: !isLiked }));
+                setArticles(prev => prev.map(item => item._id === id ? { ...item, likes: response.data.likes } : item));
+            }
         } catch (err) {
-            console.error("Error toggling like", err);
+            console.error(`Error toggling ${type} like`, err);
         }
-    };
+    }, [likedPosts, likedArticles, profileID]);
 
-    const onSubmit = data => {
-        axios.put(`http://localhost:4000/users/${id}`, data)
-            .then(response => {
-                setIsEditable(false);
-                setButtonText('Edit');
-                setIsSubmitted(true);
-                Cookies.set("name", data.name);
-                localStorage.setItem("token", response.data.token);
-            })
-            .catch(error => {
-                console.error(error);
-            });
+    const onSubmit = async (data) => {
+        try {
+            const response = await axios.put(`http://localhost:4000/users/${id}`, data);
+            setIsEditable(false);
+            setButtonText('Edit');
+            setIsSubmitted(true);
+            Cookies.set("name", data.name);
+            localStorage.setItem("token", response.data.token);
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     const handleEdit = (e) => {
@@ -130,11 +130,10 @@ function UserProfile() {
     return (
         <div>
             <Header />
-
             <div className='flex items-center justify-center mt-10'>
                 <center className="flex items-center">
                     <div className="mr-[6rem]">
-                        <img className='h-[22vh] w-[22vh] rounded-full overflow-hidden' src={prof} alt="" />
+                        <img className='h-[22vh] w-[22vh] rounded-full overflow-hidden' src={prof} alt="Profile" />
                         <h1 className="pt-7 text-gray-800 text-2xl poppins">{username}</h1>
                     </div>
 
@@ -198,8 +197,8 @@ function UserProfile() {
                         Articles
                     </button>
                 </div>
-                {activeButton === 'One' && <Posts posts={posts} likedPosts={likedPosts} toggleLike={toggleLike} isLoading={isLoading} />}
-                {activeButton === 'Two' && <Articles articles={articles} />}
+                {activeButton === 'One' && <Posts posts={posts} likedPosts={likedPosts} toggleLike={(id) => toggleLike(id, 'post')} />}
+                {activeButton === 'Two' && <Articles articles={articles} likedArticles={likedArticles} toggleLike={(id) => toggleLike(id, 'article')} />}
             </div>
         </div>
     );
