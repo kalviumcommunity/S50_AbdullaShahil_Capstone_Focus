@@ -434,6 +434,23 @@ overflow: hidden;
   }
 }
 
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0.2;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slideUp {
+  animation: slideUp 0.3s ease-out;
+  transition: .5s;
+}
+
+
 
 @media (max-width: 1022px) {
   .hamburg-div {

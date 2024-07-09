@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import CommentBox from '../CommentBox';
 
 import {
   ShimmerButton,
@@ -19,6 +20,7 @@ function Posts({ postCategory }) {
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [likedPosts, setLikedPosts] = useState({});
+  const [activeCommentPost, setActiveCommentPost] = useState(null);  // Add state for active comment post
 
   const initialLikedPosts = {};
   const profileID = Cookies.get("profileID");
@@ -52,6 +54,14 @@ function Posts({ postCategory }) {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleCommentClick = (post) => {
+    setActiveCommentPost(post);
+  };
+
+  const handleCloseCommentBox = () => {
+    setActiveCommentPost(null);
   };
 
   const filteredPosts = postCategory ? posts.filter(post => post.category === postCategory) : posts;
@@ -104,7 +114,12 @@ function Posts({ postCategory }) {
                       alt=""
                       onClick={() => handleLikeClick(post._id)}
                     />
-                    <img className='h-[2.1rem] w-[2.1rem] mb-[3px] overflow-hidden' src={Comment} alt="" />
+                    <img
+                      className='comment-box h-[2.1rem] w-[2.1rem] mb-[3px] overflow-hidden cursor-pointer'
+                      src={Comment}
+                      alt=""
+                      onClick={() => handleCommentClick(post)}
+                    />
                   </div>
                 </div>
                 <div className='pl-3'>
@@ -120,6 +135,10 @@ function Posts({ postCategory }) {
         )}
 
       </div>
+
+      {activeCommentPost && (
+        <CommentBox post={activeCommentPost} onClose={handleCloseCommentBox} />
+      )}
     </center>
   );
 }

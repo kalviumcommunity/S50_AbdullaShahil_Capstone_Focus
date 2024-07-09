@@ -12,7 +12,7 @@ require('dotenv').config()
 router.use(express.json());
 
 const generateToken = (user) => {
-    return jwt.sign({ user: user }, process.env.SECRET_KEY, { expiresIn: "5h" })
+    return jwt.sign({ user: user }, process.env.SECRET_KEY, { expiresIn: "6h" })
 }
 
 const userJoiSchema = Joi.object({
