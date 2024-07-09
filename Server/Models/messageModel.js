@@ -4,7 +4,7 @@ const messageSchema = new mongoose.Schema({
     messages: [
         {
             name: {
-                type: String,  // Assuming you want to store the user's name as a string
+                type: String,
                 required: true
             },
             message: {

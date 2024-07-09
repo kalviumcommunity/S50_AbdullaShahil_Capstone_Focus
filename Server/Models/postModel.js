@@ -1,5 +1,18 @@
 const mongoose = require('mongoose');
 
+const commentSchema = new mongoose.Schema({
+  name: String,
+  message: String,
+  profilepic: {
+    type: String,
+    ref: "Profile"
+  },
+  postedTime: {
+    type: Date,
+    default: Date.now
+  }
+});
+
 const postSchema = new mongoose.Schema({
   name: {
     type: mongoose.Schema.Types.ObjectId,
@@ -8,15 +21,15 @@ const postSchema = new mongoose.Schema({
   title: String,
   description: String,
   image: String,
-  comments: [String],
+  comments: [commentSchema],
   category: String,
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   },
-  postedTime: { 
+  postedTime: {
     type: Date,
-    default: Date.now 
+    default: Date.now
   },
   likes: [{
     type: mongoose.Schema.Types.ObjectId,

@@ -3,6 +3,7 @@ const router = express.Router();
 const postModel = require("../Models/postModel");
 const profileModel = require("../Models/profileModel");
 const userModel = require("../Models/userModel");
+
 const Joi = require("joi");
 
 router.use(express.json());
@@ -118,6 +119,74 @@ router.get("/userPosts/:id", async (req, res) => {
 });
 
 
+// GET comments of a specific post
+router.get("/comments/:id", async (req, res) => {
+  const postId = req.params.id;
+  try {
+    const post = await postModel.findById(postId);
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    const responseData = post.comments
+    res.json(responseData);
+
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
+// POST a comment on a post
+router.post('/comments/:postId', async (req, res) => {
+  try {
+    const { name, message, profilepic } = req.body;
+
+    const post = await postModel.findById(req.params.postId);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    const newComment = {
+      name: name,
+      message: message,
+      profilepic: profilepic,
+      postedTime: Date.now()
+    };
+    post.comments.push(newComment);
+    await post.save();
+
+    const addedComment = post.comments[post.comments.length - 1];
+console.log(addedComment)
+    res.status(201).json(addedComment);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+
+// DELETE a comment on a post
+router.delete('/comments/delete/:postId', async (req, res) => {
+  try {
+    const { commentId } = req.query;
+
+    const post = await postModel.findById(req.params.postId);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    post.comments.pull({ _id: commentId });
+    await post.save();
+    console.log("Comment deleted")
+    res.status(200).json({ message: 'Comment deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+
 // PATCH to update likes in a post
 router.patch("/like/:id", validatePatch, async (req, res) => {
   const postId = req.params.id;
@@ -138,7 +207,7 @@ router.patch("/like/:id", validatePatch, async (req, res) => {
           postId,
           { $addToSet: { likes: profileID } },
           { new: true }
-        )      .populate('name', 'name')
+        ).populate('name', 'name')
 
 
         console.log("added like");
@@ -151,7 +220,7 @@ router.patch("/like/:id", validatePatch, async (req, res) => {
           postId,
           { $pull: { likes: profileID } },
           { new: true }
-        )      .populate('name', 'name')
+        ).populate('name', 'name')
 
         console.log("removed like");
       } else {
@@ -219,7 +288,7 @@ router.post("/", validatePost, async (req, res) => {
 router.delete("/:id", async (req, res) => {
   try {
     const postID = req.params.id
-    const { profileid } = req.headers; 
+    const { profileid } = req.headers;
 
     if (!profileid) {
       return res.status(400).json({ error: "Profile ID is required" });
