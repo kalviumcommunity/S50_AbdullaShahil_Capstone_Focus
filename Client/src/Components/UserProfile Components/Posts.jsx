@@ -9,6 +9,8 @@ import {
   ShimmerThumbnail,
   ShimmerBadge,
 } from "react-shimmer-effects";
+
+import CommentBox from '../CommentBox';
 import ProfileIMG2 from '../../assets/review2.jpeg';
 import Heart from '../../assets/heart.png';
 import HeartActive from '../../assets/heartactive.png';
@@ -25,6 +27,7 @@ function Posts({ posts, likedPosts, toggleLike }) {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [deletePostId, setDeletePostId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeCommentPost, setActiveCommentPost] = useState(null);  
 
   const profileID = Cookies.get('profileID');
   const navigate = useNavigate();
@@ -56,6 +59,13 @@ function Posts({ posts, likedPosts, toggleLike }) {
     navigate(`/edit/post/${id}`);
   }
 
+  const handleCommentClick = (post) => {
+    setActiveCommentPost(post);
+  };
+
+  const handleCloseCommentBox = () => {
+    setActiveCommentPost(null);
+  };
 
   return (
     <center className="pt-12 overflow-hidden">
@@ -136,7 +146,7 @@ function Posts({ posts, likedPosts, toggleLike }) {
                   <div className='flex justify-between items-center'>
                     <h2 className='mr-2 text-lg'>{post.likes.length}</h2>
                     <img className='h-10 w-10 mr-1 rounded-full overflow-hidden cursor-pointer' src={likedPosts[post._id] ? HeartActive : Heart} alt="" onClick={() => toggleLike(post._id)} />
-                    <img className='h-[2.1rem] w-[2.1rem] mb-[3px] overflow-hidden' src={Comment} alt="" />
+                    <img className='h-[2.1rem] w-[2.1rem] mb-[3px] overflow-hidden cursor-pointer' src={Comment} alt="" onClick={() => handleCommentClick(post)}/>
                   </div>
                 </div>
                 <div className='pl-3'>
@@ -147,6 +157,10 @@ function Posts({ posts, likedPosts, toggleLike }) {
           ))
         )}
       </div>
+
+      {activeCommentPost && (
+        <CommentBox entity={activeCommentPost} onClose={handleCloseCommentBox} type="posts"/>
+      )}
     </center>
   );
 }

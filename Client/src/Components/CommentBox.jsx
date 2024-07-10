@@ -7,7 +7,7 @@ import { Toaster, toast } from 'sonner';
 import postComment from '../assets/post-comment.png';
 import more from '../assets/more.png';
 
-function CommentBox({ post, onClose }) {
+function CommentBox({ entity, onClose, type }) {
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState("");
     const username = Cookies.get("name") ? Cookies.get("name").replace(/\"/g, '') : '';
@@ -17,7 +17,7 @@ function CommentBox({ post, onClose }) {
     const [deleteCommentId, setDeleteCommentId] = useState(null);
 
     useEffect(() => {
-        axios.get(`http://localhost:4000/posts/comments/${post._id}`)
+        axios.get(`http://localhost:4000/${type}/comments/${entity._id}`)
         .then(response => {
             const fetchedComments = response.data.map(comment => ({
                     ...comment,
@@ -28,11 +28,10 @@ function CommentBox({ post, onClose }) {
             .catch(err => {
                 console.log(err);
             });
-    }, [post._id]);
+    }, [entity._id]);
     
-    const handleDelete = (commentId, postId) => {
-        console.log(commentId)
-        axios.delete(`http://localhost:4000/posts/comments/delete/${postId}`, { params: {commentId} })
+    const handleDelete = (commentId, entityId) => {
+        axios.delete(`http://localhost:4000/${type}/comments/delete/${entityId}`, { params: {commentId} })
             .then(response => {
                 toast.success('Comment deleted successfully');
                 console.log(response);
@@ -57,7 +56,7 @@ function CommentBox({ post, onClose }) {
             message: newComment,
         };
         
-        axios.post(`http://localhost:4000/posts/comments/${post._id}`, payload)
+        axios.post(`http://localhost:4000/${type}/comments/${entity._id}`, payload)
         .then(response => {
             toast.success('Comment added successfully');
             console.log(response);
@@ -95,7 +94,7 @@ function CommentBox({ post, onClose }) {
                         <div className="bg-white p-6 rounded-lg shadow-lg z-50 text-center">
                             <h2 className='mb-7 poppins'>Are you sure you want to delete this comment?</h2>
                             <div>
-                                <button onClick={() => handleDelete(deleteCommentId, post._id)} className='py-3 px-5 mr-5 rounded bg-red-500 text-white font-bold hover:bg-red-400'>Yes</button>
+                                <button onClick={() => handleDelete(deleteCommentId, entity._id)} className='py-3 px-5 mr-5 rounded bg-red-500 text-white font-bold hover:bg-red-400'>Yes</button>
                                 <button onClick={() => setShowDeleteConfirmation(false)} className='py-3 px-5 ml-5 border rounded text-black font-bold'>No</button>
                             </div>
                         </div>
