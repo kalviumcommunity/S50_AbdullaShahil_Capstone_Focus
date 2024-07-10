@@ -281,7 +281,7 @@ router.get("/comments/:id", async (req, res) => {
       return res.status(404).json({ error: "Article not found" });
     }
 
-    const responseData = post.comments
+    const responseData = article.comments
     res.json(responseData);
 
   } catch (error) {
@@ -334,7 +334,7 @@ router.delete('/comments/delete/:articleId', async (req, res) => {
 
     console.log("Comment deleted")
     res.status(200).json({ message: 'Comment deleted successfully' });
-    
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
