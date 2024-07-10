@@ -11,6 +11,7 @@ import {
     ShimmerBadge,
 } from "react-shimmer-effects";
 
+import CommentBox from '../CommentBox';
 import ProfileIMG2 from '../../assets/review2.jpeg';
 import Heart from '../../assets/heart.png';
 import HeartActive from '../../assets/heartactive.png';
@@ -27,6 +28,7 @@ function Articles({ articles, likedArticles, toggleLike }) {
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [deleteArticleId, setDeleteArticleId] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [activeCommentPost, setActiveCommentPost] = useState(null);  
 
     const username = Cookies.get("name") ? Cookies.get("name").replace(/\"/g, '') : '';
     const profileID = Cookies.get('profileID');
@@ -57,6 +59,14 @@ function Articles({ articles, likedArticles, toggleLike }) {
     const EditArticle = (id) => {
         navigate(`/edit/article/${id}`);
     }
+
+    const handleCommentClick = (article) => {
+        setActiveCommentPost(article);
+      };
+    
+      const handleCloseCommentBox = () => {
+        setActiveCommentPost(null);
+      };
 
     return (
         <center className="h-[85vh] pt-10 overflow-hidden">
@@ -138,7 +148,7 @@ function Articles({ articles, likedArticles, toggleLike }) {
                                         <div className='flex items-center justify-end'>
                                             <h2 className='mr-2 text-lg'>{article.likes.length}</h2>
                                             <img className='h-10 w-10 mr-1 rounded-full overflow-hidden cursor-pointer' src={likedArticles[article._id] ? HeartActive : Heart} alt="" onClick={() => toggleLike(article._id)} />
-                                            <img className='h-[2.1rem] w-[2.1rem] mb-[3px] overflow-hidden' src={Comment} alt="" />
+                                            <img className='h-[2.1rem] w-[2.1rem] mb-[3px] overflow-hidden cursor-pointer' src={Comment} alt="" onClick={() => handleCommentClick(article)}/>
                                         </div>
                                     </div>
                                 </div>
@@ -147,6 +157,9 @@ function Articles({ articles, likedArticles, toggleLike }) {
                     ))
                 )}
             </div>
+            {activeCommentPost && (
+        <CommentBox entity={activeCommentPost} onClose={handleCloseCommentBox} type="articles"/>
+      )}
         </center>
     )
 }

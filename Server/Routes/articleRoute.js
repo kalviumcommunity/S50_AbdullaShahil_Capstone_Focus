@@ -34,7 +34,7 @@ function validatePatch(req, res, next) {
 }
 
 function validatePost(req, res, next) {
-  
+
   const { error } = postJoiSchema.validate(req.body);
   if (error) {
     return res.status(400).json({ error: error.details[0].message });
@@ -94,7 +94,7 @@ router.get("/userArticles/:id", async (req, res) => {
     const profile = await profileModel.findById(id).populate("articles").exec();
 
     const articles = profile.articles;
-    
+
     const responseData = articles.map(article => ({
       _id: article._id,
       name: article.name,
@@ -124,7 +124,7 @@ function validateUrlFormat(url) {
 // POSTING - along with populating in profile
 router.post("/", validatePost, async (req, res) => {
   try {
-    const { title, description, name, image,category } = req.body;
+    const { title, description, name, image, category } = req.body;
 
     if (!name) {
       return res.status(400).json({ error: "Name not provided" });
@@ -184,7 +184,7 @@ router.patch("/like/:id", validatePatch, async (req, res) => {
           articleId,
           { $addToSet: { likes: profileID } },
           { new: true }
-        )      .populate('name', 'name')
+        ).populate('name', 'name')
 
 
         console.log("added like");
@@ -197,7 +197,7 @@ router.patch("/like/:id", validatePatch, async (req, res) => {
           articleId,
           { $pull: { likes: profileID } },
           { new: true }
-        )      .populate('name', 'name')
+        ).populate('name', 'name')
 
         console.log("removed like");
       } else {
@@ -242,7 +242,7 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   try {
     const articleID = req.params.id
-    const { profileid } = req.headers; 
+    const { profileid } = req.headers;
 
     if (!profileid) {
       return res.status(400).json({ error: "Profile ID is required" });
@@ -270,5 +270,75 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+
+// GET comments of a specific article
+router.get("/comments/:id", async (req, res) => {
+  const articleId = req.params.id;
+  try {
+    const article = await articleModel.findById(articleId);
+    if (!article) {
+      return res.status(404).json({ error: "Article not found" });
+    }
+
+    const responseData = article.comments
+    res.json(responseData);
+
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
+// POST a comment on a article
+router.post('/comments/:articleId', async (req, res) => {
+  try {
+    const { name, message, profilepic } = req.body;
+
+    const article = await articleModel.findById(req.params.articleId);
+    if (!article) {
+      return res.status(404).json({ message: 'Article not found' });
+    }
+
+    const newComment = {
+      name: name,
+      message: message,
+      profilepic: profilepic,
+      postedTime: Date.now()
+    };
+    article.comments.push(newComment);
+    await article.save();
+
+    const addedComment = article.comments[article.comments.length - 1];
+    console.log(addedComment)
+    res.status(201).json(addedComment);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+
+// DELETE a comment on a article
+router.delete('/comments/delete/:articleId', async (req, res) => {
+  try {
+    const { commentId } = req.query;
+
+    const article = await articleModel.findById(req.params.articleId);
+    if (!article) {
+      return res.status(404).json({ message: 'Article not found' });
+    }
+
+    article.comments.pull({ _id: commentId });
+    await article.save();
+
+    console.log("Comment deleted")
+    res.status(200).json({ message: 'Comment deleted successfully' });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 
 module.exports = router;

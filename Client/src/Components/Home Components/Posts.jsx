@@ -20,8 +20,8 @@ function Posts({ postCategory }) {
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [likedPosts, setLikedPosts] = useState({});
-  const [activeCommentPost, setActiveCommentPost] = useState(null);  // Add state for active comment post
-
+  const [activeCommentPost, setActiveCommentPost] = useState(null);  
+  
   const initialLikedPosts = {};
   const profileID = Cookies.get("profileID");
 
@@ -137,7 +137,7 @@ function Posts({ postCategory }) {
       </div>
 
       {activeCommentPost && (
-        <CommentBox post={activeCommentPost} onClose={handleCloseCommentBox} />
+        <CommentBox entity={activeCommentPost} onClose={handleCloseCommentBox} type="posts"/>
       )}
     </center>
   );
