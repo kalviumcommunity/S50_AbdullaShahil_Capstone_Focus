@@ -23,6 +23,12 @@ const setupSocket = (server) => {
       }
     });
 
+    socket.on('joinRoom', (room) => {
+      socket.join(room); 
+      console.log(`User ${socket.id} joined room ${room}`);
+    });
+  
+
     socket.on("message", async (message) => {
       try {
         console.log("Message received:", message);

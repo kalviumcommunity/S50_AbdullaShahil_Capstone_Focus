@@ -23,6 +23,14 @@ body {
   color: #1E1E1E;
 }
 
+.save-btn{
+  border: 1px solid white;
+}
+
+.save-btn:hover{
+  background-color: #f4b43e;
+}
+
 .E49600 {
   color: #E49600;
 }
@@ -277,7 +285,7 @@ ul.breadcrumb li span {
 .image-wrapper {
   width: 100%;
   height: 0;
-  padding-top: calc(100% / (3 / 4));
+  padding-top: calc(100% / (3.5 / 4));
   position: relative;
   overflow: hidden;
 }

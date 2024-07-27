@@ -39,7 +39,7 @@ function CommentBox({ entity, onClose, type }) {
                 setShowDeleteConfirmation(false);
             })
             .catch(err => {
-                toast.error('Event has not been created');
+                toast.error('An error occured');
                 console.log(err);
             });
     };

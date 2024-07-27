@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import ProfileIMG2 from '../../assets/review2.jpeg'
 import ProfileIMG3 from '../../assets/review3.jpeg'
 import Cookies from 'js-cookie';
+import NoProfile from "../../assets/noprofile.png";
 
 function UserPanel() {
     const username = Cookies.get("name") ? Cookies.get("name").replace(/\"/g, '') : '';
@@ -62,7 +63,7 @@ function UserPanel() {
 
             <div className="gradient2 p-2 pl-3 flex items-center justify-between border w-[18vw] h-[10vh] rounded-full shadow-[0px_0px_10px_rgba(0,0,0,0.08)] overflow-hidden">
                 <div className='flex items-center'>
-                    <img className='h-16 w-16 rounded-full overflow-hidden' src={ProfileIMG2} alt="" />
+                    <img className='h-16 w-16 rounded-full overflow-hidden' src={NoProfile} alt="" />
                     <Link to='/profile'>
                         <h3 className='post-username pl-4  poppins text-white'>{username}</h3>
                     </Link>
@@ -91,6 +92,7 @@ function UserPanel() {
             <center className='pt-12'>
                 <h1 className='suggestion-title mb-6'>Other users</h1>
             </center>
+            <input className='w-[20vw] search border border-gray-400 rounded-full px-8 py-4 mb-4' id="genreSelect" placeholder='Search...' />
 
             <div className='border border-gray-400 suggestion-scroll h-[42vh] overflow-scroll p-2 shadow-[0px_0px_10px_rgba(0,0,0,0.08)] rounded-lg  '>
 

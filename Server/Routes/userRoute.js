@@ -7,25 +7,31 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const profileModel = require("../Models/profileModel");
 const { Cookie } = require("express-session");
+
 require('dotenv').config()
 
 router.use(express.json());
 
-const generateToken = (user) => {
-    return jwt.sign({ user: user }, process.env.SECRET_KEY, { expiresIn: "6h" })
+const generateToken = (id) => {
+    return jwt.sign({ id: id }, process.env.SECRET_KEY, { expiresIn: "6h" })
 }
 
 const userJoiSchema = Joi.object({
     name: Joi.string().alphanum().min(3).max(30).required(),
     email: Joi.string().email().required(),
     password: Joi.string().required(),
+    profile_img: Joi.string(),
+    about: Joi.string(),
 });
 
 const putUserJoiSchema = Joi.object({
     name: Joi.string().alphanum().min(3).max(30),
     email: Joi.string().email(),
+    profile_img: Joi.string(),
     password: Joi.string(),
-    newPassword: Joi.string(), 
+    newPassword: Joi.string(),
+    about: Joi.string(),
+    interests: Joi.array()
 }).min(1);
 
 
@@ -33,6 +39,9 @@ const patchUserJoiSchema = Joi.object({
     name: Joi.string().alphanum().min(3).max(30),
     email: Joi.string().email(),
     password: Joi.string(),
+    profile_img: Joi.string(),
+    about: Joi.string(),
+    interests: Joi.array()
 }).min(1);
 
 function validateUser(req, res, next) {
@@ -53,6 +62,7 @@ function validatePutUser(req, res, next) {
 
 function validatePatchUser(req, res, next) {
     const { error } = patchUserJoiSchema.validate(req.body);
+
     if (error) {
         return res.status(400).json({ error: error.details[0].message });
     }
@@ -71,7 +81,7 @@ const verifyToken = (req, res, next) => {
         next();
     } catch (error) {
         console.log(error)
-        return res.status(403).json({ error1: "Forbidden: Failed to authenticate token",error });
+        return res.status(403).json({ error1: "Forbidden: Failed to authenticate token", error });
     }
 };
 
@@ -150,8 +160,8 @@ router.get("/profile/:id", async (req, res) => {
         }
 
         const profile = await profileModel.findById(user.profile)
-        .select('_id name email communities')
-        .lean();
+            .select('_id name email communities')
+            .lean();
 
         res.json(profile);
     } catch (error) {
@@ -159,14 +169,75 @@ router.get("/profile/:id", async (req, res) => {
     }
 });
 
+// GET each user's profile for about, name, interests
+router.get("/profile/get/:id", async (req, res) => {
+    const id = req.params.id;
+    try {
 
+        const profile = await profileModel.findById(id)
+        .select('_id name about interests profile_img')
+        .lean();
+
+        console.log("hhhhhhhh", profile)
+        res.json(profile);
+    } catch (error) {
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+
+const decodetoken = (req, res, next) => {
+    const token = req.cookies;
+    console.log("first")
+    console.log(token)
+    if (!token) {
+        return res.status(401).json({ error: "Unauthorized: Token is not provided" });
+    }
+    console.log("token:",token)
+
+    try {
+        const decoded = jwt.verify(token, process.env.SECRET_KEY);
+        req.decoded = decoded.id;
+        console.log("decoded userid", decoded)
+        next();
+    } catch (error) {
+        return res.status(401).json({ error: "Unauthorized: Invalid token" });
+    }
+};
+
+// Token decoding to retrieve userID / profileID
+router.get('/token/getId/:idType', decodetoken, async (req, res) => {
+    try {
+        const { idType } = req.params;
+
+        if (idType === 'userID') {
+            const userId = req.decoded;
+            if (!userId) {
+                return res.status(400).json({ error: 'User ID not found' });
+            }
+            return res.status(200).json({ id: userId });
+        } else if (idType === 'profileID') {
+            const user = await userModel.findById(req.decoded);
+            if (!user || !user.profile) {
+                return res.status(400).json({ error: 'Profile ID not found' });
+            }
+            const profileId = user.profile;
+            return res.status(200).json({ id: profileId });
+        } else {
+            return res.status(400).json({ error: 'Invalid ID type' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 
 // POST a new user
 router.post("/", validateUser, async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, picture } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
-        const profile = (await profileModel.create({ name: name, email }));
+        const profile = (await profileModel.create({ name: name, email, picture }));
         const newUser = await userModel.create({
             name: name,
             email: email,
@@ -175,6 +246,17 @@ router.post("/", validateUser, async (req, res) => {
         });
         const token = generateToken(newUser);
 
+        res.cookie("token", token, {
+            httpOnly: false,
+            secure: true,
+            sameSite: "Lax",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+        res.cookie("profileID", profile._id)
+        res.cookie("userID", newUser._id)
+        res.cookie("name", newUser.name)
+
+        // res.status(201).json({ message: "Signup successful" })
         res.status(201).json({ userData: newUser, token: token, userID: newUser._id, profileID: profile._id });
     } catch (error) {
         console.error(error);
@@ -202,7 +284,17 @@ router.post("/login", async (req, res) => {
         if (!isPasswordValid) {
             return res.status(401).json({ error: "Invalid password" });
         }
-        const token = generateToken(user);
+        const token = generateToken(user._id);
+
+        // res.cookie("token", token, {
+        //     httpOnly: false,
+        //     secure: true,
+        //     sameSite: "Lax",
+        //     maxAge: 7 * 24 * 60 * 60 * 1000,
+        // });
+
+        // res.status(201).json({ message: "Signup successful" })
+
         res.status(201).json({ email: user.email, name: user.name, token, userID: user._id, profileID: user.profile._id });
     } catch (error) {
         console.error(error);
@@ -214,28 +306,28 @@ router.post("/login", async (req, res) => {
 router.put("/change/:id", validatePutUser, async (req, res) => {
     const userId = req.params.id;
     const { password, newPassword } = req.body;
-    
+
     try {
         const user = await userModel.findById(userId);
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
-        
+
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             return res.status(401).json({ error: "Invalid password" });
         }
-        
+
         const hashedNewPassword = await bcrypt.hash(newPassword, 10);
         const updatedUser = await userModel.findByIdAndUpdate(userId, { password: hashedNewPassword }, { new: true });
-        
+
         console.log(updatedUser)
         if (!updatedUser) {
             return res.status(404).json({ error: "User not found" });
         }
-        
-        
-        res.json({ message: "Password updated successfully", user: updatedUser }); 
+
+
+        res.json({ message: "Password updated successfully", user: updatedUser });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal server error" });
@@ -298,6 +390,25 @@ router.patch("/:id", validatePatchUser, async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
         res.json(updatedUser);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+// PATCH to update profile picture and about
+router.patch("/updateProfile/:id", validatePatchUser, async (req, res) => {
+    try {
+
+        const data = req.body;
+        const profileId = req.params.id
+console.log("reqqq", data)
+        const updateProfile = await profileModel.findByIdAndUpdate(profileId, data, { new: true });
+
+        if (!updateProfile) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.json(updateProfile);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal server error" });

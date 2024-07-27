@@ -1,6 +1,7 @@
 const express = require("express");
 const session = require("express-session");
 const cors = require("cors");
+const cookieParser = require('cookie-parser');
 const connectDb = require("../Server/config/connect");
 const { createServer } = require("http");
 
@@ -27,6 +28,7 @@ app.use(session({
   saveUninitialized: true,
   cookie: { secure: false },
 }));
+
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -84,6 +86,8 @@ app.get("/logout", (req, res) => {
 
 
 app.use(express.json())
+app.use(cookieParser());
+
 app.use("/users", userRouter);
 app.use("/posts", postRouter);
 app.use("/articles", articleRouter);

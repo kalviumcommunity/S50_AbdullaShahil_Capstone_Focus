@@ -2,16 +2,10 @@ import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import {
-  ShimmerButton,
-  ShimmerText,
-  ShimmerCircularImage,
-  ShimmerThumbnail,
-  ShimmerBadge,
-} from "react-shimmer-effects";
 
+import NoProfile from "../../assets/noprofile.png";
+import { PostShimmer } from '../Utils/Shimmers';
 import CommentBox from '../CommentBox';
-import ProfileIMG2 from '../../assets/review2.jpeg';
 import Heart from '../../assets/heart.png';
 import HeartActive from '../../assets/heartactive.png';
 import Comment from '../../assets/comment.png';
@@ -33,12 +27,12 @@ function Posts({ posts, likedPosts, toggleLike }) {
   const navigate = useNavigate();
   const username = Cookies.get("name").replace(/\"/g, '');
 
+  console.log(posts)
   useEffect(() => {
     if (posts && posts.length > 0) {
         setIsLoading(false);
     }
 }, [posts]);
-
   const handleDelete = () => {
     axios.delete(`http://localhost:4000/posts/${deletePostId}`, {
       headers: {
@@ -68,7 +62,7 @@ function Posts({ posts, likedPosts, toggleLike }) {
   };
 
   return (
-    <center className="pt-12 overflow-hidden">
+    <center className="">
       {showDeleteConfirmation && (
         <div>
           <div className="overlay"></div>
@@ -82,37 +76,18 @@ function Posts({ posts, likedPosts, toggleLike }) {
         </div>
       )}
 
-      <div className="pt-12 grid grid-cols-1 lg:grid-cols-2 overflow-scroll h-[70vh]">
+      <div className="pt-12 grid grid-cols-1 lg:grid-cols-3">
         {isLoading ? (
-          Array.from({ length: 10 }).map((_, index) => (
-            <center key={index}>
-              <div className='posts border border-gray-300 rounded-md flex flex-col mb-10 p-5 w-[85vw] lg:w-[35vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]'>
-                <div className='flex justify-between items-center'>
-                  <div className="flex justify-between items-center">
-                    <ShimmerCircularImage size={50} />
-                    <div style={{ width: '10px' }}></div>
-                    <ShimmerBadge width={130} />
-                  </div>
 
-                  <ShimmerBadge width={70} />
-                </div>
-                <ShimmerThumbnail height={550} rounded />
-                <div className="rounded p-2 flex items-center justify-between mt-1">
-                  <ShimmerBadge width={200} />
-                  <ShimmerButton size="md" />
-                </div>
+          <PostShimmer scaleValue="80%" />
 
-                <ShimmerText />
-              </div>
-            </center>
-          ))
         ) : (
           posts.map((post, index) => (
-            <center key={index} className=''>
-              <div className="posts bg-white border border-gray-300 rounded-md flex flex-col mb-10 p-5 w-[85vw] md:w-[55vw] lg:w-[35vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]">
+            <center key={index} className='flex'>
+              <div className="posts bg-white border border-gray-300 rounded-md flex flex-col mb-10 p-5 w-[85vw] md:w-[55vw] lg:w-[35vw] scale-90 shadow-[0px_0px_8px_rgba(0,0,0,0.08)]">
                 <div className='top-opt flex justify-between items-center mb-5'>
                   <div className='flex items-center w-[25vw] sm:w-[20vw] md:w-[15vw]'>
-                    <img className='h- w- md:h-12 md:w-12 rounded-full overflow-hidden' src={ProfileIMG2} alt="" />
+                    <img className='md:h-12 md:w-12 rounded-full overflow-hidden' src={ post.profile_img ? (post.profile_img):(NoProfile) } alt="" />
                     <h3 className='post-username pl-4 font-light poppins'>{username}</h3>
                   </div>
 
