@@ -11,6 +11,7 @@ const ChatApp = () => {
     const [allUsers, setAllUsers] = useState([]);
     const [communities, setCommunities] = useState([]);
     const [activeChatType, setActiveChatType] = useState('personal');
+    const [messages, setMessages] = useState([]);
     const [activeChat, setActiveChat] = useState(null);
     const [viewInfo, setViewInfo] = useState(false);
 

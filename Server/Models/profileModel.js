@@ -4,7 +4,8 @@ const profileSchema = new mongoose.Schema({
   id: String,  
   name: String,
   email: String,
-  picture: String,
+  profile_img: String,
+  about: String,
   posts: [
     {
     type: mongoose.Schema.Types.ObjectId,
@@ -23,6 +24,7 @@ communities: [
   ref: 'Community'
 },
 ],
+interests: [String]
 });
 
 const profileModel = mongoose.model('Profile', profileSchema);

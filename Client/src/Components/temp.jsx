@@ -1,166 +1,207 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
-import { Select, Option } from "@material-tailwind/react";
-import { useForm } from 'react-hook-form';
+import { useState, useEffect, useCallback } from 'react';
+import { useForm } from "react-hook-form";
 import Cookies from 'js-cookie';
 import axios from 'axios';
-import Header from './Home Components/Header';
-import ProfileIMG2 from '../assets/review2.jpeg';
+import { formatDistanceToNow, parseISO } from 'date-fns';
+import Header from "./Home Components/Header";
+import Posts from "./UserProfile Components/Posts";
+import Articles from "./UserProfile Components/Articles";
+import prof from '../assets/reviewProfile.jpeg';
 
-import 'ldrs/tailspin';
-import 'ldrs/ring';
+function UserProfile() {
+    const { register, handleSubmit, formState: { errors } } = useForm();
+    const [activeButton, setActiveButton] = useState('One');
+    const [userData, setUserData] = useState({});
+    const [isEditable, setIsEditable] = useState(false);
+    const [isSubmitted, setIsSubmitted] = useState(false);
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [id, setId] = useState('');
+    const [buttonText, setButtonText] = useState('Edit'); 
+    const [isLoading, setIsLoading] = useState(true);
+    const [posts, setPosts] = useState([]);
+    const [likedPosts, setLikedPosts] = useState({});
+    const [articles, setArticles] = useState([]);
+    const [likedArticles, setLikedArticles] = useState({});
 
-function EditEntity() {
-  const { type, id } = useParams();
-  const navigate = useNavigate();
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm();
-  const [loading, setLoading] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [category, setCategory] = useState('');
-  const [existingImage, setExistingImage] = useState('');
-  const name = Cookies.get('name')?.replace(/\"/g, '');
+    const username = Cookies.get("name")?.replace(/\"/g, '') || '';
+    const token = Cookies.get("token") || localStorage.getItem('token');
+    const profileID = Cookies.get("profileID");
 
-  useEffect(() => {
-    const fetchEntity = async () => {
-      try {
-        const response = await axios.get(`http://localhost:4000/${type}s/${id}`);
-        console.log(response.data)
-        const entity = response.data;
-        setValue('title', entity.title);
-        setValue('description', entity.description);
-        setCategory(entity.category || '');
-        setExistingImage(entity.image);
-      } catch (error) {
-        console.error(`Error fetching ${type} data`, error);
-      }
+    const handleClick = (button) => setActiveButton(button);
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await axios.post(`http://localhost:4000/users/getUser`, { token }, { withCredentials: true });
+                const userData = response.data.user;
+                setUserData(userData);
+                setName(userData.name);
+                setEmail(userData.email);
+                setId(userData._id);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        fetchUserData();
+    }, [token]);
+
+    useEffect(() => {
+        if (!profileID) return;
+
+        const fetchPostsAndArticles = async () => {
+            try {
+                const [postsResponse, articlesResponse] = await Promise.all([
+                    axios.get(`http://localhost:4000/posts/userPosts/${profileID}`),
+                    axios.get(`http://localhost:4000/articles/userArticles/${profileID}`)
+                ]);
+
+                const fetchedPosts = postsResponse.data;
+                const initialLikedPosts = fetchedPosts.reduce((acc, post) => {
+                    acc[post._id] = post.likes.includes(profileID);
+                    return acc;
+                }, {});
+                
+                setPosts(fetchedPosts);
+                setLikedPosts(initialLikedPosts);
+                setIsLoading(false);
+
+                const articlesWithRelativeTime = articlesResponse.data.map(article => ({
+                    ...article,
+                    relativeTime: formatDistanceToNow(parseISO(article.postedTime), { addSuffix: true })
+                }));
+                const initialLikedArticles = articlesWithRelativeTime.reduce((acc, article) => {
+                    acc[article._id] = article.likes.includes(profileID);
+                    return acc;
+                }, {});
+                
+                setArticles(articlesWithRelativeTime);
+                setLikedArticles(initialLikedArticles);
+            } catch (err) {
+                console.error("Error fetching posts and articles", err);
+                setIsLoading(false);
+            }
+        };
+
+        fetchPostsAndArticles();
+    }, [profileID]);
+
+    const toggleLike = useCallback(async (id, type) => {
+        const isLiked = type === 'post' ? likedPosts[id] : likedArticles[id];
+        try {
+            const endpoint = type === 'post' ? `posts/like/${id}` : `articles/like/${id}`;
+            const response = await axios.patch(`http://localhost:4000/${endpoint}`, { action: isLiked ? 'unlike' : 'like', profileID });
+
+            if (type === 'post') {
+                setLikedPosts(prev => ({ ...prev, [id]: !isLiked }));
+                setPosts(prev => prev.map(item => item._id === id ? { ...item, likes: response.data.likes } : item));
+            } else {
+                setLikedArticles(prev => ({ ...prev, [id]: !isLiked }));
+                setArticles(prev => prev.map(item => item._id === id ? { ...item, likes: response.data.likes } : item));
+            }
+        } catch (err) {
+            console.error(`Error toggling ${type} like`, err);
+        }
+    }, [likedPosts, likedArticles, profileID]);
+
+    const onSubmit = async (data) => {
+        try {
+            const response = await axios.put(`http://localhost:4000/users/${id}`, data);
+            setIsEditable(false);
+            setButtonText('Edit');
+            setIsSubmitted(true);
+            Cookies.set("name", data.name);
+            localStorage.setItem("token", response.data.token);
+        } catch (error) {
+            console.error(error);
+        }
     };
 
-    fetchEntity();
-  }, [id, setValue, type]);
+    const handleEdit = (e) => {
+        e.preventDefault();
+        if (isEditable) {
+            handleSubmit(onSubmit)();
+        } else {
+            setIsEditable(true);
+            setButtonText('Save');
+        }
+    };
 
+    return (
+        <div>
+            <Header />
+            <div className='flex items-center justify-center mt-10'>
+                <center className="flex items-center">
+                    <div className="mr-[6rem]">
+                        <img className='h-[22vh] w-[22vh] rounded-full overflow-hidden' src={prof} alt="Profile" />
+                        <h1 className="pt-7 text-gray-800 text-2xl poppins">{username}</h1>
+                    </div>
 
+                    <form className="posts border-gray-300 rounded-md flex flex-col justify-between p-5 lg:w-[45vw]">
+                        <label className='text-left text-gray-800 mb-1' htmlFor="name">Name</label>
+                        <input
+                            className="form-input bg-gray-100 p-3 rounded border"
+                            {...register('name', {
+                                required: 'This Field is required',
+                                minLength: { value: 5, message: 'Minimum 5 characters are required' },
+                                maxLength: { value: 20, message: 'Maximum length is 20 characters' }
+                            })}
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="Name"
+                            id="name"
+                            disabled={!isEditable}
+                        />
+                        {errors.name && <span className="text-left text-red-500">{errors.name.message}</span>}
 
-  const handleCategoryChange = (value) => {
-    setCategory(value);
-  };
+                        <label className='text-left text-gray-800 mb-1' htmlFor="email">Email</label>
+                        <input
+                            className="form-input bg-gray-100 p-3 rounded border"
+                            {...register('email', {
+                                required: 'This Field is required',
+                                minLength: { value: 3, message: 'Minimum 3 characters are required' }
+                            })}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Email"
+                            id="email"
+                            disabled={!isEditable}
+                        />
+                        {errors.email && <span className="text-left text-red-500">{errors.email.message}</span>}
 
-  const navigateHome = () => {
-    navigate('/home');
-  };
-
-  const onSubmit = async (data) => {
-    setLoading(true);
-    try {
-      const { title, description } = data;
-      const payload = {
-        title,
-        description,
-        category,
-      };
-
-      await axios.put(`http://localhost:4000/${type}s/${id}`, payload);
-      setLoading(false);
-      setIsSubmitted(true);
-      setErrorMessage('');
-      setTimeout(() => {
-        navigate('/home');
-      }, 300);
-    } catch (error) {
-      console.error(error);
-      setLoading(false);
-      setIsSubmitted(false);
-      setErrorMessage('Submission failed. Please try again later.');
-    }
-  };
-
-  return (
-    <div>
-      <Header />
-      <div className=''>
-        <center className=''>
-          <h2 className="register-head textgray text-2xl font-semibold mt-10">Edit the {type}</h2>
-          <form className="posts border border-gray-500 rounded-md flex flex-col mt-10 p-6 lg:w-[55vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]" onSubmit={handleSubmit(onSubmit)}>
-            {isSubmitted && !errorMessage ? (
-              <div className="pop p-3 bg-green-500 text-white rounded mb-5">
-                <p className="registered-heading">Updated successfully</p>
-              </div>
-            ) : errorMessage && !isSubmitted ? (
-              <div className="pop p-3 bg-red-500 text-white rounded mb-5">
-                <p className="registered-heading">{errorMessage}</p>
-              </div>
-            ) : null}
-
-            <div className='top-opt flex justify-between items-center mb-5'>
-              <div className='flex items-center w-[15vw] '>
-                <img className='h-12 w-12 rounded-full overflow-hidden' src={ProfileIMG2} alt="" />
-                <h3 className='post-username pl-4 font-normal poppins'>{name}</h3>
-              </div>
-
-              {loading && <l-ring size="40" stroke="5" bg-opacity="0" speed="2" color="#2E93FF"></l-ring>}
+                        <div className='w-full flex justify-between'>
+                            <button onClick={handleEdit} className="submit-btn rounded text-white gradient2 font-bold p-2 h-[7vh] w-[13.5vw]">
+                                {buttonText}
+                            </button>
+                            <button className="submit-btn rounded text-white font-bold p-2 gradient1 h-[7vh] w-[13.5vw]">Change password</button>
+                            <button className="submit-btn rounded text-white bg-red-600 font-bold p-2 h-[7vh] w-[13.5vw]">Delete Account</button>
+                        </div>
+                    </form>
+                </center>
             </div>
 
-            <div className='flex items-start justify-between '>
-              {existingImage && <div className="w-[20vw] h-[45vh] existing-image-wrapper  image-wrapper-4x3 rounded-md">
-                <img src={existingImage} alt="Image 4x3" className='rounded-md ' />
-              </div>}
-              <div className='flex flex-col w-[30vw] h-full'>
+            <hr className="mt-10 bg-black" />
 
-                <label className='text-left textgray mb-1' htmlFor="title">Title</label>
-                <input className="form-input bg-gray-100 p-3 rounded border border-gray-400" {...register('title', {
-                  required: 'This Field is required',
-                  minLength: { value: 5, message: 'Minimum 5 characters are required' },
-                  maxLength: { value: 30, message: 'Maximum length is 30 characters' }
-                })} placeholder="Enter the Title" id="title" />
-                <br />
-                {errors.title && <span className="text-left text-red-500">{errors.title.message}</span>}
-
-                <label className='text-left textgray mb-1' htmlFor="description">Description</label>
-                <textarea className="form-input bg-gray-100 p-3 rounded border border-gray-400 mb-3" {...register('description', {
-                  required: 'This Field is required',
-                  minLength: { value: 3, message: 'Minimum 3 characters are required' },
-                })} placeholder="Enter the description" id="description" maxLength={250} style={{ maxHeight: "200px", minHeight:"93px" }} />
-                <br />
-                {errors.description && <span className="text-left text-red-500">{errors.description.message}</span>}
-
-
-                <div className=' mb-5'>
-                  <Select
-                    label="Select Category"
-                    value={category}
-                    id="category"
-                    onChange={handleCategoryChange}
-                  >
-                    {type === 'post' ? (
-                      <>
-                        <Option value="Portraits">Portraits</Option>
-                        <Option value="Landscapes">Landscapes</Option>
-                        <Option value="Grayscales">Grayscales</Option>
-                        <Option value="Macro">Macro</Option>
-                        <Option value="Minimal">Minimal</Option>
-                      </>
-                    ) : (
-                      <>
-                        <Option value="Photography">Photography</Option>
-                        <Option value="Experience">Experience</Option>
-                        <Option value="Tricks">Tricks</Option>
-                        <Option value="Rules">Rules</Option>
-                      </>
-                    )}
-                  </Select>
+            <div className="bg-gray-100 pt-6">
+                <div className="flex justify-center mt-9">
+                    <button
+                        className={`bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-l ${activeButton === 'One' ? 'gradient2' : ''}`}
+                        onClick={() => handleClick('One')}
+                    >
+                        Posts
+                    </button>
+                    <button
+                        className={`bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-r ${activeButton === 'Two' ? 'gradient2' : ''}`}
+                        onClick={() => handleClick('Two')}
+                    >
+                        Articles
+                    </button>
                 </div>
-
-                <div className='flex items-center w-full h-12'>
-                  <button onClick={navigateHome} className="submit-btn font-bold bg-gray-800 text-white rounded p-2 h-full w-1/2 mr-1 hover:bg-gray-600 transition">Cancel</button>
-                  <button className="submit-btn rounded text-white font-bold p-2 gradient1 h-full w-1/2 hover:opacity-90 transition">Update</button>
-                </div>
-              </div>
+                {activeButton === 'One' && <Posts posts={posts} likedPosts={likedPosts} toggleLike={(id) => toggleLike(id, 'post')} />}
+                {activeButton === 'Two' && <Articles articles={articles} likedArticles={likedArticles} toggleLike={(id) => toggleLike(id, 'article')} />}
             </div>
-          </form>
-        </center>
-      </div>
-    </div>
-  );
+        </div>
+    );
 }
 
-export default EditEntity;
+export default UserProfile;

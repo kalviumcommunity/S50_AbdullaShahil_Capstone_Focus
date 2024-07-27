@@ -26,20 +26,21 @@ const ActiveChat = ({ id, chatType, setActiveChat }) => {
 
     useEffect(() => {
         socket.connect();
-    
+
         socket.on('connect', () => {
             console.log("server connected");
             socket.emit("joinCommunity", chatId);
         });
-    
+
         socket.on('disconnect', () => {
             console.log("server disconnected");
         });
-    
+
         socket.on('message', (message) => {
+            console.log(message)
             setMessages(prevMessages => [...prevMessages, message]);
         });
-    
+
         return () => {
             socket.disconnect();
             socket.off('connect');
@@ -47,7 +48,7 @@ const ActiveChat = ({ id, chatType, setActiveChat }) => {
             socket.off('message');
         };
     }, [chatId]);
-    
+
 
     useEffect(() => {
         if (chatType === 'groups') {
@@ -145,7 +146,7 @@ const ActiveChat = ({ id, chatType, setActiveChat }) => {
     };
 
     useEffect(() => {
-        scrollToBottom(); 
+        scrollToBottom();
     }, [messages]);
 
     const scrollToBottom = () => {
@@ -249,7 +250,7 @@ const ActiveChat = ({ id, chatType, setActiveChat }) => {
                 </div>
             ) : (
                 <>
-                   <div className="messages-section mt-2 h-[57vh] overflow-scroll">
+                    <div className="messages-section mt-2 h-[57vh] overflow-scroll">
                         {messages.map((message, index) => (
                             <div key={index} className={`flex ${message.name === username ? 'justify-end' : 'justify-start'} my-2`}>
                                 <div className={`p-4 ${message.name === username ? 'gradient1 text-white' : 'gradient2 text-white'} rounded-full w-max-full text-right break-words`}>
@@ -257,6 +258,9 @@ const ActiveChat = ({ id, chatType, setActiveChat }) => {
                                 </div>
                             </div>
                         ))}
+
+
+
                         <div ref={messagesEndRef} />
                     </div>
 

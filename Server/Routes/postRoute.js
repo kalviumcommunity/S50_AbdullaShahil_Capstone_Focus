@@ -59,6 +59,7 @@ router.get("/", async (req, res) => {
     profiles.forEach(profile => {
       profileMap[profile._id] = profile.name;
     });
+    console.log(posts)
 
     const responseData = posts.map(post => ({
       _id: post._id,
@@ -68,6 +69,7 @@ router.get("/", async (req, res) => {
       image: post.image,
       category: post.category,
       likes: post.likes,
+      profile_img: post.profile_img
     }));
 
     res.json(responseData);
@@ -109,6 +111,7 @@ router.get("/userPosts/:id", async (req, res) => {
       image: post.image,
       category: post.category,
       likes: post.likes,
+      profile_img: post.profile_img
     }));
 
     res.json(responseData);
@@ -157,7 +160,7 @@ router.post('/comments/:postId', async (req, res) => {
     await post.save();
 
     const addedComment = post.comments[post.comments.length - 1];
-console.log(addedComment)
+    console.log(addedComment)
     res.status(201).json(addedComment);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -238,6 +241,7 @@ router.patch("/like/:id", validatePatch, async (req, res) => {
       image: updatedPost.image,
       category: updatedPost.category,
       likes: updatedPost.likes,
+      profile_img: updatedPost.profile_img
     };
     res.json(responseData);
   } catch (error) {
@@ -268,8 +272,10 @@ router.post("/", validatePost, async (req, res) => {
       description,
       image: image,
       category: category,
+      profile_img: profile.profile_img
     };
-
+console.log("first", profile)
+console.log("posttt",newPostData)
     const newPost = new postModel(newPostData);
     const savedPost = await newPost.save();
 

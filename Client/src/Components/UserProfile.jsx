@@ -9,16 +9,9 @@ import Articles from "./UserProfile Components/Articles";
 import prof from '../assets/reviewProfile.jpeg';
 
 function UserProfile() {
-    const { register, handleSubmit, formState: { errors } } = useForm();
     const [activeButton, setActiveButton] = useState('One');
-    const [userData, setUserData] = useState({});
-    const [isEditable, setIsEditable] = useState(false);
-    const [isSubmitted, setIsSubmitted] = useState(false);
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [id, setId] = useState('');
-    const [buttonText, setButtonText] = useState('Edit'); 
-    const [isLoading, setIsLoading] = useState(true);
+    const [loading, setIsLoading] = useState(true);
+    const [profileData, setProfileData] = useState({});
     const [posts, setPosts] = useState([]);
     const [likedPosts, setLikedPosts] = useState({});
     const [articles, setArticles] = useState([]);
@@ -33,18 +26,21 @@ function UserProfile() {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await axios.post(`http://localhost:4000/users/getUser`, { token }, { withCredentials: true });
-                const userData = response.data.user;
-                setUserData(userData);
-                setName(userData.name);
-                setEmail(userData.email);
-                setId(userData._id);
+                const response = await axios.get(`http://localhost:4000/users/profile/get/${profileID}`);
+                setProfileData({
+                    name: response.data.name,
+                    about: response.data.about,
+                    interests: response.data.interests,
+                    profile_img: response.data.profile_img,
+
+                });
+                // console.log(response)
             } catch (err) {
                 console.error(err);
             }
         };
         fetchUserData();
-    }, [token]);
+    }, [profileID]);
 
     useEffect(() => {
         if (!profileID) return;
@@ -61,10 +57,9 @@ function UserProfile() {
                     acc[post._id] = post.likes.includes(profileID);
                     return acc;
                 }, {});
-                
+
                 setPosts(fetchedPosts);
                 setLikedPosts(initialLikedPosts);
-                setIsLoading(false);
 
                 const articlesWithRelativeTime = articlesResponse.data.map(article => ({
                     ...article,
@@ -74,9 +69,10 @@ function UserProfile() {
                     acc[article._id] = article.likes.includes(profileID);
                     return acc;
                 }, {});
-                
+
                 setArticles(articlesWithRelativeTime);
                 setLikedArticles(initialLikedArticles);
+                setIsLoading(false);
             } catch (err) {
                 console.error("Error fetching posts and articles", err);
                 setIsLoading(false);
@@ -104,85 +100,43 @@ function UserProfile() {
         }
     }, [likedPosts, likedArticles, profileID]);
 
-    const onSubmit = async (data) => {
-        try {
-            const response = await axios.put(`http://localhost:4000/users/${id}`, data);
-            setIsEditable(false);
-            setButtonText('Edit');
-            setIsSubmitted(true);
-            Cookies.set("name", data.name);
-            localStorage.setItem("token", response.data.token);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const handleEdit = (e) => {
-        e.preventDefault();
-        if (isEditable) {
-            handleSubmit(onSubmit)();
-        } else {
-            setIsEditable(true);
-            setButtonText('Save');
-        }
-    };
-
     return (
         <div>
             <Header />
-            <div className='flex items-center justify-center mt-10'>
-                <center className="flex items-center">
-                    <div className="mr-[6rem]">
-                        <img className='h-[22vh] w-[22vh] rounded-full overflow-hidden' src={prof} alt="Profile" />
-                        <h1 className="pt-7 text-gray-800 text-2xl poppins">{username}</h1>
-                    </div>
-
-                    <form className="posts border-gray-300 rounded-md flex flex-col justify-between p-5 lg:w-[45vw]">
-                        <label className='text-left text-gray-800 mb-1' htmlFor="name">Name</label>
-                        <input
-                            className="form-input bg-gray-100 p-3 rounded border"
-                            {...register('name', {
-                                required: 'This Field is required',
-                                minLength: { value: 5, message: 'Minimum 5 characters are required' },
-                                maxLength: { value: 20, message: 'Maximum length is 20 characters' }
-                            })}
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="Name"
-                            id="name"
-                            disabled={!isEditable}
-                        />
-                        {errors.name && <span className="text-left text-red-500">{errors.name.message}</span>}
-
-                        <label className='text-left text-gray-800 mb-1' htmlFor="email">Email</label>
-                        <input
-                            className="form-input bg-gray-100 p-3 rounded border"
-                            {...register('email', {
-                                required: 'This Field is required',
-                                minLength: { value: 3, message: 'Minimum 3 characters are required' }
-                            })}
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="Email"
-                            id="email"
-                            disabled={!isEditable}
-                        />
-                        {errors.email && <span className="text-left text-red-500">{errors.email.message}</span>}
-
-                        <div className='w-full flex justify-between'>
-                            <button onClick={handleEdit} className="submit-btn rounded text-white gradient2 font-bold p-2 h-[7vh] w-[13.5vw]">
-                                {buttonText}
-                            </button>
-                            <button className="submit-btn rounded text-white font-bold p-2 gradient1 h-[7vh] w-[13.5vw]">Change password</button>
-                            <button className="submit-btn rounded text-white bg-red-600 font-bold p-2 h-[7vh] w-[13.5vw]">Delete Account</button>
+            <section className="flex items-center justify-around p-8 h-min">
+                <div className="user-info flex items-center p-12 w-[65vw] h-[35vh] gradient2 rounded-[45px] transition">
+                    <img className='h-[20vh] w-[20vh] rounded-full overflow-hidden border-4 border-white shadow-lg' src={prof} alt="Profile" />
+                    <div className='ml-8 flex flex-col items-left justify-start'>
+                        <h1 className="text-white font-semibold text-3xl poppins">{profileData.name}</h1>
+                        <div className='flex items-center mt-3'>
+                            {profileData.interests && profileData.interests.map((interest, index) => (
+                                <div key={index} className="text-white p-2 text-md px-8 mr-1 rounded-full hover:scale-[100.5%] bg-gray-800">
+                                    {interest}
+                                </div>
+                            ))}
                         </div>
-                    </form>
-                </center>
-            </div>
-
+                        <div className='mt-3 w-[40vw]'>
+                            <p className='text-left font-light text-white poppins text-md'>{profileData.about}</p>
+                        </div>
+                    </div>
+                </div>
+                <div className='statistics gradient1 p-10 w-[28vw] h-[35vh] flex flex-col items-center rounded-[45px]'>
+                    <h1 className='poppins text-white text-2xl font-medium'>Insights</h1>
+                    <hr className='text-white w-[20vw] mt-5 opacity-30'/>
+                    <div className="flex items-center justify-between w-[13vw] h-max mt-3">
+                        <div className="flex flex-col items-center justify-between">
+                            <h1 className='text-[4.5rem] font-semibold poppins text-white'>{posts.length}</h1>
+                            <h1 className="poppins text-white text-xl">posts</h1>
+                        </div>
+                        <div className="flex flex-col items-center justify-between">
+                            <h1 className='text-[4.5rem] font-semibold poppins text-white'>{articles.length}</h1>
+                            <h1 className="poppins text-white text-xl">articles</h1>
+                        </div>
+                    </div>
+                </div>
+            </section>
             <hr className="mt-10 bg-black" />
-
-            <div className="bg-gray-100 pt-6">
+            <div className="bg-gray-50 pt-6">
                 <div className="flex justify-center mt-9">
                     <button
                         className={`bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-l ${activeButton === 'One' ? 'gradient2' : ''}`}

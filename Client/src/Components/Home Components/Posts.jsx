@@ -2,16 +2,11 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import CommentBox from '../CommentBox';
+import NoProfile from "../../assets/noprofile.png";
 
-import {
-  ShimmerButton,
-  ShimmerText,
-  ShimmerCircularImage,
-  ShimmerThumbnail,
-  ShimmerBadge,
-} from "react-shimmer-effects";
+import { PostShimmer } from '../Utils/Shimmers';
 
-import ProfileIMG2 from '../../assets/review2.jpeg';
+
 import Heart from '../../assets/heart.png';
 import HeartActive from '../../assets/heartactive.png';
 import Comment from '../../assets/comment.png';
@@ -34,7 +29,7 @@ function Posts({ postCategory }) {
           const isLikedByUser = post.likes.includes(profileID);
           initialLikedPosts[post._id] = isLikedByUser;
         });
-
+        console.log(response.data)
         setPosts(fetchedPosts);
         setLikedPosts(initialLikedPosts);
         setIsLoading(false);
@@ -67,36 +62,20 @@ function Posts({ postCategory }) {
   const filteredPosts = postCategory ? posts.filter(post => post.category === postCategory) : posts;
 
   return (
-    <center className="h-[85vh] pl-5 pr-5 pt-10 overflow-hidden">
-      <input className='w-[30vw] search border border-gray-400 rounded-full px-8 py-4 mb-4' id="genreSelect" placeholder='Search...' />
-      <div className="pt-12 px-5 overflow-x-hidden overflow-y-scroll h-[75vh]">
+    <center className="h-[85vh] pt-5 pl-5 pr-5 overflow-hidden">
+      <div className="p-5 px overflow-x-hidden overflow-y-scroll h-[90vh]">
 
         {isLoading ? (
-          Array.from({ length: 10 }).map((_, index) => (
-            <div className='posts border border-gray-300 rounded-md flex flex-col mb-10 p-5 lg:w-[35vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]' key={index}>
-              <div className='top-opt flex justify-between items-center mb-5'>
-                <div className='flex items-center w-[15vw]'>
-                  <ShimmerCircularImage size={50} />
-                  <div style={{ width: '10px' }}></div>
-                  <ShimmerBadge width={130} />
-                </div>
-                <ShimmerBadge width={70} />
-              </div>
-              <ShimmerThumbnail height={550} rounded />
-              <div className="post-options rounded p-3 flex items-center justify-between mt-1">
-                <ShimmerBadge width={200} />
-                <ShimmerButton size="md" />
-              </div>
-              <ShimmerText />
-            </div>
-          ))
+
+          <PostShimmer scaleValue="0%" />
+
         ) : (
           filteredPosts.length > 0 ? (
             filteredPosts.map((post, index) => (
-              <div className="posts border border-gray-400 rounded-md flex flex-col mb-10 p-5 lg:w-[35vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]" key={index}>
+              <div className="posts border border-gray-400 rounded-md flex flex-col mb-10 p-5  lg:w-[35vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]" key={index}>
                 <div className='top-opt flex justify-between items-center mb-5'>
                   <div className='flex items-center w-[15vw]'>
-                    <img className='h-12 w-12 rounded-full overflow-hidden' src={ProfileIMG2} alt="" />
+                    <img className='h-12 w-12 rounded-full overflow-hidden' src={ post.profile_img ? (post.profile_img):(NoProfile) } alt="" />
                     <h3 className='post-username pl-4 font-light poppins'>{post.name}</h3>
                   </div>
                   <h1 className='font-light'>{post.category}</h1>

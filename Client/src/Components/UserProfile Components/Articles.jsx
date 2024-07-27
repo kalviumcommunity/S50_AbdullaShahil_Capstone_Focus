@@ -2,21 +2,15 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-
-import {
-    ShimmerButton,
-    ShimmerText,
-    ShimmerCircularImage,
-    ShimmerThumbnail,
-    ShimmerBadge,
-} from "react-shimmer-effects";
+import NoProfile from "../../assets/noprofile.png";
 
 import CommentBox from '../CommentBox';
-import ProfileIMG2 from '../../assets/review2.jpeg';
+import { ArticleShimmer } from '../Utils/Shimmers';
 import Heart from '../../assets/heart.png';
 import HeartActive from '../../assets/heartactive.png';
 import Comment from '../../assets/comment.png';
 import more from '../../assets/more.png';
+
 import {
     Menu,
     MenuHandler,
@@ -28,7 +22,7 @@ function Articles({ articles, likedArticles, toggleLike }) {
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [deleteArticleId, setDeleteArticleId] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [activeCommentPost, setActiveCommentPost] = useState(null);  
+    const [activeCommentPost, setActiveCommentPost] = useState(null);
 
     const username = Cookies.get("name") ? Cookies.get("name").replace(/\"/g, '') : '';
     const profileID = Cookies.get('profileID');
@@ -62,14 +56,14 @@ function Articles({ articles, likedArticles, toggleLike }) {
 
     const handleCommentClick = (article) => {
         setActiveCommentPost(article);
-      };
-    
-      const handleCloseCommentBox = () => {
+    };
+
+    const handleCloseCommentBox = () => {
         setActiveCommentPost(null);
-      };
+    };
 
     return (
-        <center className="h-[85vh] pt-10 overflow-hidden">
+        <div className="pt-2 overflow-hidden">
 
             {showDeleteConfirmation && (
                 <div>
@@ -84,33 +78,17 @@ function Articles({ articles, likedArticles, toggleLike }) {
                 </div>
             )}
 
-            <input className='w-[30vw] search border border-gray-400 rounded-full px-8 py-4 mb-4' id="genreSelect" placeholder='Search...' />
-            <div className="pt-12 px-5 overflow-scroll h-[75vh]">
+            <div className="flex flex-col items-center">
                 {isLoading ? (
-                    Array.from({ length: 10 }).map((_, index) => (
-                        <div className='posts border border-gray-300 rounded-md flex flex-col mb-10 p-5 lg:w-[63vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]' key={index}>
-                            <div className='flex justify-between items-center '>
-                                <div className="flex justify-between items-center">
-                                    <ShimmerCircularImage size={50} />
-                                    <div style={{ width: '10px' }}></div>
-                                    <ShimmerBadge width={130} />
-                                </div>
-                                <ShimmerBadge width={70} />
-                            </div>
-                            <ShimmerThumbnail height={550} rounded />
-                            <div className="rounded  p-2 flex items-center  justify-between  mt-1">
-                                <ShimmerBadge width={200} />
-                                <ShimmerButton size="md" />
-                            </div>
-                            <ShimmerText />
-                        </div>
-                    ))
+                    
+                    <ArticleShimmer />
+
                 ) : (
                     articles.map((article, index) => (
-                        <div className="posts border bg-white border-gray-300 rounded-md flex flex-col mb-10 p-5 lg:w-[63vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]" key={index} >
+                        <div className=" border bg-white border-gray-300 rounded-md flex flex-col p-5 my-5 lg:w-[60vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]" key={index} >
                             <div className='top-opt flex justify-between items-center mb-5'>
                                 <div className='flex items-center w-[15vw]'>
-                                    <img className='h-12 w-12 rounded-full overflow-hidden' src={ProfileIMG2} alt="" />
+                                    <img className='h-12 w-12 rounded-full overflow-hidden' src={article.profile_img ? (article.profile_img) : (NoProfile)} alt="" />
                                     <h3 className='post-username pl-4 font-light poppins'>{username}</h3>
                                 </div>
                                 <div className="flex items-center">
@@ -148,7 +126,7 @@ function Articles({ articles, likedArticles, toggleLike }) {
                                         <div className='flex items-center justify-end'>
                                             <h2 className='mr-2 text-lg'>{article.likes.length}</h2>
                                             <img className='h-10 w-10 mr-1 rounded-full overflow-hidden cursor-pointer' src={likedArticles[article._id] ? HeartActive : Heart} alt="" onClick={() => toggleLike(article._id)} />
-                                            <img className='h-[2.1rem] w-[2.1rem] mb-[3px] overflow-hidden cursor-pointer' src={Comment} alt="" onClick={() => handleCommentClick(article)}/>
+                                            <img className='h-[2.1rem] w-[2.1rem] mb-[3px] overflow-hidden cursor-pointer' src={Comment} alt="" onClick={() => handleCommentClick(article)} />
                                         </div>
                                     </div>
                                 </div>
@@ -158,9 +136,9 @@ function Articles({ articles, likedArticles, toggleLike }) {
                 )}
             </div>
             {activeCommentPost && (
-        <CommentBox entity={activeCommentPost} onClose={handleCloseCommentBox} type="articles"/>
-      )}
-        </center>
+                <CommentBox entity={activeCommentPost} onClose={handleCloseCommentBox} type="articles" />
+            )}
+        </div>
     )
 }
 

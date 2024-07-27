@@ -7,9 +7,9 @@ import Cookies from 'js-cookie';
 import axios from 'axios';
 import { v4 } from 'uuid';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ImageDB } from '../firebase';
 import Header from './Home Components/Header';
 import ProfileIMG2 from '../assets/review2.jpeg';
-import { ImageDB } from '../firebase';
 
 import 'ldrs/tailspin'
 import 'ldrs/ring'

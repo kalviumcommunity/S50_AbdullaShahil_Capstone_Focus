@@ -43,8 +43,8 @@ function EditEntity() {
     setCategory(value);
   };
 
-  const navigateHome = () => {
-    navigate('/home');
+  const navigateProfile = () => {
+    navigate('/profile');
   };
 
   const onSubmit = async (data) => {
@@ -154,7 +154,7 @@ function EditEntity() {
 
 
                 <div className='flex items-center w-full h-12'>
-                  <button onClick={navigateHome} className="submit-btn font-bold bg-gray-800 text-white rounded p-2 h-full w-1/2 mr-1 hover:bg-gray-600 transition">Cancel</button>
+                  <button onClick={navigateProfile} className="submit-btn font-bold bg-gray-800 text-white rounded p-2 h-full w-1/2 mr-1 hover:bg-gray-600 transition">Cancel</button>
                   <button className="submit-btn rounded text-white font-bold p-2 gradient1 h-full w-1/2 hover:opacity-90 transition">Update</button>
                 </div>
               </div>
