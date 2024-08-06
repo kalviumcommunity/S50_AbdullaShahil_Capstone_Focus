@@ -24,6 +24,7 @@ const articleSchema = new mongoose.Schema({
   image: String,
   comments: [commentSchema],
   category: String,
+  profile_img: String,
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'

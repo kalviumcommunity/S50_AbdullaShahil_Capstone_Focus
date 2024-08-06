@@ -3,6 +3,8 @@ const router = express.Router();
 const Joi = require("joi");
 
 const communityModel = require("../Models/communityModel");
+const personalMessageModel = require("../Models/personalMessageModel");
+
 const profileModel = require("../Models/profileModel");
 const userModel = require("../Models/userModel");
 const messageModel = require("../Models/messageModel")
@@ -63,6 +65,28 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ message: "500 - Internal server error" });
   }
 });
+
+
+// GET PERSONAL MESSAGES
+router.get("/messages/personalMessages/:otherUserId", async (req, res) => {
+  const { userId } = req.query;
+  const { otherUserId } = req.params;
+  const parsedUserId = JSON.parse(userId);
+  
+  const currentUserId = parsedUserId._id;
+
+  const room = [currentUserId, otherUserId].sort().join("_");
+
+  try {
+    const personalMessages = await personalMessageModel.findOne({ room });
+    res.json(personalMessages ? personalMessages.messages : []);
+  } catch (error) {
+    console.error("Error fetching personal messages:", error);
+    res.status(500).send("Error fetching personal messages");
+  }
+});
+
+
 
 // GET COMMUNITY LISTS (NAME, PROFILE IMG AND ID)
 router.get("/list/displayData", async (req, res) => {

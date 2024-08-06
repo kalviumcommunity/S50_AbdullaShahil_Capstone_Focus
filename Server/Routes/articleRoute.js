@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const articleModel = require("../Models/articleModel");
 const profileModel = require("../Models/profileModel");
-const userModel = require("../Models/userModel");
 const Joi = require("joi");
 
 router.use(express.json());
@@ -42,6 +41,9 @@ function validatePost(req, res, next) {
   next();
 }
 
+
+// GET REQUESTS
+
 // GET all articles
 router.get("/", async (req, res) => {
   try {
@@ -62,7 +64,9 @@ router.get("/", async (req, res) => {
       image: doc.image,
       postedTime: doc.postedTime,
       likes: doc.likes,
-      category: doc.category
+      category: doc.category,
+      profile_img: doc.profile_img
+
     }));
 
     res.json(responseData);
@@ -113,7 +117,24 @@ router.get("/userArticles/:id", async (req, res) => {
   }
 });
 
+// GET comments of a specific article
+router.get("/comments/:id", async (req, res) => {
+  const articleId = req.params.id;
+  try {
+    const article = await articleModel.findById(articleId);
+    if (!article) {
+      return res.status(404).json({ error: "Article not found" });
+    }
 
+    const responseData = article.comments
+    res.json(responseData);
+
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// POST REQUESTS
 
 // Function to validate URL 
 function validateUrlFormat(url) {
@@ -146,22 +167,56 @@ router.post("/", validatePost, async (req, res) => {
       description,
       image: image,
       category: category,
+      profile_img: profile.profile_img
     };
-
+    
     const newArticle = new articleModel(newArticleData);
     const savedArticle = await newArticle.save();
-
+    
     profile.articles.push(savedArticle._id);
     await profile.save();
 
     const populatedProfile = await profileModel.findById(profile._id).populate("articles").exec();
     res.status(201).json(populatedProfile);
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
 
+
+
+// POST a comment on a article
+router.post('/comments/:articleId', async (req, res) => {
+  try {
+    const { name, message, profilepic } = req.body;
+
+    const article = await articleModel.findById(req.params.articleId);
+    if (!article) {
+      return res.status(404).json({ message: 'Article not found' });
+    }
+
+    const newComment = {
+      name: name,
+      message: message,
+      profilepic: profilepic,
+      postedTime: Date.now()
+    };
+    article.comments.push(newComment);
+    await article.save();
+
+    const addedComment = article.comments[article.comments.length - 1];
+    console.log(addedComment)
+    res.status(201).json(addedComment);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+
+// PATCH/PUT REQUESTS
 
 
 // PATCH to update likes in a article
@@ -238,6 +293,10 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+
+
+// DELETE REQUESTS
+
 // DELETE an article
 router.delete("/:id", async (req, res) => {
   try {
@@ -270,53 +329,6 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
-
-// GET comments of a specific article
-router.get("/comments/:id", async (req, res) => {
-  const articleId = req.params.id;
-  try {
-    const article = await articleModel.findById(articleId);
-    if (!article) {
-      return res.status(404).json({ error: "Article not found" });
-    }
-
-    const responseData = article.comments
-    res.json(responseData);
-
-  } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
-
-// POST a comment on a article
-router.post('/comments/:articleId', async (req, res) => {
-  try {
-    const { name, message, profilepic } = req.body;
-
-    const article = await articleModel.findById(req.params.articleId);
-    if (!article) {
-      return res.status(404).json({ message: 'Article not found' });
-    }
-
-    const newComment = {
-      name: name,
-      message: message,
-      profilepic: profilepic,
-      postedTime: Date.now()
-    };
-    article.comments.push(newComment);
-    await article.save();
-
-    const addedComment = article.comments[article.comments.length - 1];
-    console.log(addedComment)
-    res.status(201).json(addedComment);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
 
 
 // DELETE a comment on a article

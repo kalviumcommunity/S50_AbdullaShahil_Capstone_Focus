@@ -110,6 +110,25 @@ router.get("/", async (req, res) => {
     }
 });
 
+// GET all profiles
+router.get("/profiles", async (req, res) => {
+    try {
+        const users = await userModel.find({}, 'profile');  // Second parameter is the projection
+        const profileIds = users.map(user => user.profile);
+
+        const profiles = await profileModel.find({ _id: { $in: profileIds } })
+        .select('_id name profile_img ')
+        .lean();
+
+        res.json(profiles);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "500-Internal server error" });
+    }
+});
+
+
+
 // GET users for suggestion
 router.get("/otherUsers", async (req, res) => {
     try {
@@ -154,13 +173,8 @@ router.get("/:id", async (req, res) => {
 router.get("/profile/:id", async (req, res) => {
     const id = req.params.id;
     try {
-        const user = await userModel.findById(id);
-        if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }
-
-        const profile = await profileModel.findById(user.profile)
-            .select('_id name email communities')
+        const profile = await profileModel.findById(id)
+            .select('_id name about profile_img communities')
             .lean();
 
         res.json(profile);
@@ -187,12 +201,13 @@ router.get("/profile/get/:id", async (req, res) => {
 
 
 const decodetoken = (req, res, next) => {
-    const token = req.cookies;
     console.log("first")
+    const token = req.body.token || req.query.token || req.headers["x-access-token"];
     console.log(token)
     if (!token) {
         return res.status(401).json({ error: "Unauthorized: Token is not provided" });
     }
+
     console.log("token:",token)
 
     try {
@@ -206,7 +221,7 @@ const decodetoken = (req, res, next) => {
 };
 
 // Token decoding to retrieve userID / profileID
-router.get('/token/getId/:idType', decodetoken, async (req, res) => {
+router.post('/token/getId/:idType', decodetoken, async (req, res) => {
     try {
         const { idType } = req.params;
 
@@ -286,16 +301,16 @@ router.post("/login", async (req, res) => {
         }
         const token = generateToken(user._id);
 
-        // res.cookie("token", token, {
-        //     httpOnly: false,
-        //     secure: true,
-        //     sameSite: "Lax",
-        //     maxAge: 7 * 24 * 60 * 60 * 1000,
-        // });
+        res.cookie("token", token, {
+            httpOnly: false,
+            secure: true,
+            sameSite: "Lax",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
 
         // res.status(201).json({ message: "Signup successful" })
 
-        res.status(201).json({ email: user.email, name: user.name, token, userID: user._id, profileID: user.profile._id });
+        res.status(201).json({ email: user.email, name: user.name, userID: user._id, profileID: user.profile._id });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal server error" });

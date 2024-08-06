@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'tailwindcss/tailwind.css';
-import Cookies from 'js-cookie';
 import Header from './Home Components/Header';
 import axios from 'axios';
 import ActiveChat from './Chat Components/ActiveChat';
@@ -11,10 +10,9 @@ const ChatApp = () => {
     const [allUsers, setAllUsers] = useState([]);
     const [communities, setCommunities] = useState([]);
     const [activeChatType, setActiveChatType] = useState('personal');
-    const [messages, setMessages] = useState([]);
     const [activeChat, setActiveChat] = useState(null);
-    const [viewInfo, setViewInfo] = useState(false);
 
+    const profilePic = 'https://www.famousbirthdays.com/headshots/russell-crowe-6.jpg';
     
     const toHome = () => {
         navigate("/home");
@@ -32,14 +30,9 @@ const ChatApp = () => {
         navigate("/createCommunity");
     };
     
-    const username = Cookies.get("name") ? Cookies.get("name").replace(/\"/g, '') : '';
-    const profilePic = 'https://www.famousbirthdays.com/headshots/russell-crowe-6.jpg';
-    
-   
-
 
     useEffect(() => {
-        axios.get(`http://localhost:4000/users`)
+        axios.get(`http://localhost:4000/users/profiles`)
             .then(response => {
                 setAllUsers(response.data);
                 console.log(response.data);
@@ -60,8 +53,6 @@ const ChatApp = () => {
 
     const handleChatClick = (chat) => {
         setActiveChat(chat);
-        setViewInfo(false);
-        setMessages([]);
     };
 
 
@@ -118,7 +109,7 @@ const ChatApp = () => {
                             <div key={user._id} className='flex items-center p-2 hover:bg-gray-100 rounded-lg transition hover:cursor-pointer' onClick={() => handleChatClick(user)}>
                                 <img
                                     className="w-16 h-16 border rounded-full mr-2"
-                                    src={profilePic}
+                                    src={user.profile_img ? user.profile_img : profilePic}
                                     alt="Profile"
                                 />
                                 <h1 className='p-4 poppins text-md'>{user.name}</h1>
