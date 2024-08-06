@@ -11,46 +11,21 @@ const ActiveChat = ({ id, chatType, setActiveChat }) => {
     const chatId = id;
     const profilePic = 'https://www.famousbirthdays.com/headshots/russell-crowe-6.jpg';
     const username = Cookies.get("name") ? Cookies.get("name").replace(/\"/g, '') : '';
-
     const navigate = useNavigate();
+
     const [userData, setUserData] = useState([]);
     const [community, setCommunity] = useState(null);
     const messagesEndRef = useRef(null);
-
     const [messages, setMessages] = useState([]);
     const [messageInput, setMessageInput] = useState('');
-
     const [viewInfo, setViewInfo] = useState(false);
     const [deletePopupOpen, setDeletePopupOpen] = useState(false);
     const [addMemberPopupOpen, setAddMemberPopupOpen] = useState(false);
+    const profileID = Cookies.get("profileID")
 
     useEffect(() => {
-        socket.connect();
-
-        socket.on('connect', () => {
-            console.log("server connected");
-            socket.emit("joinCommunity", chatId);
-        });
-
-        socket.on('disconnect', () => {
-            console.log("server disconnected");
-        });
-
-        socket.on('message', (message) => {
-            console.log(message)
-            setMessages(prevMessages => [...prevMessages, message]);
-        });
-
-        return () => {
-            socket.disconnect();
-            socket.off('connect');
-            socket.off('disconnect');
-            socket.off('message');
-        };
-    }, [chatId]);
-
-
-    useEffect(() => {
+        setViewInfo(false)
+        console.log("hhhhhh",chatId,chatType)
         if (chatType === 'groups') {
             axios.get(`http://localhost:4000/communities/${chatId}`)
                 .then(response => {
@@ -63,6 +38,7 @@ const ActiveChat = ({ id, chatType, setActiveChat }) => {
             axios.get(`http://localhost:4000/users/list/displayData`)
                 .then(response => {
                     setUserData(response.data);
+                    console.log(response.data)
                 })
                 .catch(error => {
                     console.log("error: ", error);
@@ -70,36 +46,79 @@ const ActiveChat = ({ id, chatType, setActiveChat }) => {
 
             axios.get(`http://localhost:4000/messages/community/${chatId}`)
                 .then(response => {
-                    console.log(response.data)
                     setMessages(response.data.messages);
                 })
                 .catch(error => {
                     console.log("error: ", error);
                 });
 
+            socket.emit('joinCommunity', chatId); 
+
         } else {
+            setCommunity("")
+            const userId = Cookies.get('profileID'); 
+            axios.get(`http://localhost:4000/communities/messages/personalMessages/${chatId}`, {
+                params: {
+                    userId: JSON.stringify({ _id: userId }) 
+                }
+            })
+            .then(response => {
+                setMessages(response.data);
+                console.log("msggggg-----",response.data)
+
+            })
+            .catch(error => {
+                console.log("error: ", error);
+            });
+
             axios.get(`http://localhost:4000/users/profile/${chatId}`)
-                .then(response => {
-                    console.log(response.data)
-                    setUserData(response.data);
-                })
-                .catch(error => {
-                    console.log("error: ", error);
-                });
+            .then(response => {
+                console.log(response.data)
+                setUserData(response.data);
+            })
+            .catch(error => {
+                console.log("error: ", error);
+            });
+            const otherUserId = chatId;
+            socket.emit('joinPersonalChat', { userId, otherUserId });
         }
     }, [chatId]);
 
+    useEffect(() => {
+        socket.on('message', (message) => {
+            setMessages(prevMessages => [...prevMessages, message]);
+        });
+
+        socket.on('personalMessage', (message) => {
+            setMessages(prevMessages => [...prevMessages, message]);
+        });
+
+        return () => {
+            socket.off('message');
+            socket.off('personalMessage');
+        };
+    }, []);
+
     const handleSendMessage = () => {
         if (messageInput.trim() !== '') {
-            const newMessage = {
-                name: username,
-                message: messageInput,
-                communityId: chatId,
-            };
+            if (chatType === 'groups') {
+                const newMessage = {
+                    name: username,
+                    message: messageInput,
+                    communityId: chatId,
+                };
 
-            socket.emit("message", newMessage);
+                socket.emit("message", newMessage);
+            } else if (chatType === 'personal') {
+                const newMessage = {
+                    senderId: Cookies.get('profileID'),
+                    receiverId: chatId,
+                    message: messageInput,
+                };
+
+                socket.emit("personalMessage", newMessage);
+            }
             setMessageInput('');
-
         }
     };
 
@@ -153,6 +172,7 @@ const ActiveChat = ({ id, chatType, setActiveChat }) => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
+
     return (
         <div className="relative h-full">
             <div className="border-b flex items-center justify-between">
@@ -183,7 +203,7 @@ const ActiveChat = ({ id, chatType, setActiveChat }) => {
                     <center className="poppins text-xl font-semibold">{community?.name || userData.name}</center>
                     <p className="poppins text-center text-md mt-2">{community?.description || "No description available."}</p>
 
-                    {chatType === 'groups' && community && (
+                    { community && (
                         <div className="flex flex-col items-center additional-info mt-4">
                             <div className="flex items-center justify-around w-[30vw]">
                                 <div
@@ -252,14 +272,12 @@ const ActiveChat = ({ id, chatType, setActiveChat }) => {
                 <>
                     <div className="messages-section mt-2 h-[57vh] overflow-scroll">
                         {messages.map((message, index) => (
-                            <div key={index} className={`flex ${message.name === username ? 'justify-end' : 'justify-start'} my-2`}>
-                                <div className={`p-4 ${message.name === username ? 'gradient1 text-white' : 'gradient2 text-white'} rounded-full w-max-full text-right break-words`}>
+                            <div key={index} className={`flex ${message.name === username || message.senderId == profileID ? 'justify-end' : 'justify-start'} my-2`}>
+                                <div className={`p-4 ${message.name === username || message.senderId == profileID ? 'gradient1 text-white' : 'gradient2 text-white'} rounded-full w-max-full text-right break-words`}>
                                     <p className="poppins">{message.message}</p>
                                 </div>
                             </div>
                         ))}
-
-
 
                         <div ref={messagesEndRef} />
                     </div>

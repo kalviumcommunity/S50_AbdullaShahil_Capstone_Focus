@@ -6,7 +6,7 @@ import { formatDistanceToNow, parseISO } from 'date-fns';
 import Header from "./Home Components/Header";
 import Posts from "./UserProfile Components/Posts";
 import Articles from "./UserProfile Components/Articles";
-import prof from '../assets/reviewProfile.jpeg';
+import { getId } from './Utils/ApiUtils';
 
 function UserProfile() {
     const [activeButton, setActiveButton] = useState('One');
@@ -16,10 +16,17 @@ function UserProfile() {
     const [likedPosts, setLikedPosts] = useState({});
     const [articles, setArticles] = useState([]);
     const [likedArticles, setLikedArticles] = useState({});
+    const [profileID, setProfileID] = useState(null);
 
-    const username = Cookies.get("name")?.replace(/\"/g, '') || '';
-    const token = Cookies.get("token") || localStorage.getItem('token');
-    const profileID = Cookies.get("profileID");
+    useEffect(() => {
+        const fetchProfileID = async () => {
+            const id = await getId('profileID');
+            setProfileID(id);
+        };
+
+        fetchProfileID();
+    }, []);
+
 
     const handleClick = (button) => setActiveButton(button);
 
@@ -34,7 +41,6 @@ function UserProfile() {
                     profile_img: response.data.profile_img,
 
                 });
-                // console.log(response)
             } catch (err) {
                 console.error(err);
             }
@@ -57,7 +63,7 @@ function UserProfile() {
                     acc[post._id] = post.likes.includes(profileID);
                     return acc;
                 }, {});
-
+console.log(fetchedPosts)
                 setPosts(fetchedPosts);
                 setLikedPosts(initialLikedPosts);
 
@@ -105,7 +111,8 @@ function UserProfile() {
             <Header />
             <section className="flex items-center justify-around p-8 h-min">
                 <div className="user-info flex items-center p-12 w-[65vw] h-[35vh] gradient2 rounded-[45px] transition">
-                    <img className='h-[20vh] w-[20vh] rounded-full overflow-hidden border-4 border-white shadow-lg' src={prof} alt="Profile" />
+                    <img className='h-[20vh] w-[20vh] rounded-full overflow-hidden border-4 border-white shadow-lg' src={profileData.profile_img
+} alt="Profile" />
                     <div className='ml-8 flex flex-col items-left justify-start'>
                         <h1 className="text-white font-semibold text-3xl poppins">{profileData.name}</h1>
                         <div className='flex items-center mt-3'>

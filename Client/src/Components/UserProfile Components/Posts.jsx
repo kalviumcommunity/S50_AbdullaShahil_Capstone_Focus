@@ -27,7 +27,6 @@ function Posts({ posts, likedPosts, toggleLike }) {
   const navigate = useNavigate();
   const username = Cookies.get("name").replace(/\"/g, '');
 
-  console.log(posts)
   useEffect(() => {
     if (posts && posts.length > 0) {
         setIsLoading(false);

@@ -1,7 +1,7 @@
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
-import ProfileIMG2 from '../../assets/review2.jpeg'
+import { getId } from '../Utils/ApiUtils';
 import ProfileIMG3 from '../../assets/review3.jpeg'
 import Cookies from 'js-cookie';
 import NoProfile from "../../assets/noprofile.png";
@@ -10,8 +10,31 @@ function UserPanel() {
     const username = Cookies.get("name") ? Cookies.get("name").replace(/\"/g, '') : '';
     const [isLogoutPopupOpen, setIsLogoutPopupOpen] = useState(false);
     const [suggestedUsers, setSuggestedUsers] = useState([]);
+    const [profileID, setProfileID] = useState(null);
+    const [profileImg, setProfileImg] = useState({});
+
     const navigate = useNavigate();
 
+    useEffect(() => {
+        const fetchProfileID = async () => {
+            const id = await getId('profileID');
+            setProfileID(id);
+        };
+
+        fetchProfileID();
+    }, []);
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await axios.get(`http://localhost:4000/users/profile/get/${profileID}`);
+                setProfileImg(response.data.profile_img);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        fetchUserData();
+    }, [profileID]);
 
     useEffect(() => {
         axios.get(`http://localhost:4000/users/otherUsers`)
@@ -63,7 +86,7 @@ function UserPanel() {
 
             <div className="gradient2 p-2 pl-3 flex items-center justify-between border w-[18vw] h-[10vh] rounded-full shadow-[0px_0px_10px_rgba(0,0,0,0.08)] overflow-hidden">
                 <div className='flex items-center'>
-                    <img className='h-16 w-16 rounded-full overflow-hidden' src={NoProfile} alt="" />
+                    <img className='h-16 w-16 rounded-full overflow-hidden' src={profileImg? profileImg : NoProfile} alt="" />
                     <Link to='/profile'>
                         <h3 className='post-username pl-4  poppins text-white'>{username}</h3>
                     </Link>
