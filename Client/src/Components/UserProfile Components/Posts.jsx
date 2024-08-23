@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+import { getId } from '../Utils/ApiUtils';
 import NoProfile from "../../assets/noprofile.png";
 import { PostShimmer } from '../Utils/Shimmers';
 import CommentBox from '../CommentBox';
@@ -22,8 +22,19 @@ function Posts({ posts, likedPosts, toggleLike }) {
   const [deletePostId, setDeletePostId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeCommentPost, setActiveCommentPost] = useState(null);  
+  const [profileID, setProfileID] = useState(null);
 
-  const profileID = Cookies.get('profileID');
+
+  useEffect(() => {
+      const fetchProfileID = async () => {
+          const id = await getId('profileID');
+          setProfileID(id);
+      };
+
+      fetchProfileID();
+  }, []);
+
+
   const navigate = useNavigate();
   const username = Cookies.get("name").replace(/\"/g, '');
 
@@ -32,6 +43,7 @@ function Posts({ posts, likedPosts, toggleLike }) {
         setIsLoading(false);
     }
 }, [posts]);
+
   const handleDelete = () => {
     axios.delete(`http://localhost:4000/posts/${deletePostId}`, {
       headers: {
@@ -80,6 +92,10 @@ function Posts({ posts, likedPosts, toggleLike }) {
 
           <PostShimmer scaleValue="80%" />
 
+        ) : posts.length === 0 ? (
+            <div>
+                <p className='poppins text-xl textgray'>No posts</p>
+            </div>
         ) : (
           posts.map((post, index) => (
             <center key={index} className='flex'>

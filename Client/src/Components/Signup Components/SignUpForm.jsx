@@ -1,10 +1,9 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
-import axios from 'axios';
 import { Toaster, toast } from 'sonner';
-import Cookies from "js-cookie";
+import axios from 'axios';
+
+
 function SignUpForm({ onSignupSuccess }) {
-    const [signupStatus, setSignupStatus] = useState(null);
     const { register, handleSubmit, formState: { errors }, watch } = useForm();
     const checkPassword = watch('password', '');
 
@@ -15,37 +14,23 @@ function SignUpForm({ onSignupSuccess }) {
 
     const onSubmit = (data) => {
         const { name, email, password } = data;
-        axios.post('http://localhost:4000/users', { name, email, password },
-            { withCredentials: true })
+
+        axios.post('http://localhost:4000/users', { name, email, password }, { withCredentials: true })
             .then(response => {
                 console.log(response);
-                Cookies.set('name', userData.name, { httpOnly: false, secure: false });
-                Cookies.set('token', token, { httpOnly: false, secure: false });
-                Cookies.set('userID', userID, { httpOnly: false, secure: false });
-                Cookies.set('profileID', profileID, { httpOnly: false, secure: false });
-
-                toast.success("Account creation successful")
-                // setSignupStatus('success');
-                onSignupSuccess();
+                onSignupSuccess(); 
             })
             .catch(error => {
                 console.log(error);
-                toast.error("Error signing up")
-                // setSignupStatus('failure');
+                toast.error("Error signing up");
             });
     };
 
     return (
         <div>
-            <Toaster position="top-center" />
-            <form className="w-[85vw] md:w-[70vw] lg:w-[35vw] text-left rounded-lg bg-white p-8" onSubmit={handleSubmit(onSubmit)}>
-                {signupStatus === 'success' && (
-                    <div className="pop p-2 bg-green-500 text-white rounded mb-5"><p className="registered-heading text-sm">Account created successfully</p></div>
-                )}
+            <Toaster position="top-center"  />
 
-                {signupStatus === 'failure' && (
-                    <div className="pop p-2 bg-red-500 text-white rounded mb-5"><p className="registered-heading text-sm">Failed to create account</p></div>
-                )}
+            <form className="w-[85vw] md:w-[70vw] lg:w-[35vw] text-left rounded-lg bg-white p-8" onSubmit={handleSubmit(onSubmit)}>
 
                 <div className="flex justify-center">
                     <div className="gsi-material-button mb-5 w-1/2" onClick={toSignup}>

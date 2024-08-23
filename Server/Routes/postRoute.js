@@ -62,7 +62,6 @@ router.get("/", async (req, res) => {
     profiles.forEach(profile => {
       profileMap[profile._id] = profile.name;
     });
-    console.log(posts)
 
     const responseData = posts.map(post => ({
       _id: post._id,
@@ -135,13 +134,31 @@ router.get("/comments/:id", async (req, res) => {
       return res.status(404).json({ error: "Post not found" });
     }
 
-    const responseData = post.comments
-    res.json(responseData);
+    const comments = post.comments;
+
+    // Get profile images for each comment's user
+    const commentsWithProfileImg = await Promise.all(
+      comments.map(async (comment) => {
+        // Find the profile by the user's _id
+        const profile = await profileModel.findById(comment.profile);
+        
+        // Add profile_img to the comment
+        return {
+          ...comment.toObject(),
+          profile_img: profile ? profile.profile_img : null,
+        };
+      })
+    );
+
+    console.log(commentsWithProfileImg)
+    // Send the updated comments with profile images
+    res.json(commentsWithProfileImg);
 
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
 
 
 
@@ -151,7 +168,7 @@ router.get("/comments/:id", async (req, res) => {
 // POST a comment on a post
 router.post('/comments/:postId', async (req, res) => {
   try {
-    const { name, message, profilepic } = req.body;
+    const { name, message, profilepic, profileId } = req.body;
 
     const post = await postModel.findById(req.params.postId);
     if (!post) {
@@ -161,7 +178,7 @@ router.post('/comments/:postId', async (req, res) => {
     const newComment = {
       name: name,
       message: message,
-      profilepic: profilepic,
+      profile: profileId,
       postedTime: Date.now()
     };
     post.comments.push(newComment);

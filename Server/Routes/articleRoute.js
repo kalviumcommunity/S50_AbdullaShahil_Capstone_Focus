@@ -50,6 +50,7 @@ router.get("/", async (req, res) => {
     const data = await articleModel.find()
       .populate({
         path: 'name',
+        select: 'name' 
       });
 
     if (!data || data.length === 0) {
@@ -58,7 +59,7 @@ router.get("/", async (req, res) => {
 
     const responseData = data.map(doc => ({
       _id: doc._id,
-      name: doc.name.name,
+      name: doc.name.name, 
       title: doc.title,
       description: doc.description,
       image: doc.image,

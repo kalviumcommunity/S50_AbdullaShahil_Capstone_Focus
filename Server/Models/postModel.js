@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const commentSchema = new mongoose.Schema({
   name: String,
   message: String,
-  profilepic: {
-    type: String,
+  profile: {
+    type: mongoose.Schema.Types.ObjectId,
     ref: "Profile"
   },
   postedTime: {

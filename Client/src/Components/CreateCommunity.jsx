@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import Cookies from 'js-cookie';
@@ -8,7 +8,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import Header from './Home Components/Header';
 import ProfileIMG2 from '../assets/review2.jpeg';
 import { ImageDB } from '../firebase';
-
+import { getId } from './Utils/ApiUtils';
 import 'ldrs/tailspin'
 import 'ldrs/ring'
 
@@ -22,10 +22,18 @@ function CreateCommunity() {
     const [loading, setLoading] = useState(false);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    const admin = Cookies.get('profileID');
     const name = Cookies.get('name');
     const navigate = useNavigate();
-  
+    const [profileID, setProfileID] = useState(null);
+
+    useEffect(() => {
+        const fetchProfileID = async () => {
+            const id = await getId('profileID');
+            setProfileID(id);
+        };
+
+        fetchProfileID();
+    }, []);  
     const getCurrentTime = () => {
       const currentTime = new Date();
       return currentTime.toLocaleString();
@@ -42,10 +50,10 @@ function CreateCommunity() {
         const Image = ref(ImageDB, `CommunityImg/${v4()}`);
         await uploadBytes(Image, profileImg[0]);
         const imageUrl = await getDownloadURL(Image);
-  
+  console.log(profileID)
         const payload = {
           name: name,
-          admin: admin,
+          admin: profileID,
           description: description,
           profileImg: imageUrl,
         };

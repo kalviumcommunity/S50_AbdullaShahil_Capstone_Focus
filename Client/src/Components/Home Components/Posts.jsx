@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import Cookies from 'js-cookie';
-import CommentBox from '../CommentBox';
-import NoProfile from "../../assets/noprofile.png";
 
 import { PostShimmer } from '../Utils/Shimmers';
+import { getId } from '../Utils/ApiUtils';
+import CommentBox from '../CommentBox';
+
+import NoProfile from "../../assets/noprofile.png";
+
 
 
 import Heart from '../../assets/heart.png';
@@ -18,7 +20,17 @@ function Posts({ postCategory }) {
   const [activeCommentPost, setActiveCommentPost] = useState(null);  
   
   const initialLikedPosts = {};
-  const profileID = Cookies.get("profileID");
+  const [profileID, setProfileID] = useState(null);
+
+
+  useEffect(() => {
+      const fetchProfileID = async () => {
+          const id = await getId('profileID');
+          setProfileID(id);
+      };
+
+      fetchProfileID();
+  }, []);  
 
   useEffect(() => {
     axios.get(`http://localhost:4000/posts`)
@@ -29,7 +41,6 @@ function Posts({ postCategory }) {
           const isLikedByUser = post.likes.includes(profileID);
           initialLikedPosts[post._id] = isLikedByUser;
         });
-        console.log(response.data)
         setPosts(fetchedPosts);
         setLikedPosts(initialLikedPosts);
         setIsLoading(false);

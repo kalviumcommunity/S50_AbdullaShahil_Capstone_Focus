@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useForm } from "react-hook-form";
-import Cookies from 'js-cookie';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import Header from "./Home Components/Header";
 import Posts from "./UserProfile Components/Posts";
 import Articles from "./UserProfile Components/Articles";
 import { getId } from './Utils/ApiUtils';
+import NoProfile from "../assets/noprofile.png";
+import Back from "../assets/back.png"
 
 function UserProfile() {
     const [activeButton, setActiveButton] = useState('One');
@@ -27,11 +28,17 @@ function UserProfile() {
         fetchProfileID();
     }, []);
 
-
+    const navigate = useNavigate();
+    const navigateHome = () => {
+        navigate('/home');
+    };
+    
     const handleClick = (button) => setActiveButton(button);
 
     useEffect(() => {
         const fetchUserData = async () => {
+            if (!profileID) return;
+
             try {
                 const response = await axios.get(`http://localhost:4000/users/profile/get/${profileID}`);
                 setProfileData({
@@ -39,12 +46,12 @@ function UserProfile() {
                     about: response.data.about,
                     interests: response.data.interests,
                     profile_img: response.data.profile_img,
-
                 });
             } catch (err) {
                 console.error(err);
             }
         };
+
         fetchUserData();
     }, [profileID]);
 
@@ -63,7 +70,7 @@ function UserProfile() {
                     acc[post._id] = post.likes.includes(profileID);
                     return acc;
                 }, {});
-console.log(fetchedPosts)
+
                 setPosts(fetchedPosts);
                 setLikedPosts(initialLikedPosts);
 
@@ -109,10 +116,13 @@ console.log(fetchedPosts)
     return (
         <div>
             <Header />
+            <div onClick={navigateHome} className='text-left ml-4 mt-4 flex justify-between items-center hover:bg-blue-gray-50 hover:cursor-pointer rounded-md transition w-[6vw] p-1 '>
+                <img className='h-4' src={Back} alt="" />
+                <h1 className='poppins textgray text-lg'>Home</h1>
+            </div>
             <section className="flex items-center justify-around p-8 h-min">
                 <div className="user-info flex items-center p-12 w-[65vw] h-[35vh] gradient2 rounded-[45px] transition">
-                    <img className='h-[20vh] w-[20vh] rounded-full overflow-hidden border-4 border-white shadow-lg' src={profileData.profile_img
-} alt="Profile" />
+                    <img className='h-[20vh] w-[20vh] rounded-full overflow-hidden border-4 border-white shadow-lg' src={profileData.profile_img ? profileData.profile_img : NoProfile} alt="Profile" />
                     <div className='ml-8 flex flex-col items-left justify-start'>
                         <h1 className="text-white font-semibold text-3xl poppins">{profileData.name}</h1>
                         <div className='flex items-center mt-3'>
@@ -123,13 +133,13 @@ console.log(fetchedPosts)
                             ))}
                         </div>
                         <div className='mt-3 w-[40vw]'>
-                            <p className='text-left font-light text-white poppins text-md'>{profileData.about}</p>
+                            <p className='text-left font-light text-white poppins text-md'>{profileData.about ? profileData.about : "No about"}</p>
                         </div>
                     </div>
                 </div>
                 <div className='statistics gradient1 p-10 w-[28vw] h-[35vh] flex flex-col items-center rounded-[45px]'>
                     <h1 className='poppins text-white text-2xl font-medium'>Insights</h1>
-                    <hr className='text-white w-[20vw] mt-5 opacity-30'/>
+                    <hr className='text-white w-[20vw] mt-5 opacity-30' />
                     <div className="flex items-center justify-between w-[13vw] h-max mt-3">
                         <div className="flex flex-col items-center justify-between">
                             <h1 className='text-[4.5rem] font-semibold poppins text-white'>{posts.length}</h1>
