@@ -55,12 +55,18 @@ function Posts({ postCategory }) {
     try {
       const response = await axios.patch(`http://localhost:4000/posts/like/${postId}`, { action: !likedPosts[postId] ? 'like' : 'unlike', profileID });
       const updatedPost = response.data;
-      setPosts(posts.map(post => post._id === updatedPost._id ? updatedPost : post));
+  
+      // Preserve the profile_img by merging the updated post data with the original post data
+      setPosts(posts.map(post => 
+        post._id === updatedPost._id ? { ...post, ...updatedPost } : post
+      ));
+      
       setLikedPosts({ ...likedPosts, [postId]: !likedPosts[postId] });
     } catch (error) {
       console.error(error);
     }
   };
+  
 
   const handleCommentClick = (post) => {
     setActiveCommentPost(post);

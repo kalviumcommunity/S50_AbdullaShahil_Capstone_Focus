@@ -44,7 +44,6 @@ function validatePost(req, res, next) {
 
 // GET REQUESTS
 
-
 // GET all posts
 router.get("/", async (req, res) => {
   try {
@@ -56,22 +55,27 @@ router.get("/", async (req, res) => {
 
     const profileIds = posts.map(post => post.name);
 
-    const profiles = await profileModel.find({ _id: { $in: profileIds } }).lean();
+    const profiles = await profileModel.find({ _id: { $in: profileIds } })
+      .select('name profile_img')
+      .lean();
 
     const profileMap = {};
     profiles.forEach(profile => {
-      profileMap[profile._id] = profile.name;
+      profileMap[profile._id] = {
+        name: profile.name,
+        profile_img: profile.profile_img
+      };
     });
 
     const responseData = posts.map(post => ({
       _id: post._id,
-      name: profileMap[post.name] || 'Unknown',
+      name: profileMap[post.name]?.name || 'Unknown',
       title: post.title,
       description: post.description,
       image: post.image,
       category: post.category,
       likes: post.likes,
-      profile_img: post.profile_img
+      profile_img: profileMap[post.name]?.profile_img || null
     }));
 
     res.json(responseData);
@@ -96,33 +100,59 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// GET specific post by USER ID
+// GET specific posts by USER ID
 router.get("/userPosts/:id", async (req, res) => {
   const id = req.params.id;
-
+  
   try {
-
-    const profile = await profileModel.findById(id).populate("posts").exec();
-
+    const profile = await profileModel.findById(id).populate("posts").lean();
+    
+    if (!profile) {
+      return res.status(404).json({ error: "Profile not found" });
+    }
+    
     const posts = profile.posts;
+    
+    if (!posts || posts.length === 0) {
+      return res.status(200).json({ posts: [], message: "No posts found for this user" });
+    }
+    
+    const profileIds = posts.map(post => post.name);
+    
+    const profiles = await profileModel.find({ _id: { $in: profileIds } })
+      .select('name profile_img')
+      .lean();
+    
+    const profileMap = {};
+    profiles.forEach(profile => {
+      profileMap[profile._id] = {
+        name: profile.name,
+        profile_img: profile.profile_img
+      };
+    });
     
     const responseData = posts.map(post => ({
       _id: post._id,
-      name: post.name.name,
+      name: profileMap[post.name]?.name || 'Unknown',
       title: post.title,
       description: post.description,
       image: post.image,
       category: post.category,
       likes: post.likes,
-      profile_img: post.profile_img
+      profile_img: profileMap[post.name]?.profile_img || null,
+      profileID: post.name 
     }));
+    // console.log("first----", responseData)
 
     res.json(responseData);
 
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+
 
 
 // GET comments of a specific post
@@ -141,7 +171,7 @@ router.get("/comments/:id", async (req, res) => {
       comments.map(async (comment) => {
         // Find the profile by the user's _id
         const profile = await profileModel.findById(comment.profile);
-        
+
         // Add profile_img to the comment
         return {
           ...comment.toObject(),

@@ -16,49 +16,32 @@ function UserPanel() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchProfileID = async () => {
-            const id = await getId('profileID');
-            setProfileID(id);
-        };
-        fetchProfileID();
-    }, []);
+        const fetchProfileIDAndUserData = async () => {
+            try {
+                const id = await getId('profileID');
+                setProfileID(id);
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            if (profileID) {
-                try {
-                    const response = await axios.get(`http://localhost:4000/users/profile/get/${profileID}`);
+                if (id) {
+                    const response = await axios.get(`http://localhost:4000/users/profile/get/${id}`);
                     setUsername(response.data.name);
                     setProfileImg(response.data.profile_img);
-                } catch (err) {
-                    console.error("Error fetching user data:", err);
-                }
-            }
-        };
 
-        if (profileID !== null) {
-            fetchUserData();
-        }
-    }, [profileID]);
-
-    useEffect(() => {
-        const fetchSuggestedUsers = async () => {
-            if (profileID) {
-                try {
-                    const response = await axios.get(`http://localhost:4000/users/otherUsers`);
-                    const filteredUsers = response.data.filter(user => user._id !== profileID);
+                    const suggestedResponse = await axios.get(`http://localhost:4000/users/otherUsers`);
+                    const filteredUsers = suggestedResponse.data.filter(user => user._id !== id);
                     setSuggestedUsers(filteredUsers);
-                } catch (error) {
-                    console.log("Error fetching suggested users:", error);
                 }
+            } catch (err) {
+                console.error("Error fetching data:", err);
             }
         };
 
-        if (profileID !== null) {
-            fetchSuggestedUsers();
-        }
-    }, [profileID]);
+        fetchProfileIDAndUserData();
+    }, []);
 
+    const handleUserClick = (userId) => {
+        navigate(`/profile/${userId}`);
+        console.log(userId)
+    };
 
     const handleLogout = () => {
         axios.get('http://localhost:4000/logout', {
@@ -130,7 +113,7 @@ function UserPanel() {
 
             <div className='border border-gray-400 suggestion-scroll h-[42vh] overflow-scroll p-2 shadow-[0px_0px_10px_rgba(0,0,0,0.08)] rounded-lg'>
                 {filteredUsers.map((user, index) => (
-                    <div key={index} className="cm-panel profile-panel bg-white rounded-md flex items-center p-5 h-20">
+                    <div key={index} onClick={() => handleUserClick(user._id)} className="cm-panel profile-panel bg-white rounded-lg flex items-center p-5 h-20 hover:bg-gray-100 hover:cursor-pointer transition">
                         <div className="profile-img w-14 h-14 rounded-full flex justify-center items-center overflow-hidden">
                             <img src={user.profile_img || NoProfile} alt="Profile" />
                         </div>

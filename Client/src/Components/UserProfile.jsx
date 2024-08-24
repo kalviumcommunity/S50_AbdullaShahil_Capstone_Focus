@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import Header from "./Home Components/Header";
 import Posts from "./UserProfile Components/Posts";
 import Articles from "./UserProfile Components/Articles";
 import { getId } from './Utils/ApiUtils';
 import NoProfile from "../assets/noprofile.png";
-import Back from "../assets/back.png"
+import Back from "../assets/back.png";
 
 function UserProfile() {
     const [activeButton, setActiveButton] = useState('One');
@@ -19,16 +19,24 @@ function UserProfile() {
     const [likedArticles, setLikedArticles] = useState({});
     const [profileID, setProfileID] = useState(null);
 
+    const { id } = useParams(); 
+    const navigate = useNavigate();
+
     useEffect(() => {
         const fetchProfileID = async () => {
-            const id = await getId('profileID');
-            setProfileID(id);
+            if (id) {
+                setProfileID(id);
+                console.log("first")
+            } else {
+                console.log("second")
+                const fetchedID = await getId('profileID');
+                setProfileID(fetchedID);
+            }
         };
 
         fetchProfileID();
-    }, []);
+    }, [id]);
 
-    const navigate = useNavigate();
     const navigateHome = () => {
         navigate('/home');
     };
@@ -57,32 +65,37 @@ function UserProfile() {
 
     useEffect(() => {
         if (!profileID) return;
-
+    
         const fetchPostsAndArticles = async () => {
             try {
                 const [postsResponse, articlesResponse] = await Promise.all([
                     axios.get(`http://localhost:4000/posts/userPosts/${profileID}`),
                     axios.get(`http://localhost:4000/articles/userArticles/${profileID}`)
                 ]);
-
-                const fetchedPosts = postsResponse.data;
+    
+                const fetchedPosts = Array.isArray(postsResponse.data) ? postsResponse.data : [];
                 const initialLikedPosts = fetchedPosts.reduce((acc, post) => {
                     acc[post._id] = post.likes.includes(profileID);
                     return acc;
                 }, {});
-
+    
                 setPosts(fetchedPosts);
                 setLikedPosts(initialLikedPosts);
-
-                const articlesWithRelativeTime = articlesResponse.data.map(article => ({
-                    ...article,
-                    relativeTime: formatDistanceToNow(parseISO(article.postedTime), { addSuffix: true })
-                }));
-                const initialLikedArticles = articlesWithRelativeTime.reduce((acc, article) => {
-                    acc[article._id] = article.likes.includes(profileID);
-                    return acc;
-                }, {});
-
+    
+                let articlesWithRelativeTime = [];
+                let initialLikedArticles = {};
+    
+                if (Array.isArray(articlesResponse.data) && articlesResponse.data.length > 0) {
+                    articlesWithRelativeTime = articlesResponse.data.map(article => ({
+                        ...article,
+                        relativeTime: formatDistanceToNow(parseISO(article.postedTime), { addSuffix: true })
+                    }));
+                    initialLikedArticles = articlesWithRelativeTime.reduce((acc, article) => {
+                        acc[article._id] = article.likes.includes(profileID);
+                        return acc;
+                    }, {});
+                }
+    
                 setArticles(articlesWithRelativeTime);
                 setLikedArticles(initialLikedArticles);
                 setIsLoading(false);
@@ -91,9 +104,11 @@ function UserProfile() {
                 setIsLoading(false);
             }
         };
-
+    
         fetchPostsAndArticles();
     }, [profileID]);
+    
+    
 
     const toggleLike = useCallback(async (id, type) => {
         const isLiked = type === 'post' ? likedPosts[id] : likedArticles[id];
@@ -117,7 +132,7 @@ function UserProfile() {
         <div>
             <Header />
             <div onClick={navigateHome} className='text-left ml-4 mt-4 flex justify-between items-center hover:bg-blue-gray-50 hover:cursor-pointer rounded-md transition w-[6vw] p-1 '>
-                <img className='h-4' src={Back} alt="" />
+                <img className='h-4' src={Back} alt="Back" />
                 <h1 className='poppins textgray text-lg'>Home</h1>
             </div>
             <section className="flex items-center justify-around p-8 h-min">
@@ -168,8 +183,8 @@ function UserProfile() {
                         Articles
                     </button>
                 </div>
-                {activeButton === 'One' && <Posts posts={posts} likedPosts={likedPosts} toggleLike={(id) => toggleLike(id, 'post')} />}
-                {activeButton === 'Two' && <Articles articles={articles} likedArticles={likedArticles} toggleLike={(id) => toggleLike(id, 'article')} />}
+                {activeButton === 'One' && <Posts posts={posts} likedPosts={likedPosts} toggleLike={(id) => toggleLike(id, 'post')} profile_img={profileData.profile_img} />}
+                {activeButton === 'Two' && <Articles articles={articles} likedArticles={likedArticles} toggleLike={(id) => toggleLike(id, 'article')} profile_img={profileData.profile_img} />}
             </div>
         </div>
     );

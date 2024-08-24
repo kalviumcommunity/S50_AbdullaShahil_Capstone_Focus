@@ -47,27 +47,36 @@ function validatePost(req, res, next) {
 // GET all articles
 router.get("/", async (req, res) => {
   try {
-    const data = await articleModel.find()
-      .populate({
-        path: 'name',
-        select: 'name' 
-      });
+    const articles = await articleModel.find().lean();
 
-    if (!data || data.length === 0) {
+    if (!articles || articles.length === 0) {
       return res.status(404).json({ error: "No articles found" });
     }
 
-    const responseData = data.map(doc => ({
-      _id: doc._id,
-      name: doc.name.name, 
-      title: doc.title,
-      description: doc.description,
-      image: doc.image,
-      postedTime: doc.postedTime,
-      likes: doc.likes,
-      category: doc.category,
-      profile_img: doc.profile_img
+    const profileIds = articles.map(article => article.name);
 
+    const profiles = await profileModel.find({ _id: { $in: profileIds } })
+      .select('name profile_img')
+      .lean();
+
+    const profileMap = {};
+    profiles.forEach(profile => {
+      profileMap[profile._id] = {
+        name: profile.name,
+        profile_img: profile.profile_img
+      };
+    });
+
+    const responseData = articles.map(article => ({
+      _id: article._id,
+      name: profileMap[article.name]?.name || 'Unknown',
+      title: article.title,
+      description: article.description,
+      image: article.image,
+      postedTime: article.postedTime,
+      likes: article.likes,
+      category: article.category,
+      profile_img: profileMap[article.name]?.profile_img || null
     }));
 
     res.json(responseData);
@@ -76,6 +85,7 @@ router.get("/", async (req, res) => {
     res.status(500).json({ message: "500-Internal server error" });
   }
 });
+
 
 // GET specific article by ID
 router.get("/:id", async (req, res) => {
@@ -94,26 +104,51 @@ router.get("/:id", async (req, res) => {
 // GET specific articles by Profile ID
 router.get("/userArticles/:id", async (req, res) => {
   const id = req.params.id;
-  console.log(id)
+  
   try {
-    const profile = await profileModel.findById(id).populate("articles").exec();
-
+    const profile = await profileModel.findById(id).populate("articles").lean();
+    
+    if (!profile) {
+      return res.status(404).json({ error: "Profile not found" });
+    }
+    
     const articles = profile.articles;
+
+    if (!articles || articles.length === 0) {
+      return res.status(200).json({ articles: [], message: "No articles found for this user" });
+    }    
+
+    const profileIds = articles.map(article => article.name);
+
+    const profiles = await profileModel.find({ _id: { $in: profileIds } })
+      .select('name profile_img')
+      .lean();
+
+    const profileMap = {};
+    profiles.forEach(profile => {
+      profileMap[profile._id] = {
+        name: profile.name,
+        profile_img: profile.profile_img
+      };
+    });
 
     const responseData = articles.map(article => ({
       _id: article._id,
-      name: article.name,
+      name: profileMap[article.name]?.name || 'Unknown',
       title: article.title,
       description: article.description,
       image: article.image,
       postedTime: article.postedTime,
       likes: article.likes,
-      category: article.category
+      category: article.category,
+      profile_img: profileMap[article.name]?.profile_img || null,
+      profileID: article.name
     }));
-    console.log(responseData)
+
     res.json(responseData);
 
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
@@ -170,10 +205,10 @@ router.post("/", validatePost, async (req, res) => {
       category: category,
       profile_img: profile.profile_img
     };
-    
+
     const newArticle = new articleModel(newArticleData);
     const savedArticle = await newArticle.save();
-    
+
     profile.articles.push(savedArticle._id);
     await profile.save();
 

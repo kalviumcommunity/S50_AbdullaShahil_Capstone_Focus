@@ -23,7 +23,7 @@ function App() {
       <Route path='/login' element={<Login/>}/>
       <Route path='/home' element={<Home/>}/>
       <Route path='/post' element={<Post/>}/>
-      <Route path='/profile' element={<UserProfile/>}/>
+      <Route path='/profile/:id?' element={<UserProfile/>}/>
       <Route path='/settings' element={<Settings/>}/>
       <Route path='/lenshub' element={<LensHub/>}/>
       <Route path='/write' element={<Write/>}/>

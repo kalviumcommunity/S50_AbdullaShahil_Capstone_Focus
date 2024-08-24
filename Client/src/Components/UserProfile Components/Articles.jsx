@@ -33,9 +33,9 @@ function Articles({ articles, likedArticles, toggleLike }) {
             const id = await getId('profileID');
             setProfileID(id);
         };
-  
+
         fetchProfileID();
-    }, []);    
+    }, []);
 
     useEffect(() => {
         if (articles) {
@@ -101,26 +101,31 @@ function Articles({ articles, likedArticles, toggleLike }) {
                                     <img className='h-12 w-12 rounded-full overflow-hidden' src={article.profile_img ? (article.profile_img) : (NoProfile)} alt="" />
                                     <h3 className='post-username pl-4 font-light poppins'>{username}</h3>
                                 </div>
+
                                 <div className="flex items-center">
                                     <h3 className='font-light poppins text-gray-700'>{article.relativeTime}</h3>
-                                    <Menu
-                                        animate={{
-                                            mount: { y: 0 },
-                                            unmount: { y: 25 },
-                                        }}
-                                    >
-                                        <MenuHandler>
-                                            <img className='h-9 p-1 ml-5 cursor-pointer hover:bg-gray-100 rounded-full' src={more} alt="more options" />
-                                        </MenuHandler>
-                                        <MenuList>
-                                            <MenuItem className='mb-2 text-white bg-gray-800' onClick={() => EditArticle(article._id)}>Edit</MenuItem>
-                                            <MenuItem onClick={() => {
-                                                console.log(article._id);
-                                                setShowDeleteConfirmation(true);
-                                                setDeleteArticleId(article._id);
-                                            }} className='text-white bg-red-500'>Delete</MenuItem>
-                                        </MenuList>
-                                    </Menu>
+                                    {article.profileID === profileID && (
+
+                                        <Menu
+                                            animate={{
+                                                mount: { y: 0 },
+                                                unmount: { y: 25 },
+                                            }}
+                                        >
+                                            <MenuHandler>
+                                                <img className='h-9 p-1 ml-5 cursor-pointer hover:bg-gray-100 rounded-full' src={more} alt="more options" />
+                                            </MenuHandler>
+                                            <MenuList>
+                                                <MenuItem className='mb-2 text-white bg-gray-800' onClick={() => EditArticle(article._id)}>Edit</MenuItem>
+                                                <MenuItem onClick={() => {
+                                                    console.log(article._id);
+                                                    setShowDeleteConfirmation(true);
+                                                    setDeleteArticleId(article._id);
+                                                }} className='text-white bg-red-500'>Delete</MenuItem>
+                                            </MenuList>
+                                        </Menu>
+                                    )}
+
                                 </div>
                             </div>
                             <div className='flex justify-center'>
