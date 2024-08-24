@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
-import Cookies from "js-cookie";
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { Toaster, toast } from 'sonner';
+import { getId } from "./Utils/ApiUtils";
+import axios from "axios";
+import Cookies from "js-cookie";
 
+import NoProfile from "../assets/noprofile.png";
 import postComment from '../assets/post-comment.png';
 import more from '../assets/more.png';
 
@@ -15,10 +17,24 @@ function CommentBox({ entity, onClose, type }) {
     const [showOptionsIndex, setShowOptionsIndex] = useState(null);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
     const [deleteCommentId, setDeleteCommentId] = useState(null);
+    const [profileID, setProfileID] = useState(null);
+
+
+    useEffect(() => {
+        const fetchProfileID = async () => {
+            const id = await getId('profileID');
+            setProfileID(id);
+        };
+  
+        fetchProfileID();
+    }, []);  
+
 
     useEffect(() => {
         axios.get(`http://localhost:4000/${type}/comments/${entity._id}`)
         .then(response => {
+            console.log("get comnt", response);
+
             const fetchedComments = response.data.map(comment => ({
                     ...comment,
                     relativeTime: formatDistanceToNow(parseISO(comment.postedTime), { addSuffix: true })
@@ -54,6 +70,7 @@ function CommentBox({ entity, onClose, type }) {
         const payload = {
             name: username,
             message: newComment,
+            profileId: profileID,
         };
         
         axios.post(`http://localhost:4000/${type}/comments/${entity._id}`, payload)
@@ -89,6 +106,7 @@ function CommentBox({ entity, onClose, type }) {
                         <span className="mb-1 close-button">&times;</span>
                     </button>
                 </div>
+
                 {showDeleteConfirmation && (
                     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                         <div className="bg-white p-6 rounded-lg shadow-lg z-50 text-center">
@@ -100,12 +118,13 @@ function CommentBox({ entity, onClose, type }) {
                         </div>
                     </div>
                 )}
+                
                 <div className='overflow-x-scroll h-[60vh] bg-gray-100 p-1 px-4 rounded-xl'>
                     {comments.length > 0 ? (
                         comments.map((comment, index) => (
                             <div className="flex mt-5 p-2 rounded-lg bg-white" key={index}>
                                 <div className="w-14 h-14 rounded-full bg-gray-100 flex-shrink-0 flex items-center justify-center">
-                                    <img className="h-12 w-12 rounded-full object-cover" src="https://randomuser.me/api/portraits/men/43.jpg" alt="" />
+                                    <img className="h-12 w-12 rounded-full object-cover" src={comment.profile_img ? comment.profile_img : NoProfile } alt="" />
                                 </div>
                                 <div className="ml-3 w-full">
                                     <div className="h-6 flex justify-between items-center">

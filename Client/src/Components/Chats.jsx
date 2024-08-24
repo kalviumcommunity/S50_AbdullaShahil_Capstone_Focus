@@ -4,19 +4,48 @@ import 'tailwindcss/tailwind.css';
 import Header from './Home Components/Header';
 import axios from 'axios';
 import ActiveChat from './Chat Components/ActiveChat';
+import NoProfile from "../assets/noprofile.png";
+import { getId } from './Utils/ApiUtils';
+import {
+    Accordion,
+    AccordionHeader,
+    AccordionBody,
+} from "@material-tailwind/react";
+import { AccordionComponent } from './Utils/Accordion';
 
 const ChatApp = () => {
     const navigate = useNavigate();
     const [allUsers, setAllUsers] = useState([]);
-    const [communities, setCommunities] = useState([]);
+    const [otherCommunities, setOtherCommunities] = useState([]);
+    const [joinedCommunities, setJoinedCommunities] = useState([]);
     const [activeChatType, setActiveChatType] = useState('personal');
     const [activeChat, setActiveChat] = useState(null);
+    const [profileID, setProfileID] = useState(null);
+    const [isJoinedOpen, setIsJoinedOpen] = useState(false);
+    const [isOtherOpen, setIsOtherOpen] = useState(false);
+    const [isJoined, setIsJoined] = useState(false);
+    const [open, setOpen] = useState(1);
+    const handleOpen = (value) => setOpen(open === value ? 0 : value);
 
-    const profilePic = 'https://www.famousbirthdays.com/headshots/russell-crowe-6.jpg';
-    
+    useEffect(() => {
+        const fetchProfileID = async () => {
+            const id = await getId('profileID');
+            setProfileID(id);
+        };
+
+        fetchProfileID();
+    }, []);
+
+    const handleCommunityJoin = (community) => {
+        setJoinedCommunities([...joinedCommunities, community]);
+        setOtherCommunities(otherCommunities.filter(c => c._id !== community._id));
+    };
+
     const toHome = () => {
         navigate("/home");
     };
+
+
 
     const toSettings = () => {
         navigate("/settings");
@@ -29,32 +58,47 @@ const ChatApp = () => {
     const toCreateCommunity = () => {
         navigate("/createCommunity");
     };
-    
 
     useEffect(() => {
-        axios.get(`http://localhost:4000/users/profiles`)
-            .then(response => {
-                setAllUsers(response.data);
-                console.log(response.data);
-            })
-            .catch(error => {
-                console.log("error: ", error);
-            });
+        const fetchData = async () => {
+            try {
+                const usersResponse = await axios.get(`http://localhost:4000/users/profiles`);
+                setAllUsers(usersResponse.data);
 
-            axios.get(`http://localhost:4000/communities/list/displayData`)
-            .then(response => {
-                setCommunities(response.data);
-                console.log("communities", response.data);
-            })
-            .catch(error => {
-                console.log("error: ", error);
-            });
-    }, []);
+                if (profileID) {
+                    const otherCommunitiesResponse = await axios.get(`http://localhost:4000/communities/getOthers/${profileID}`);
+                    setOtherCommunities(otherCommunitiesResponse.data);
+
+                    const joinedCommunitiesResponse = await axios.get(`http://localhost:4000/communities/myCommunities/${profileID}`);
+                    setJoinedCommunities(joinedCommunitiesResponse.data);
+                }
+            } catch (error) {
+                console.error("An error occurred while fetching data:", error);
+            }
+        };
+
+        fetchData();
+    }, [profileID]);
 
     const handleChatClick = (chat) => {
         setActiveChat(chat);
+    
+        if (activeChatType === 'community') {
+            const isCommunityJoined = joinedCommunities.some(community => community._id === chat._id);
+            setIsJoined(isCommunityJoined);
+        } else {
+            setIsJoined(false);
+        }
+    };
+    
+
+    const toggleJoined = () => {
+        setIsJoinedOpen(!isJoinedOpen);
     };
 
+    const toggleOther = () => {
+        setIsOtherOpen(!isOtherOpen);
+    };
 
     return (
         <div>
@@ -98,10 +142,10 @@ const ChatApp = () => {
                         </button>
                         <button
                             type="button"
-                            className={`border-b w-1/2 px-4 py-2 text-sm font-medium ${activeChatType === 'groups' ? 'text-blue-800 border-b-blue-800' : 'text-gray-900'} bg-white hover:bg-gray-100 hover:text-blue-800 focus:z-10 focus:border-b-blue-800 focus:text-blue-800 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white`}
-                            onClick={() => setActiveChatType('groups')}
+                            className={`border-b w-1/2 px-4 py-2 text-sm font-medium ${activeChatType === 'community' ? 'text-blue-800 border-b-blue-800' : 'text-gray-900'} bg-white hover:bg-gray-100 hover:text-blue-800 focus:z-10 focus:border-b-blue-800 focus:text-blue-800 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white`}
+                            onClick={() => setActiveChatType('community')}
                         >
-                            Groups
+                            Communities
                         </button>
                     </div>
                     <div className='user-chat-list w-full h-[63vh] overflow-scroll'>
@@ -109,29 +153,33 @@ const ChatApp = () => {
                             <div key={user._id} className='flex items-center p-2 hover:bg-gray-100 rounded-lg transition hover:cursor-pointer' onClick={() => handleChatClick(user)}>
                                 <img
                                     className="w-16 h-16 border rounded-full mr-2"
-                                    src={user.profile_img ? user.profile_img : profilePic}
+                                    src={user.profile_img ? user.profile_img : NoProfile}
                                     alt="Profile"
                                 />
-                                <h1 className='p-4 poppins text-md'>{user.name}</h1>
+                                <h1 className='poppins text-md'>{user.name}</h1>
                             </div>
                         ))}
-                        {activeChatType === 'groups' && communities.map(community => (
-                            <div key={community._id} className='flex items-center p-2 hover:bg-gray-100 rounded-lg transition hover:cursor-pointer' onClick={() => handleChatClick(community)}>
-                                <img
-                                    className="w-16 h-16 border rounded-full mr-2"
-                                    src={community.profileImg}
-                                    alt="Profile"
-                                />
-                                <h1 className='p-4 poppins text-md'>{community.name}</h1>
-                            </div>
-                        ))}
+                        {activeChatType === 'community' && (
+                            <AccordionComponent
+                            open={open}
+                            handleOpen={handleOpen}
+                            joinedCommunities={joinedCommunities}
+                            otherCommunities={otherCommunities}
+                            handleChatClick={handleChatClick}
+                        />
+                        )}
                     </div>
                 </div>
 
                 <div className='relative chat-main-box mt-10 border border-gray-300 shadow-sm lg:w-[45vw] h-[78vh] rounded-lg p-2'>
                     {activeChat ? (
-                        <ActiveChat id={activeChat._id} chatType={activeChatType} setActiveChat={setActiveChat} />
-                        ) : (
+                        <ActiveChat 
+                        id={activeChat._id} 
+                        chatType={activeChatType} 
+                        setActiveChat={setActiveChat} 
+                        onCommunityJoin={handleCommunityJoin} 
+                        isJoined={isJoined} setIsJoined={setIsJoined} />
+                    ) : (
                         <div className='flex justify-center items-center h-full'>
                             <h1 className='poppins text-xl text-gray-600'>Select a chat to start messaging</h1>
                         </div>

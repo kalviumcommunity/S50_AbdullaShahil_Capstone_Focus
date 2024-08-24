@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import Cookies from 'js-cookie';
-import CommentBox from '../CommentBox';
-import NoProfile from "../../assets/noprofile.png";
 
 import { PostShimmer } from '../Utils/Shimmers';
+import { getId } from '../Utils/ApiUtils';
+import CommentBox from '../CommentBox';
+
+import NoProfile from "../../assets/noprofile.png";
+
 
 
 import Heart from '../../assets/heart.png';
@@ -18,7 +20,17 @@ function Posts({ postCategory }) {
   const [activeCommentPost, setActiveCommentPost] = useState(null);  
   
   const initialLikedPosts = {};
-  const profileID = Cookies.get("profileID");
+  const [profileID, setProfileID] = useState(null);
+
+
+  useEffect(() => {
+      const fetchProfileID = async () => {
+          const id = await getId('profileID');
+          setProfileID(id);
+      };
+
+      fetchProfileID();
+  }, []);  
 
   useEffect(() => {
     axios.get(`http://localhost:4000/posts`)
@@ -29,7 +41,6 @@ function Posts({ postCategory }) {
           const isLikedByUser = post.likes.includes(profileID);
           initialLikedPosts[post._id] = isLikedByUser;
         });
-        console.log(response.data)
         setPosts(fetchedPosts);
         setLikedPosts(initialLikedPosts);
         setIsLoading(false);
@@ -44,12 +55,18 @@ function Posts({ postCategory }) {
     try {
       const response = await axios.patch(`http://localhost:4000/posts/like/${postId}`, { action: !likedPosts[postId] ? 'like' : 'unlike', profileID });
       const updatedPost = response.data;
-      setPosts(posts.map(post => post._id === updatedPost._id ? updatedPost : post));
+  
+      // Preserve the profile_img by merging the updated post data with the original post data
+      setPosts(posts.map(post => 
+        post._id === updatedPost._id ? { ...post, ...updatedPost } : post
+      ));
+      
       setLikedPosts({ ...likedPosts, [postId]: !likedPosts[postId] });
     } catch (error) {
       console.error(error);
     }
   };
+  
 
   const handleCommentClick = (post) => {
     setActiveCommentPost(post);

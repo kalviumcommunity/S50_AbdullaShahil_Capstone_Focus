@@ -20,11 +20,13 @@ function Signup() {
 
             <div className="h-screen w-full lg:w-1/2 form-main flex lg:flex-col justify-center items-center">
                 <center>
-                    <h1 className="register-head mb-5 text-3xl font-bold text-white">{signupStatus === 'success' ? ("Setup your profile") : ("Create an Account")}</h1>
+                    <h1 className="register-head mb-5 text-3xl font-bold text-white">
+                        {signupStatus === 'success' ? "Setup your profile" : "Create an Account"}
+                    </h1>
                     {signupStatus === 'success' ? (
-                        <SignUpForm onSignupSuccess={handleSignupSuccess} />
-                        ) : (
                         <SetupProfile />
+                    ) : (
+                        <SignUpForm onSignupSuccess={handleSignupSuccess} />
                     )}
                 </center>
             </div>

@@ -11,6 +11,17 @@ const messageModel = require("../Models/messageModel")
 
 router.use(express.json());
 
+
+// Utility function to shuffle an array
+const shuffle = (array) => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+};
+
+
 // GET ALL COMMUNITIES
 router.get("/", async (req, res) => {
   try {
@@ -45,14 +56,97 @@ router.get("/", async (req, res) => {
   }
 });
 
+// GET COMMUNITIES WHERE THE USER HAVEN'T JOINED
+router.get("/getOthers/:id", async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const communities = await communityModel.find({
+      members: { $nin: [id] },
+      admin: { $nin: id },
+    })
+      .select('_id name profileImg')
+      .lean(); 
+
+    const shuffledCommunities = shuffle(communities);
+    res.status(200).json(shuffledCommunities);
+  } catch (error) {
+    console.error("An error occurred while fetching community data:", error);
+    res.status(500).json({
+      error: "Internal Server Error while fetching community data",
+    });
+  }
+});
+
+
+// GET COMMUNITIES WHERE THE USER HAS JOINED
+router.get("/myCommunities/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const profile = await profileModel.findById(id);
+
+    if (!profile) {
+      return res.status(404).json({ message: "User not found" }); 
+    }
+
+    const communityIds = profile.communities; 
+    const communities = await communityModel.find({ _id: { $in: communityIds } })
+      .select('_id name profileImg')
+      .lean(); 
+
+    if (!communities || communities.length === 0) { 
+      return res.status(404).json({ error: "No communities found" }); 
+    }
+
+    res.status(200).json(communities);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "500 - Internal server error" });
+  }
+});
+
+
+// GET ALL USERS WHO ARE NOT MEMBERS OF A SPECIFIC COMMUNITY
+router.get("/otherusers/:id", async (req, res) => {
+  try {
+    const communityId = req.params.id;
+    
+    const community = await communityModel.findById(communityId).select('members').lean();
+    
+    if (!community) {
+      return res.status(404).json({ message: "Community not found" }); 
+    }
+
+    const memberIds = community.members;
+
+    // Find all users who are not in the members list of the community
+    const users = await profileModel.find({ _id: { $nin: memberIds } }).lean();
+
+    if (!users.length) {
+      return res.status(404).json({ message: "No users found" }); 
+    }
+
+    res.status(200).json(users);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "500 - Internal server error" });
+  }
+});
+
+
+
 // GET A SINGLE COMMUNITY
 router.get("/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const community = await communityModel.findById(id)
-      .populate('admin', 'name')
-      .populate('members', 'name')
+      .populate('admin', 'name profile_img')
+      .populate('members', 'name profile_img')  
       .lean();
+
+      console.log("jjjjjjj------>",community)
 
     if (!community) {
       return res.status(404).json({ error: "Community not found" });
@@ -67,6 +161,7 @@ router.get("/:id", async (req, res) => {
 });
 
 
+
 // GET PERSONAL MESSAGES
 router.get("/messages/personalMessages/:otherUserId", async (req, res) => {
   const { userId } = req.query;
@@ -74,7 +169,6 @@ router.get("/messages/personalMessages/:otherUserId", async (req, res) => {
   const parsedUserId = JSON.parse(userId);
   
   const currentUserId = parsedUserId._id;
-
   const room = [currentUserId, otherUserId].sort().join("_");
 
   try {
@@ -118,6 +212,8 @@ router.post("/", async (req, res) => {
       return res.status(400).json({ error: "Name not provided" });
     }
 
+    console.log(req.body)
+
     const profile = await profileModel.findById(admin);
     if (!profile) {
       return res.status(404).json({ error: "Profile not found" });
@@ -152,21 +248,16 @@ router.post("/", async (req, res) => {
 router.patch("/addMember/:id", async (req, res) => {
   try {
     const communityId = req.params.id;
-    const userId = req.body.userId;
+    const profileId = req.body.userId;
 
     const community = await communityModel.findById(communityId);
     if (!community) {
       return res.status(404).json({ error: "Community not found" });
     }
-
-    const user = await userModel.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
     
-    const profileId = user.profile;
     const profile = await profileModel.findById(profileId);
     if (!profile) {
+      console.log("first")
       return res.status(404).json({ error: "Profile not found" });
     }
 

@@ -6,6 +6,10 @@ const Joi = require("joi");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const profileModel = require("../Models/profileModel");
+const postModel = require("../Models/postModel");
+const articleModel = require("../Models/articleModel");
+const communityModel = require("../Models/communityModel");
+
 const { Cookie } = require("express-session");
 
 require('dotenv').config()
@@ -22,6 +26,8 @@ const userJoiSchema = Joi.object({
     password: Joi.string().required(),
     profile_img: Joi.string(),
     about: Joi.string(),
+    accountType: Joi.string(),
+
 });
 
 const putUserJoiSchema = Joi.object({
@@ -86,19 +92,6 @@ const verifyToken = (req, res, next) => {
 };
 
 
-// GET each user by token
-router.post("/getUser", verifyToken, async (req, res) => {
-    try {
-        const user = req.decoded.user;
-
-        res.status(200).json({ valid: true, user });
-    } catch (error) {
-        console.error("Error fetching user:", error);
-        res.status(500).json({ error: "Internal server error" });
-    }
-});
-
-
 // GET all users
 router.get("/", async (req, res) => {
     try {
@@ -113,7 +106,7 @@ router.get("/", async (req, res) => {
 // GET all profiles
 router.get("/profiles", async (req, res) => {
     try {
-        const users = await userModel.find({}, 'profile');  // Second parameter is the projection
+        const users = await userModel.find({}, 'profile'); 
         const profileIds = users.map(user => user.profile);
 
         const profiles = await profileModel.find({ _id: { $in: profileIds } })
@@ -132,7 +125,11 @@ router.get("/profiles", async (req, res) => {
 // GET users for suggestion
 router.get("/otherUsers", async (req, res) => {
     try {
-        const data = await userModel.aggregate([{ $sample: { size: 5 } }]);
+        const data = await profileModel.aggregate([
+            { $sample: { size: 6 } },
+            { $project: { _id: 1, name: 1, profile_img: 1 } }
+        ]).exec();
+
         res.json(data);
     } catch (error) {
         console.error(error);
@@ -150,6 +147,7 @@ router.get("/list/displayData", async (req, res) => {
         res.status(500).json({ message: "500-Internal server error" });
     }
 });
+
 
 
 // GET each user by ID
@@ -172,9 +170,10 @@ router.get("/:id", async (req, res) => {
 // GET each user's profile by userID
 router.get("/profile/:id", async (req, res) => {
     const id = req.params.id;
+
     try {
         const profile = await profileModel.findById(id)
-            .select('_id name about profile_img communities')
+            .select('_id name email about profile_img communities')
             .lean();
 
         res.json(profile);
@@ -192,7 +191,6 @@ router.get("/profile/get/:id", async (req, res) => {
         .select('_id name about interests profile_img')
         .lean();
 
-        console.log("hhhhhhhh", profile)
         res.json(profile);
     } catch (error) {
         res.status(500).json({ message: "Internal server error" });
@@ -201,14 +199,11 @@ router.get("/profile/get/:id", async (req, res) => {
 
 
 const decodetoken = (req, res, next) => {
-    console.log("first")
     const token = req.body.token || req.query.token || req.headers["x-access-token"];
-    console.log(token)
+
     if (!token) {
         return res.status(401).json({ error: "Unauthorized: Token is not provided" });
     }
-
-    console.log("token:",token)
 
     try {
         const decoded = jwt.verify(token, process.env.SECRET_KEY);
@@ -231,6 +226,7 @@ router.post('/token/getId/:idType', decodetoken, async (req, res) => {
                 return res.status(400).json({ error: 'User ID not found' });
             }
             return res.status(200).json({ id: userId });
+
         } else if (idType === 'profileID') {
             const user = await userModel.findById(req.decoded);
             if (!user || !user.profile) {
@@ -238,6 +234,7 @@ router.post('/token/getId/:idType', decodetoken, async (req, res) => {
             }
             const profileId = user.profile;
             return res.status(200).json({ id: profileId });
+            
         } else {
             return res.status(400).json({ error: 'Invalid ID type' });
         }
@@ -249,17 +246,33 @@ router.post('/token/getId/:idType', decodetoken, async (req, res) => {
 
 // POST a new user
 router.post("/", validateUser, async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try {
         const { name, email, password, picture } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
-        const profile = (await profileModel.create({ name: name, email, picture }));
-        const newUser = await userModel.create({
+
+        const profile = await profileModel.create([{
+            name: name,
+            email: email,
+            picture: picture
+        }], { session });
+
+        const newUser = new userModel({
             name: name,
             email: email,
             password: hashedPassword,
-            profile: profile._id
+            profile: profile[0]._id,
+            accountType: "Normal",
         });
-        const token = generateToken(newUser);
+
+        await newUser.save({ session });
+
+        await session.commitTransaction();
+        session.endSession();
+
+        const token = generateToken(newUser._id);
+        console.log(newUser, newUser._id)
 
         res.cookie("token", token, {
             httpOnly: false,
@@ -267,17 +280,16 @@ router.post("/", validateUser, async (req, res) => {
             sameSite: "Lax",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
-        res.cookie("profileID", profile._id)
-        res.cookie("userID", newUser._id)
-        res.cookie("name", newUser.name)
 
-        // res.status(201).json({ message: "Signup successful" })
-        res.status(201).json({ userData: newUser, token: token, userID: newUser._id, profileID: profile._id });
+        res.status(201).json({ message: "Signup successful" });
     } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
         console.error(error);
         res.status(500).json({ message: "Internal server error" });
     }
 });
+
 
 
 // VALIDATE TOKEN
@@ -318,7 +330,7 @@ router.post("/login", async (req, res) => {
 });
 
 // CHANGE PASSWORD
-router.put("/change/:id", validatePutUser, async (req, res) => {
+router.put("/password/change/:id", validatePutUser, async (req, res) => {
     const userId = req.params.id;
     const { password, newPassword } = req.body;
 
@@ -417,7 +429,6 @@ router.patch("/updateProfile/:id", validatePatchUser, async (req, res) => {
 
         const data = req.body;
         const profileId = req.params.id
-console.log("reqqq", data)
         const updateProfile = await profileModel.findByIdAndUpdate(profileId, data, { new: true });
 
         if (!updateProfile) {
@@ -431,17 +442,54 @@ console.log("reqqq", data)
 });
 
 // DELETE a user
-router.delete("/:id", async (req, res) => {
+router.delete("/delete/:id", async (req, res) => {
+    const userId = req.params.id;
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
     try {
-        const deletedUser = await userModel.findByIdAndDelete(req.params.id);
-        if (!deletedUser) {
+        const user = await userModel.findById(userId).session(session);
+        if (!user) {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(404).json({ message: "User not found" });
         }
-        res.json({ message: "User deleted successfully" });
+
+        const profileId = user.profile;
+        const profile = await profileModel.findById(profileId).session(session);
+        
+        if (profile) {
+            await postModel.deleteMany({ _id: { $in: profile.posts } }).session(session);
+            
+            await articleModel.deleteMany({ _id: { $in: profile.articles } }).session(session);
+            
+            await Promise.all(profile.communities.map(async (communityId) => {
+                await communityModel.updateOne(
+                    { _id: communityId },
+                    { $pull: { members: userId } }
+                ).session(session);
+            }));
+
+
+            await profileModel.findByIdAndDelete(profileId).session(session);
+        }
+        await userModel.findByIdAndDelete(userId).session(session);
+
+        await session.commitTransaction();
+        session.endSession();
+
+        res.json({ message: "User account deleted successfully" });
     } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
         console.error(error);
         res.status(500).json({ message: "Internal server error" });
     }
 });
 
+
+
 module.exports = router;
+
+
+

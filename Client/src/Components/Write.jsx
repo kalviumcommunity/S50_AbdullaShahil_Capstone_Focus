@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Select, Option } from "@material-tailwind/react";
 
 import { useForm } from 'react-hook-form';
-import Cookies from 'js-cookie';
+import { getId } from './Utils/ApiUtils';
 import axios from 'axios';
 import { v4 } from 'uuid';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import Header from './Home Components/Header';
-import ProfileIMG2 from '../assets/review2.jpeg';
+import NoProfile from "../assets/noprofile.png";
 import { ImageDB } from '../firebase';
 
 import 'ldrs/tailspin'
@@ -21,8 +21,36 @@ function Write() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [category, setCategory] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const name = Cookies.get('name');
+  const [name, setName] = useState();
+  const [profileImg, setProfileImg] = useState();
+  const [profileID, setProfileID] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchProfileID = async () => {
+      const id = await getId('profileID');
+      setProfileID(id);
+    };
+
+    fetchProfileID();
+  }, []);  
+
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+        if (!profileID) return;
+
+        try {
+            const response = await axios.get(`http://localhost:4000/users/profile/get/${profileID}`);
+            setName(response.data.name);
+            setProfileImg(response.data.profile_img);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    fetchUserData();
+}, [profileID]);
 
   const getCurrentTime = () => {
     const currentTime = new Date();
@@ -100,7 +128,7 @@ function Write() {
 
             <div className=' top-opt flex justify-between items-center mb-5'>
               <div className='flex items-center w-[15vw]'>
-                <img className='h-12 w-12 rounded-full overflow-hidden' src={ProfileIMG2} alt="" />
+                <img className='h-12 w-12 rounded-full overflow-hidden' src={profileImg ? profileImg : NoProfile} alt="" />
                 <h3 className='post-username pl-4 font-normal poppins'>{name}</h3>
               </div>
 

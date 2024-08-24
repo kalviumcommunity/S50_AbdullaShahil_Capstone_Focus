@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { formatDistanceToNow, parseISO } from 'date-fns';
-import Cookies from 'js-cookie';
+import { getId } from '../Utils/ApiUtils';
 import CommentBox from '../CommentBox';
 import NoProfile from "../../assets/noprofile.png";
 import { ArticleShimmer } from '../Utils/Shimmers';
@@ -15,40 +15,50 @@ function Articles({ articleCategory }) {
   const [isLoading, setIsLoading] = useState(true);
   const [likedArticles, setLikedArticles] = useState({});
   const [activeCommentPost, setActiveCommentPost] = useState(null);
-
-  const profileID = Cookies.get("profileID");
+  const [profileID, setProfileID] = useState(null);
 
   useEffect(() => {
-    const initialLikedArticles = {};
-    axios.get('http://localhost:4000/articles')
-      .then(response => {
-        const articlesWithRelativeTime = response.data.map(article => ({
-          ...article,
-          relativeTime: formatDistanceToNow(parseISO(article.postedTime), { addSuffix: true })
-        }));
-        console.log(response.data)
+    const fetchProfileID = async () => {
+      const id = await getId('profileID');
+      setProfileID(id);
+    };
 
-        articlesWithRelativeTime.forEach(article => {
-          const isLikedByUser = Array.isArray(article.likes) && article.likes.includes(profileID);
-          initialLikedArticles[article._id] = isLikedByUser;
-        });
+    fetchProfileID();
+  }, []);   
 
-        setArticles(articlesWithRelativeTime);
-        setLikedArticles(initialLikedArticles);
-        setIsLoading(false);
-      })
-      .catch(err => {
-        console.log(err);
-        setIsLoading(false);
-      });
+  useEffect(() => {
+    if (profileID) {  
+      const fetchArticles = async () => {
+        setIsLoading(true);
+        try {
+          const response = await axios.get('http://localhost:4000/articles');
+          const articlesWithRelativeTime = response.data.map(article => ({
+            ...article,
+            relativeTime: formatDistanceToNow(parseISO(article.postedTime), { addSuffix: true })
+          }));
+
+          const initialLikedArticles = {};
+          articlesWithRelativeTime.forEach(article => {
+            const isLikedByUser = Array.isArray(article.likes) && article.likes.includes(profileID);
+            initialLikedArticles[article._id] = isLikedByUser;
+          });
+
+          setArticles(articlesWithRelativeTime);
+          setLikedArticles(initialLikedArticles);
+        } catch (err) {
+          console.log(err);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchArticles();
+    }
   }, [profileID]);
-
-  console.log(articles)
 
   const handleLikeClick = async (articleId) => {
     try {
       const response = await axios.patch(`http://localhost:4000/articles/like/${articleId}`, { action: !likedArticles[articleId] ? 'like' : 'unlike', profileID });
-      console.log(response)
       const updatedArticle = response.data;
       setArticles(articles.map(article => article._id === updatedArticle._id ? updatedArticle : article));
       setLikedArticles(prevLikedArticles => ({
@@ -75,9 +85,7 @@ function Articles({ articleCategory }) {
       <input className='w-[30vw] search border border-gray-400 rounded-full px-8 py-4 mb-4' id="genreSelect" placeholder='Search...' />
       <div className="pt-12 px-5 overflow-scroll h-[75vh]">
         {isLoading ? (
-
           <ArticleShimmer />
-
         ) : (
           filteredArticles.length > 0 ? (
             filteredArticles.map((article, index) => (

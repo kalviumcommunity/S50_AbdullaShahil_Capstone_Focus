@@ -3,16 +3,15 @@ import { Select, Option } from "@material-tailwind/react";
 
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import Cookies from 'js-cookie';
+import { getId } from './Utils/ApiUtils';
 import axios from 'axios';
 import { v4 } from 'uuid';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { ImageDB } from '../firebase';
 import Header from './Home Components/Header';
-import ProfileIMG2 from '../assets/review2.jpeg';
+import NoProfile from "../assets/noprofile.png";
+import Loader from './Utils/Loaders';
 
-import 'ldrs/tailspin'
-import 'ldrs/ring'
 
 
 function Post() {
@@ -21,9 +20,36 @@ function Post() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [category, setCategory] = useState('');
-  const name = Cookies.get('name');
-
+  const [name, setName] = useState();
+  const [profileImg, setProfileImg] = useState();
+  const [profileID, setProfileID] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchProfileID = async () => {
+      const id = await getId('profileID');
+      setProfileID(id);
+    };
+
+    fetchProfileID();
+  }, []);   
+
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+        if (!profileID) return;
+
+        try {
+            const response = await axios.get(`http://localhost:4000/users/profile/get/${profileID}`);
+            setName(response.data.name);
+            setProfileImg(response.data.profile_img);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    fetchUserData();
+}, [profileID]);
 
   const navigateHome = () => {
     navigate('/home');
@@ -96,17 +122,11 @@ function Post() {
 
             <div className=' top-opt flex justify-between items-center mb-5'>
               <div className='flex items-center w-[15vw]'>
-                <img className='h-12 w-12 rounded-full overflow-hidden' src={ProfileIMG2} alt="" />
+                <img className='h-12 w-12 rounded-full overflow-hidden' src={profileImg ? profileImg : NoProfile} alt="" />
                 <h3 className='post-username pl-4 font-normal poppins'>{name}</h3>
               </div>
 
-              {loading && <l-ring
-                size="40"
-                stroke="5"
-                bg-opacity="0"
-                speed="2"
-                color="#2E93FF"
-              ></l-ring>}
+              {loading && <Loader/>}
 
             </div>
             <label className='text-left textgray mb-1 ' htmlFor="title">Title</label>
@@ -171,8 +191,6 @@ function Post() {
 
 
       </div>
-
-
     </div>
   )
 }

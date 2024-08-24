@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
@@ -18,26 +17,3 @@ export const getId = async (idType) => {
         return null;
     }
 };
-
-const MyComponent = () => {
-    const [userId, setUserId] = useState(null);
-    const [profileId, setProfileId] = useState(null);
-
-    const fetchIds = async () => {
-        const userIdData = await getId('userID');
-        setUserId(userIdData);
-
-        const profileIdData = await getId('profileID');
-        setProfileId(profileIdData);
-    };
-
-    return (
-        <div>
-            <button onClick={fetchIds} className='border'>Fetch IDs</button>
-            <p>User ID: {userId}</p>
-            <p>Profile ID: {profileId}</p>
-        </div>
-    );
-};
-
-export default MyComponent;

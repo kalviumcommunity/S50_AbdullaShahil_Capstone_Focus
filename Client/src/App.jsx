@@ -11,8 +11,6 @@ import LensHub from './Components/LensHub';
 import EditEntity from './Components/EditEntity';
 import Chats from './Components/Chats';
 import CreateCommunity from './Components/CreateCommunity';
-
-import MyComponent from './Components/Utils/ApiUtils';
 import './App.css'
 
 
@@ -25,14 +23,13 @@ function App() {
       <Route path='/login' element={<Login/>}/>
       <Route path='/home' element={<Home/>}/>
       <Route path='/post' element={<Post/>}/>
-      <Route path='/profile' element={<UserProfile/>}/>
+      <Route path='/profile/:id?' element={<UserProfile/>}/>
       <Route path='/settings' element={<Settings/>}/>
       <Route path='/lenshub' element={<LensHub/>}/>
       <Route path='/write' element={<Write/>}/>
       <Route path='/edit/:type/:id' element={<EditEntity/>}/>
       <Route path='/chats' element={<Chats/>}/>
       <Route path='/createCommunity' element={<CreateCommunity/>}/>
-      <Route path='/testApi' element={<MyComponent/>}/>
     </Routes>
     </div>
   )

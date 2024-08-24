@@ -1,20 +1,26 @@
 import React, { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import Header from "./Home Components/Header";
 import Account from "./Settings Components/Account";
-import General from "./Settings Components/General";
+import Back from "../assets/back.png"
 
 function Settings() {
-  const [activeComponent, setActiveComponent] = useState("general");
-
-  const handleItemClick = (item) => {
-    setActiveComponent(item);
+  const navigate = useNavigate();
+  const navigateHome = () => {
+    navigate('/home');
   };
+
 
   return (
     <div>
       <Header />
+
+      <div onClick={navigateHome} className='text-left ml-4 mt-4 flex justify-between items-center hover:bg-blue-gray-50 hover:cursor-pointer rounded-md transition w-[6vw] p-1 '>
+        <img className='h-5' src={Back} alt="" />
+        <h1 className='poppins textgray text-lg'>Home</h1>
+      </div>
       <div className="mx-4 min-h-[80vh] max-w-screen-xl sm:mx-8 xl:mx-auto">
-        <h1 className="border-b py-6 text-4xl font-medium">Settings</h1>
+        <h1 className="border-b py-6 text-4xl font-medium poppins">Settings</h1>
         <div className="grid grid-cols-8  pt-3 sm:grid-cols-10">
           <div className="relative my-4 w-56 sm:hidden">
             <input
@@ -45,46 +51,27 @@ function Settings() {
             </svg>
             <ul className="max-h-0 select-none flex-col overflow-hidden rounded-b-lg shadow-md transition-all duration-300 peer-checked:max-h-56 peer-checked:py-3">
               <li
-                className={`cursor-pointer px-3 py-2 text-sm text-slate-600 hover:bg-blue-700 hover:text-white ${
-                  activeComponent === "account" ? "font-medium" : ""
-                }`}
-                onClick={() => handleItemClick("account")}
+                className='poppins cursor-pointer px-3 py-2 text-sm text-slate-600 hover:bg-blue-700 hover:text-white font-medium'
               >
                 Account
               </li>
-              <li
-                className={`cursor-pointer px-3 py-2 text-sm text-slate-600 hover:bg-blue-700 hover:text-white ${
-                  activeComponent === "general" ? "font-medium" : ""
-                }`}
-                onClick={() => handleItemClick("general")}
-              >
-                General
-              </li>
+
             </ul>
           </div>
 
           <div className="col-span-2 hidden sm:block">
             <ul>
+
               <li
-                className={`mt-5 cursor-pointer border-l-2 border-transparent px-2 py-2 font-semibold transition hover:border-1-gradient1 hover:text-blue-700 ${
-                  activeComponent === "general" ? "font-semibold" : ""
-                }`}
-                onClick={() => handleItemClick("general")}
-              >
-                General
-              </li>
-              <li
-                className={`mt-5 cursor-pointer border-l-2 border-l-blue-700 px-2 py-2 font-semibold text-blue-700 transition hover:gradient1 ${
-                  activeComponent === "account" ? "font-semibold" : ""
-                }`}
-                onClick={() => handleItemClick("account")}
+                className='mt-5 poppins textgray cursor-pointer border-l-2 border-transparent px-2 py-2 transition hover:gradient1 hover:text-blue-700 font-semibold border-l-blue-700 text-blue-700'
               >
                 Account
               </li>
             </ul>
           </div>
-      {activeComponent === "general" && <General />}
-      {activeComponent === "account" && <Account />}
+
+          <Account />
+
         </div>
       </div>
 

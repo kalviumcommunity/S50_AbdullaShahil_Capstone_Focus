@@ -20,7 +20,7 @@ function Login() {
     
     useEffect(() => {
         const fetchData = async () => {
-            const token = Cookies.get("token")? Cookies.get("token") : localStorage.getItem('token');
+            const token = Cookies.get("token");
             if (token) {
             try {
               await axios.post(
@@ -39,11 +39,8 @@ function Login() {
         const { email, password } = data;
         axios.post('http://localhost:4000/users/login', { email, password }, {withCredentials: true})
             .then(response => {
-                const { email, name, userID, profileID } = response.data;
-                // localStorage.setItem('token', token);
+                const { name } = response.data;
                 Cookies.set('name', name, { httpOnly: false, secure: false });
-                Cookies.set('userID', userID, { httpOnly: false, secure: false });
-                Cookies.set('profileID', profileID, { httpOnly: false, secure: false });
                 setSignupStatus('success');
 
                 setTimeout(() => {

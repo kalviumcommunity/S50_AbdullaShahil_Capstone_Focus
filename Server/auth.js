@@ -29,7 +29,7 @@ async function (request, accessToken, refreshToken, profile, done) {
             profileDoc = new Profile({
                 id: profile.id,
                 name: profile.displayName,
-                picture: profile.picture,
+                profile_img: profile.picture,
                 email: profile.email,
             });
             
@@ -37,7 +37,8 @@ async function (request, accessToken, refreshToken, profile, done) {
                 id: profile.id,
                 name: profile.displayName,
                 email: profile.email,
-                profile: profileDoc._id
+                profile: profileDoc._id,
+                accountType: "Google",
             });
             
             await profileDoc.save();
@@ -49,9 +50,6 @@ async function (request, accessToken, refreshToken, profile, done) {
         const token = generateToken(profileDoc);
 
         request.res.cookie('token', token, { httpOnly: false });
-        request.res.cookie('name', profile.displayName.toString(), { httpOnly: false });
-        request.res.cookie('userID', userDoc._id.toString(), { httpOnly: false });
-        request.res.cookie('profileID', profileDoc._id.toString(), { httpOnly: false });
 
         return done(null, profileDoc);
     } catch (err) {

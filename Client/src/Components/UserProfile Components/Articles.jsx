@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import NoProfile from "../../assets/noprofile.png";
-
+import { getId } from '../Utils/ApiUtils';
 import CommentBox from '../CommentBox';
 import { ArticleShimmer } from '../Utils/Shimmers';
 import Heart from '../../assets/heart.png';
@@ -23,13 +23,22 @@ function Articles({ articles, likedArticles, toggleLike }) {
     const [deleteArticleId, setDeleteArticleId] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [activeCommentPost, setActiveCommentPost] = useState(null);
-
-    const username = Cookies.get("name") ? Cookies.get("name").replace(/\"/g, '') : '';
-    const profileID = Cookies.get('profileID');
     const navigate = useNavigate();
+    const username = Cookies.get("name") ? Cookies.get("name").replace(/\"/g, '') : '';
+    const [profileID, setProfileID] = useState(null);
+
 
     useEffect(() => {
-        if (articles && articles.length > 0) {
+        const fetchProfileID = async () => {
+            const id = await getId('profileID');
+            setProfileID(id);
+        };
+
+        fetchProfileID();
+    }, []);
+
+    useEffect(() => {
+        if (articles) {
             setIsLoading(false);
         }
     }, [articles]);
@@ -64,7 +73,6 @@ function Articles({ articles, likedArticles, toggleLike }) {
 
     return (
         <div className="pt-2 overflow-hidden">
-
             {showDeleteConfirmation && (
                 <div>
                     <div className="overlay"></div>
@@ -78,11 +86,13 @@ function Articles({ articles, likedArticles, toggleLike }) {
                 </div>
             )}
 
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center justify-center min-h-[30vh]">
                 {isLoading ? (
-                    
                     <ArticleShimmer />
-
+                ) : articles.length === 0 ? (
+                    <div>
+                        <p className='poppins text-xl textgray'>No articles</p>
+                    </div>
                 ) : (
                     articles.map((article, index) => (
                         <div className=" border bg-white border-gray-300 rounded-md flex flex-col p-5 my-5 lg:w-[60vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]" key={index} >
@@ -91,26 +101,31 @@ function Articles({ articles, likedArticles, toggleLike }) {
                                     <img className='h-12 w-12 rounded-full overflow-hidden' src={article.profile_img ? (article.profile_img) : (NoProfile)} alt="" />
                                     <h3 className='post-username pl-4 font-light poppins'>{username}</h3>
                                 </div>
+
                                 <div className="flex items-center">
                                     <h3 className='font-light poppins text-gray-700'>{article.relativeTime}</h3>
-                                    <Menu
-                                        animate={{
-                                            mount: { y: 0 },
-                                            unmount: { y: 25 },
-                                        }}
-                                    >
-                                        <MenuHandler>
-                                            <img className='h-9 p-1 ml-5 cursor-pointer hover:bg-gray-100 rounded-full' src={more} alt="more options" />
-                                        </MenuHandler>
-                                        <MenuList>
-                                            <MenuItem className='mb-2 text-white bg-gray-800' onClick={() => EditArticle(article._id)}>Edit</MenuItem>
-                                            <MenuItem onClick={() => {
-                                                console.log(article._id);
-                                                setShowDeleteConfirmation(true);
-                                                setDeleteArticleId(article._id);
-                                            }} className='text-white bg-red-500'>Delete</MenuItem>
-                                        </MenuList>
-                                    </Menu>
+                                    {article.profileID === profileID && (
+
+                                        <Menu
+                                            animate={{
+                                                mount: { y: 0 },
+                                                unmount: { y: 25 },
+                                            }}
+                                        >
+                                            <MenuHandler>
+                                                <img className='h-9 p-1 ml-5 cursor-pointer hover:bg-gray-100 rounded-full' src={more} alt="more options" />
+                                            </MenuHandler>
+                                            <MenuList>
+                                                <MenuItem className='mb-2 text-white bg-gray-800' onClick={() => EditArticle(article._id)}>Edit</MenuItem>
+                                                <MenuItem onClick={() => {
+                                                    console.log(article._id);
+                                                    setShowDeleteConfirmation(true);
+                                                    setDeleteArticleId(article._id);
+                                                }} className='text-white bg-red-500'>Delete</MenuItem>
+                                            </MenuList>
+                                        </Menu>
+                                    )}
+
                                 </div>
                             </div>
                             <div className='flex justify-center'>
