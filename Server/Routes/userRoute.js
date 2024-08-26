@@ -274,7 +274,7 @@ router.post("/", validateUser, async (req, res) => {
         session.endSession();
 
         const token = generateToken(newUser._id);
-        console.log(newUser, newUser._id)
+        console.log("token------>", token)
 
         res.cookie("token", token, {
             httpOnly: true,
@@ -314,6 +314,7 @@ router.post("/login", async (req, res) => {
             return res.status(401).json({ error: "Invalid password" });
         }
         const token = generateToken(user._id);
+        console.log("token------>", token)
 
         res.cookie("token", token, {
             httpOnly: true,
