@@ -62,14 +62,14 @@ const ChatApp = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const usersResponse = await axios.get(`http://localhost:4000/users/profiles`);
+                const usersResponse = await axios.get(`https://s50-abdullashahil-capstone-focus.onrender.com/users/profiles`);
                 setAllUsers(usersResponse.data);
 
                 if (profileID) {
-                    const otherCommunitiesResponse = await axios.get(`http://localhost:4000/communities/getOthers/${profileID}`);
+                    const otherCommunitiesResponse = await axios.get(`https://s50-abdullashahil-capstone-focus.onrender.com/communities/getOthers/${profileID}`);
                     setOtherCommunities(otherCommunitiesResponse.data);
 
-                    const joinedCommunitiesResponse = await axios.get(`http://localhost:4000/communities/myCommunities/${profileID}`);
+                    const joinedCommunitiesResponse = await axios.get(`https://s50-abdullashahil-capstone-focus.onrender.com/communities/myCommunities/${profileID}`);
                     setJoinedCommunities(joinedCommunitiesResponse.data);
                 }
             } catch (error) {

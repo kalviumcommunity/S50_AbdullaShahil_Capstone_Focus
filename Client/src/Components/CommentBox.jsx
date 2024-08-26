@@ -31,7 +31,7 @@ function CommentBox({ entity, onClose, type }) {
 
 
     useEffect(() => {
-        axios.get(`http://localhost:4000/${type}/comments/${entity._id}`)
+        axios.get(`https://s50-abdullashahil-capstone-focus.onrender.com/${type}/comments/${entity._id}`)
         .then(response => {
             console.log("get comnt", response);
 
@@ -47,7 +47,7 @@ function CommentBox({ entity, onClose, type }) {
     }, [entity._id]);
     
     const handleDelete = (commentId, entityId) => {
-        axios.delete(`http://localhost:4000/${type}/comments/delete/${entityId}`, { params: {commentId} })
+        axios.delete(`https://s50-abdullashahil-capstone-focus.onrender.com/${type}/comments/delete/${entityId}`, { params: {commentId} })
             .then(response => {
                 toast.success('Comment deleted successfully');
                 console.log(response);
@@ -73,7 +73,7 @@ function CommentBox({ entity, onClose, type }) {
             profileId: profileID,
         };
         
-        axios.post(`http://localhost:4000/${type}/comments/${entity._id}`, payload)
+        axios.post(`https://s50-abdullashahil-capstone-focus.onrender.com/${type}/comments/${entity._id}`, payload)
         .then(response => {
             toast.success('Comment added successfully');
             console.log(response);

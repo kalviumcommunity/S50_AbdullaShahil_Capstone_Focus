@@ -40,7 +40,7 @@ function SetupProfile({ setLoading }) {
             setLoadingState(true);
 
             try {
-                const response = await axios.get(`http://localhost:4000/users/profile/get/${profileID}`);
+                const response = await axios.get(`https://s50-abdullashahil-capstone-focus.onrender.com/users/profile/get/${profileID}`);
                 setProfileData({
                     name: response.data.name,
                     about: response.data.about,
@@ -97,7 +97,7 @@ function SetupProfile({ setLoading }) {
         };
 
         try {
-            const response = await axios.patch(`http://localhost:4000/users/updateProfile/${profileID}`, payload);
+            const response = await axios.patch(`https://s50-abdullashahil-capstone-focus.onrender.com/users/updateProfile/${profileID}`, payload);
             console.log(response);
             setIsEditMode(false);
         } catch (error) {

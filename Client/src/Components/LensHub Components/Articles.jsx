@@ -31,7 +31,7 @@ function Articles({ articleCategory }) {
       const fetchArticles = async () => {
         setIsLoading(true);
         try {
-          const response = await axios.get('http://localhost:4000/articles');
+          const response = await axios.get('https://s50-abdullashahil-capstone-focus.onrender.com/articles');
           const articlesWithRelativeTime = response.data.map(article => ({
             ...article,
             relativeTime: formatDistanceToNow(parseISO(article.postedTime), { addSuffix: true })
@@ -58,7 +58,7 @@ function Articles({ articleCategory }) {
 
   const handleLikeClick = async (articleId) => {
     try {
-      const response = await axios.patch(`http://localhost:4000/articles/like/${articleId}`, { action: !likedArticles[articleId] ? 'like' : 'unlike', profileID });
+      const response = await axios.patch(`https://s50-abdullashahil-capstone-focus.onrender.com/articles/like/${articleId}`, { action: !likedArticles[articleId] ? 'like' : 'unlike', profileID });
       const updatedArticle = response.data;
       setArticles(articles.map(article => article._id === updatedArticle._id ? updatedArticle : article));
       setLikedArticles(prevLikedArticles => ({

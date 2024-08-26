@@ -33,7 +33,7 @@ function Posts({ postCategory }) {
   }, []);  
 
   useEffect(() => {
-    axios.get(`http://localhost:4000/posts`)
+    axios.get(`https://s50-abdullashahil-capstone-focus.onrender.com/posts`)
       .then(response => {
         const fetchedPosts = response.data;
 
@@ -53,7 +53,7 @@ function Posts({ postCategory }) {
 
   const handleLikeClick = async (postId) => {
     try {
-      const response = await axios.patch(`http://localhost:4000/posts/like/${postId}`, { action: !likedPosts[postId] ? 'like' : 'unlike', profileID });
+      const response = await axios.patch(`https://s50-abdullashahil-capstone-focus.onrender.com/posts/like/${postId}`, { action: !likedPosts[postId] ? 'like' : 'unlike', profileID });
       const updatedPost = response.data;
   
       // Preserve the profile_img by merging the updated post data with the original post data

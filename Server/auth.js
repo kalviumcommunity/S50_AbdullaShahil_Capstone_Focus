@@ -17,7 +17,7 @@ const generateToken = (user) => {
 passport.use(new GoogleStrategy({
     clientID: GOOGLE_CLIENT_ID,
     clientSecret: GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://localhost:4000/auth/google/callback",
+    callbackURL: "https://s50-abdullashahil-capstone-focus.onrender.com/auth/google/callback",
     passReqToCallback: true
 },
 async function (request, accessToken, refreshToken, profile, done) {
@@ -49,7 +49,13 @@ async function (request, accessToken, refreshToken, profile, done) {
 
         const token = generateToken(profileDoc);
 
-        request.res.cookie('token', token, { httpOnly: false });
+        // request.res.cookie('token', token, { httpOnly: false });
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+          });
 
         return done(null, profileDoc);
     } catch (err) {

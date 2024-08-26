@@ -22,11 +22,11 @@ function UserPanel() {
                 setProfileID(id);
 
                 if (id) {
-                    const response = await axios.get(`http://localhost:4000/users/profile/get/${id}`);
+                    const response = await axios.get(`https://s50-abdullashahil-capstone-focus.onrender.com/users/profile/get/${id}`);
                     setUsername(response.data.name);
                     setProfileImg(response.data.profile_img);
 
-                    const suggestedResponse = await axios.get(`http://localhost:4000/users/otherUsers`);
+                    const suggestedResponse = await axios.get(`https://s50-abdullashahil-capstone-focus.onrender.com/users/otherUsers`);
                     const filteredUsers = suggestedResponse.data.filter(user => user._id !== id);
                     setSuggestedUsers(filteredUsers);
                 }
@@ -44,7 +44,7 @@ function UserPanel() {
     };
 
     const handleLogout = () => {
-        axios.get('http://localhost:4000/logout', {
+        axios.get('https://s50-abdullashahil-capstone-focus.onrender.com/logout', {
             withCredentials: true
         })
             .then(response => {

@@ -4,6 +4,7 @@ const cors = require("cors");
 const cookieParser = require('cookie-parser');
 const connectDb = require("../Server/config/connect");
 const { createServer } = require("http");
+require('dotenv').config();
 
 const userRouter = require("./Routes/userRoute");
 const postRouter = require("./Routes/postRoute");
@@ -17,6 +18,8 @@ const app = express();
 
 connectDb();
 
+const SESSION_SECRET = process.env.SESSION_SECRET;
+
 const setupSocket = require("./socketio");
 const server = createServer(app);
 
@@ -28,6 +31,14 @@ app.use(session({
   saveUninitialized: true,
   cookie: { secure: false },
 }));
+
+app.use(
+  session({
+    secret: SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 
 
 app.use(passport.initialize());

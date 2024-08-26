@@ -48,7 +48,7 @@ function UserProfile() {
             if (!profileID) return;
 
             try {
-                const response = await axios.get(`http://localhost:4000/users/profile/get/${profileID}`);
+                const response = await axios.get(`https://s50-abdullashahil-capstone-focus.onrender.com/users/profile/get/${profileID}`);
                 setProfileData({
                     name: response.data.name,
                     about: response.data.about,
@@ -69,8 +69,8 @@ function UserProfile() {
         const fetchPostsAndArticles = async () => {
             try {
                 const [postsResponse, articlesResponse] = await Promise.all([
-                    axios.get(`http://localhost:4000/posts/userPosts/${profileID}`),
-                    axios.get(`http://localhost:4000/articles/userArticles/${profileID}`)
+                    axios.get(`https://s50-abdullashahil-capstone-focus.onrender.com/posts/userPosts/${profileID}`),
+                    axios.get(`https://s50-abdullashahil-capstone-focus.onrender.com/articles/userArticles/${profileID}`)
                 ]);
     
                 const fetchedPosts = Array.isArray(postsResponse.data) ? postsResponse.data : [];
@@ -114,7 +114,7 @@ function UserProfile() {
         const isLiked = type === 'post' ? likedPosts[id] : likedArticles[id];
         try {
             const endpoint = type === 'post' ? `posts/like/${id}` : `articles/like/${id}`;
-            const response = await axios.patch(`http://localhost:4000/${endpoint}`, { action: isLiked ? 'unlike' : 'like', profileID });
+            const response = await axios.patch(`https://s50-abdullashahil-capstone-focus.onrender.com/${endpoint}`, { action: isLiked ? 'unlike' : 'like', profileID });
 
             if (type === 'post') {
                 setLikedPosts(prev => ({ ...prev, [id]: !isLiked }));

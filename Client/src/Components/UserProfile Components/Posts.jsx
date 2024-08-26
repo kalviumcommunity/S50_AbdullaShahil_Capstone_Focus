@@ -43,7 +43,7 @@ function Posts({ posts, likedPosts, toggleLike }) {
   }, [posts]);
 
   const handleDelete = () => {
-    axios.delete(`http://localhost:4000/posts/${deletePostId}`, {
+    axios.delete(`https://s50-abdullashahil-capstone-focus.onrender.com/posts/${deletePostId}`, {
       headers: {
         'profileID': profileID
       }

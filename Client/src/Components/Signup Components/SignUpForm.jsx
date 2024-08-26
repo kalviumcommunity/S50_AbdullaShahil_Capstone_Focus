@@ -8,14 +8,14 @@ function SignUpForm({ onSignupSuccess }) {
     const checkPassword = watch('password', '');
 
     const toSignup = () => {
-        window.location.href = 'http://localhost:4000/auth/google';
+        window.location.href = 'https://s50-abdullashahil-capstone-focus.onrender.com/auth/google';
     };
 
 
     const onSubmit = (data) => {
         const { name, email, password } = data;
 
-        axios.post('http://localhost:4000/users', { name, email, password }, { withCredentials: true })
+        axios.post('https://s50-abdullashahil-capstone-focus.onrender.com/users', { name, email, password }, { withCredentials: true })
             .then(response => {
                 console.log(response);
                 onSignupSuccess(); 

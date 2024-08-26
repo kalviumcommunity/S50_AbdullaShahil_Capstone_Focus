@@ -39,7 +39,7 @@ function CreateCommunity() {
         if (!profileID) return;
 
         try {
-            const response = await axios.get(`http://localhost:4000/users/profile/get/${profileID}`);
+            const response = await axios.get(`https://s50-abdullashahil-capstone-focus.onrender.com/users/profile/get/${profileID}`);
             setName(response.data.name);
             setProfileImg(response.data.profile_img);
         } catch (err) {
@@ -74,7 +74,7 @@ function CreateCommunity() {
         profileImg: imageUrl,
       };
 
-      await axios.post('http://localhost:4000/communities', payload);
+      await axios.post('https://s50-abdullashahil-capstone-focus.onrender.com/communities', payload);
       setLoading(false);
       setIsSubmitted(true);
       setErrorMessage('');

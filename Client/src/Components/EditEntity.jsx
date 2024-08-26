@@ -24,7 +24,7 @@ function EditEntity() {
   useEffect(() => {
     const fetchEntity = async () => {
       try {
-        const response = await axios.get(`http://localhost:4000/${type}s/${id}`);
+        const response = await axios.get(`https://s50-abdullashahil-capstone-focus.onrender.com/${type}s/${id}`);
         console.log(response.data)
         const entity = response.data;
         setValue('title', entity.title);
@@ -57,7 +57,7 @@ function EditEntity() {
         category,
       };
 
-      await axios.put(`http://localhost:4000/${type}s/${id}`, payload);
+      await axios.put(`https://s50-abdullashahil-capstone-focus.onrender.com/${type}s/${id}`, payload);
       setLoading(false);
       setIsSubmitted(true);
       setErrorMessage('');
