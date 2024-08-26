@@ -31,9 +31,9 @@ app.use(
     secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
+    cookie: { secure: true }
   })
 );
-
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -87,8 +87,6 @@ app.get("/logout", (req, res) => {
     }
   });
 });
-
-
 
 app.use(express.json())
 app.use(cookieParser());
