@@ -28,7 +28,8 @@ app.use(express.static('public'));
 
 app.use(
   session({
-    secret: SESSION_SECRET,
+    secret: "YhENdXTKzl8OZ1sMdOfjYc",
+    // secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: { secure: true }
