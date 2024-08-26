@@ -25,12 +25,6 @@ const server = createServer(app);
 
 const port = 4000;
 app.use(express.static('public'));
-app.use(session({
-  secret: 'cats',
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false },
-}));
 
 app.use(
   session({
