@@ -68,7 +68,7 @@ function SetupProfile() {
 
         console.log(payload);
 
-        axios.patch(`http://localhost:4000/users/updateProfile/${profileID}`, payload)
+        axios.patch(`https://s50-abdullashahil-capstone-focus.onrender.com/users/updateProfile/${profileID}`, payload)
             .then(response => {
                 console.log(response);
                 navigate('/home');

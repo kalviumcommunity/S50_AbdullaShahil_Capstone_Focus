@@ -9,7 +9,7 @@ import { DeletePopup } from '../Utils/Popups';
 import { AddMemberPopup } from '../Utils/Popups';
 import NoProfile from "../../assets/noprofile.png";
 
-const socket = io('http://localhost:4000');
+const socket = io('https://s50-abdullashahil-capstone-focus.onrender.com');
 
 const ActiveChat = ({ id, chatType, setActiveChat, onCommunityJoin, isJoined, setIsJoined }) => {
     const chatId = id;
@@ -41,7 +41,7 @@ const ActiveChat = ({ id, chatType, setActiveChat, onCommunityJoin, isJoined, se
         setViewInfo(false)
         console.log("type->", chatId, chatType)
         if (chatType === 'community') {
-            axios.get(`http://localhost:4000/communities/${chatId}`)
+            axios.get(`https://s50-abdullashahil-capstone-focus.onrender.com/communities/${chatId}`)
                 .then(response => {
                     setCommunity(response.data);
                     console.log("first", response.data)
@@ -50,7 +50,7 @@ const ActiveChat = ({ id, chatType, setActiveChat, onCommunityJoin, isJoined, se
                     console.log("error: ", error);
                 });
 
-            axios.get(`http://localhost:4000/communities/otherusers/${chatId}`)
+            axios.get(`https://s50-abdullashahil-capstone-focus.onrender.com/communities/otherusers/${chatId}`)
                 .then(response => {
                     setUserData(response.data);
                 })
@@ -58,7 +58,7 @@ const ActiveChat = ({ id, chatType, setActiveChat, onCommunityJoin, isJoined, se
                     console.log("error: ", error);
                 });
 
-            axios.get(`http://localhost:4000/messages/community/${chatId}`)
+            axios.get(`https://s50-abdullashahil-capstone-focus.onrender.com/messages/community/${chatId}`)
                 .then(response => {
                     setMessages(response.data.messages);
                     console.log(response.data.messages)
@@ -72,7 +72,7 @@ const ActiveChat = ({ id, chatType, setActiveChat, onCommunityJoin, isJoined, se
         } else {
             setCommunity("")
             const userId = Cookies.get('profileID');
-            axios.get(`http://localhost:4000/communities/messages/personalMessages/${chatId}`, {
+            axios.get(`https://s50-abdullashahil-capstone-focus.onrender.com/communities/messages/personalMessages/${chatId}`, {
                 params: {
                     userId: JSON.stringify({ _id: userId })
                 }
@@ -85,7 +85,7 @@ const ActiveChat = ({ id, chatType, setActiveChat, onCommunityJoin, isJoined, se
                     console.log("error: ", error);
                 });
 
-            axios.get(`http://localhost:4000/users/profile/${chatId}`)
+            axios.get(`https://s50-abdullashahil-capstone-focus.onrender.com/users/profile/${chatId}`)
                 .then(response => {
                     console.log(response.data)
                     setUserData(response.data);
@@ -148,7 +148,7 @@ const ActiveChat = ({ id, chatType, setActiveChat, onCommunityJoin, isJoined, se
 
     const handleAddMember = (userId) => {
         if (community) {
-            axios.patch(`http://localhost:4000/communities/addMember/${community._id}`, { userId })
+            axios.patch(`https://s50-abdullashahil-capstone-focus.onrender.com/communities/addMember/${community._id}`, { userId })
                 .then(response => {
                     setCommunity(prevCommunity => ({
                         ...prevCommunity,
@@ -168,7 +168,7 @@ const ActiveChat = ({ id, chatType, setActiveChat, onCommunityJoin, isJoined, se
 
     const handleDeleteCommunity = () => {
         if (community) {
-            axios.delete(`http://localhost:4000/communities/${chatId}`)
+            axios.delete(`https://s50-abdullashahil-capstone-focus.onrender.com/communities/${chatId}`)
                 .then(response => {
                     setDeletePopupOpen(false);
                     window.location.reload();

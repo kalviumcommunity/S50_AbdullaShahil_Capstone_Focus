@@ -10,6 +10,8 @@ const postModel = require("../Models/postModel");
 const articleModel = require("../Models/articleModel");
 const communityModel = require("../Models/communityModel");
 
+const saltRounds = 10;
+
 const { Cookie } = require("express-session");
 
 require('dotenv').config()
@@ -250,7 +252,7 @@ router.post("/", validateUser, async (req, res) => {
     session.startTransaction();
     try {
         const { name, email, password, picture } = req.body;
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
 
         const profile = await profileModel.create([{
             name: name,
@@ -275,11 +277,11 @@ router.post("/", validateUser, async (req, res) => {
         console.log(newUser, newUser._id)
 
         res.cookie("token", token, {
-            httpOnly: false,
+            httpOnly: true,
             secure: true,
-            sameSite: "Lax",
+            sameSite: "none",
             maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+          });
 
         res.status(201).json({ message: "Signup successful" });
     } catch (error) {
@@ -314,11 +316,11 @@ router.post("/login", async (req, res) => {
         const token = generateToken(user._id);
 
         res.cookie("token", token, {
-            httpOnly: false,
+            httpOnly: true,
             secure: true,
-            sameSite: "Lax",
+            sameSite: "none",
             maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+          });
 
         // res.status(201).json({ message: "Signup successful" })
 

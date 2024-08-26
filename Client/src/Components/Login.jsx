@@ -15,7 +15,7 @@ function Login() {
 
     const toLogin = (event) => {
         event.preventDefault(); 
-        window.location.href = 'http://localhost:4000/auth/google';
+        window.location.href = 'https://s50-abdullashahil-capstone-focus.onrender.com/auth/google';
     }
     
     useEffect(() => {
@@ -24,7 +24,7 @@ function Login() {
             if (token) {
             try {
               await axios.post(
-                "http://localhost:4000/users/tokenvalidate", { token });
+                "https://s50-abdullashahil-capstone-focus.onrender.com/users/tokenvalidate", { token });
               navigate("/home");
             } catch (error) {
               console.error("Error in post request", error.response.data.error);
@@ -37,10 +37,10 @@ function Login() {
 
     const onSubmit = (data) => {
         const { email, password } = data;
-        axios.post('http://localhost:4000/users/login', { email, password }, {withCredentials: true})
+        axios.post('https://s50-abdullashahil-capstone-focus.onrender.com/users/login', { email, password }, {withCredentials: true})
             .then(response => {
                 const { name } = response.data;
-                Cookies.set('name', name, { httpOnly: false, secure: false });
+                Cookies.set('name', name, { httpOnly: true, secure: true });
                 setSignupStatus('success');
 
                 setTimeout(() => {

@@ -41,7 +41,7 @@ function Write() {
         if (!profileID) return;
 
         try {
-            const response = await axios.get(`http://localhost:4000/users/profile/get/${profileID}`);
+            const response = await axios.get(`https://s50-abdullashahil-capstone-focus.onrender.com/users/profile/get/${profileID}`);
             setName(response.data.name);
             setProfileImg(response.data.profile_img);
         } catch (err) {
@@ -84,7 +84,7 @@ function Write() {
         category: category,
       };
 
-      await axios.post('http://localhost:4000/articles', payload);
+      await axios.post('https://s50-abdullashahil-capstone-focus.onrender.com/articles', payload);
       setLoading(false);
       setIsSubmitted(true);
       setErrorMessage('');

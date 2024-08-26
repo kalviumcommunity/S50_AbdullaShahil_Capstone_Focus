@@ -44,7 +44,7 @@ function Articles({ articles, likedArticles, toggleLike }) {
     }, [articles]);
 
     const handleDelete = () => {
-        axios.delete(`http://localhost:4000/articles/${deleteArticleId}`, {
+        axios.delete(`https://s50-abdullashahil-capstone-focus.onrender.com/articles/${deleteArticleId}`, {
             headers: {
                 'profileID': profileID
             }

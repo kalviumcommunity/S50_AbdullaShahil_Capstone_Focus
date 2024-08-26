@@ -38,7 +38,7 @@ function Account() {
   useEffect(() => {
     if (profileID) {
       setLoading(true); 
-      axios.get(`http://localhost:4000/users/profile/${profileID}`, { withCredentials: true })
+      axios.get(`https://s50-abdullashahil-capstone-focus.onrender.com/users/profile/${profileID}`, { withCredentials: true })
         .then(response => {
           setUserData(response.data);
         })
@@ -60,7 +60,7 @@ function Account() {
 
     setLoading(true); 
 
-    axios.put(`http://localhost:4000/users/password/change/${id}`, { password, newPassword })
+    axios.put(`https://s50-abdullashahil-capstone-focus.onrender.com/users/password/change/${id}`, { password, newPassword })
       .then(response => {
         // const token = response.data.token;
         // Cookies.set('token', token, { expires: 7 });
@@ -83,7 +83,7 @@ function Account() {
   const handleDeleteAccount = async () => {
     setLoading(true);
     try {
-      await axios.delete(`http://localhost:4000/users/delete/${id}`, { withCredentials: true });
+      await axios.delete(`https://s50-abdullashahil-capstone-focus.onrender.com/users/delete/${id}`, { withCredentials: true });
       Cookies.remove('token'); 
       console.log("success")
       navigate("/");

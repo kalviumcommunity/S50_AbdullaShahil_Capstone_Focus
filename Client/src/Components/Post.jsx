@@ -40,7 +40,7 @@ function Post() {
         if (!profileID) return;
 
         try {
-            const response = await axios.get(`http://localhost:4000/users/profile/get/${profileID}`);
+            const response = await axios.get(`https://s50-abdullashahil-capstone-focus.onrender.com/users/profile/get/${profileID}`);
             setName(response.data.name);
             setProfileImg(response.data.profile_img);
         } catch (err) {
@@ -79,7 +79,7 @@ function Post() {
       };
       console.log(payload)
 
-      await axios.post('http://localhost:4000/posts', payload);
+      await axios.post('https://s50-abdullashahil-capstone-focus.onrender.com/posts', payload);
       setLoading(false);
       setIsSubmitted(true);
       setErrorMessage('');

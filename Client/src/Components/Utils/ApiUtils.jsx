@@ -4,9 +4,10 @@ import Cookies from 'js-cookie';
 const token = Cookies.get("token")
 
 export const getId = async (idType) => {
+    console.log(token)
     try {
         const response = await axios.post(
-            `http://localhost:4000/users/token/getId/${idType}`,
+            `https://s50-abdullashahil-capstone-focus.onrender.com/users/token/getId/${idType}`,
             { token },
             { withCredentials: true }
           );
