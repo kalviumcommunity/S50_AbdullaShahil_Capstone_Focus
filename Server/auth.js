@@ -47,14 +47,7 @@ async function (request, accessToken, refreshToken, profile, done) {
             userDoc = await User.findOne({ profile: profileDoc._id });
         }
 
-        const token = generateToken(profileDoc);
-
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "none",
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-          });
+        const token = generateToken(userDoc._id);
 
         return done(null, profileDoc);
     } catch (err) {

@@ -28,8 +28,7 @@ app.use(express.static('public'));
 
 app.use(
   session({
-    secret: "YhENdXTKzl8OZ1sMdOfjYc",
-    // secret: SESSION_SECRET,
+    secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: { secure: true }
@@ -56,7 +55,18 @@ app.use(cors(
   );
   
   app.get('/auth/google/callback',
-  passport.authenticate('google', {
+  passport.authenticate('google', 
+  () =>{
+    const { token } = req.user;
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+
+    });
+  },{
     successRedirect: 'http://localhost:5173/home',
     failureRedirect: 'http://localhost:5173/signup'
   })
