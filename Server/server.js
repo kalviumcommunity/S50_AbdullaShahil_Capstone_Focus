@@ -18,7 +18,7 @@ const app = express();
 
 connectDb();
 
-const SESSION_SECRET = process.env.SESSION_SECRET;
+const SESSION_SECRET_KEY = process.env.SESSION_SECRET;
 
 const setupSocket = require("./socketio");
 const server = createServer(app);
@@ -28,7 +28,7 @@ app.use(express.static('public'));
 
 app.use(
   session({
-    secret: SESSION_SECRET,
+    secret: "G9z#kT!4xE*2pL$7qW^nR1vF&8bA@3zJ",
     resave: false,
     saveUninitialized: true,
     cookie: { secure: true }
@@ -98,6 +98,43 @@ app.get("/logout", (req, res) => {
     }
   });
 });
+
+
+app.get("/logout", (req, res) => {
+  // Destroy the session
+  req.logout((err) => {
+    if (err) {
+      console.error("Error during logout:", err);
+      return res.status(500).send("Error during logout");
+    }
+
+
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      domain: "https://s50-abdullashahil-capstone-focus.onrender.com/" 
+    });
+    
+    res.clearCookie("connect.sid", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      domain: "https://s50-abdullashahil-capstone-focus.onrender.com/"
+    });
+
+    // Destroy the session on the server
+    req.session.destroy(function (err) {
+      if (err) {
+        return res.status(500).send("Error destroying session");
+      }
+      
+      res.status(200).send("User logged out successfully");
+    });
+  });
+});
+
+
 
 app.use(express.json())
 app.use(cookieParser());

@@ -56,8 +56,6 @@ function UserPanel() {
                 console.error('Error during logout:', error);
             });
 
-        localStorage.removeItem('token');
-        Cookies.remove('token');
         navigate('/');
         setIsLogoutPopupOpen(false);
     };

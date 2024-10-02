@@ -49,7 +49,7 @@ async function (request, accessToken, refreshToken, profile, done) {
 
         const token = generateToken(userDoc._id);
 
-        return done(null, profileDoc);
+        return done(null, token);
     } catch (err) {
         return done(err);
     }
