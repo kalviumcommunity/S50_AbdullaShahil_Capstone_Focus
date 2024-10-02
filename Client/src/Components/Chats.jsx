@@ -6,11 +6,7 @@ import axios from 'axios';
 import ActiveChat from './Chat Components/ActiveChat';
 import NoProfile from "../assets/noprofile.png";
 import { getId } from './Utils/ApiUtils';
-import {
-    Accordion,
-    AccordionHeader,
-    AccordionBody,
-} from "@material-tailwind/react";
+
 import { AccordionComponent } from './Utils/Accordion';
 
 const ChatApp = () => {
@@ -29,7 +25,7 @@ const ChatApp = () => {
 
     useEffect(() => {
         const fetchProfileID = async () => {
-            const id = await getId('profileID');
+            const { id } = await getId('profileID');
             setProfileID(id);
         };
 

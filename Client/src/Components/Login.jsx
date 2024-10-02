@@ -39,8 +39,8 @@ function Login() {
         const { email, password } = data;
         axios.post('https://s50-abdullashahil-capstone-focus.onrender.com/users/login', { email, password }, {withCredentials: true})
             .then(response => {
-                const { name } = response.data;
-                Cookies.set('name', name, { httpOnly: true, secure: true });
+                // const { name } = response.data;
+                // Cookies.set('name', name, { httpOnly: true, secure: true });
                 setSignupStatus('success');
 
                 setTimeout(() => {

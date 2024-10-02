@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Cookies from 'js-cookie';
 import sendButton from "../../assets/sendbutton.png";
 import io from 'socket.io-client';
 import { getId } from '../Utils/ApiUtils';
@@ -13,9 +12,9 @@ const socket = io('https://s50-abdullashahil-capstone-focus.onrender.com');
 
 const ActiveChat = ({ id, chatType, setActiveChat, onCommunityJoin, isJoined, setIsJoined }) => {
     const chatId = id;
-    const username = Cookies.get("name") ? Cookies.get("name").replace(/\"/g, '') : '';
     const navigate = useNavigate();
 
+    const [username, setUsername] = useState();
     const [userData, setUserData] = useState([]);
     const [community, setCommunity] = useState(null);
     const messagesEndRef = useRef(null);
@@ -28,8 +27,9 @@ const ActiveChat = ({ id, chatType, setActiveChat, onCommunityJoin, isJoined, se
 
     useEffect(() => {
         const fetchProfileID = async () => {
-            const id = await getId('profileID');
+            const {id, name} = await getId('profileID');
             setProfileID(id);
+            setUsername(name);
         };
 
         fetchProfileID();
@@ -71,7 +71,7 @@ const ActiveChat = ({ id, chatType, setActiveChat, onCommunityJoin, isJoined, se
 
         } else {
             setCommunity("")
-            const userId = Cookies.get('profileID');
+            const userId = profileID;
             axios.get(`https://s50-abdullashahil-capstone-focus.onrender.com/communities/messages/personalMessages/${chatId}`, {
                 params: {
                     userId: JSON.stringify({ _id: userId })
@@ -127,7 +127,7 @@ const ActiveChat = ({ id, chatType, setActiveChat, onCommunityJoin, isJoined, se
                 socket.emit("message", newMessage);
             } else if (chatType === 'personal') {
                 const newMessage = {
-                    senderId: Cookies.get('profileID'),
+                    senderId: profileID,
                     receiverId: chatId,
                     message: messageInput,
                 };

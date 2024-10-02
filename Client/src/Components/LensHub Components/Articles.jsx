@@ -19,7 +19,7 @@ function Articles({ articleCategory }) {
 
   useEffect(() => {
     const fetchProfileID = async () => {
-      const id = await getId('profileID');
+      const {id} = await getId('profileID');
       setProfileID(id);
     };
 

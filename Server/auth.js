@@ -49,7 +49,6 @@ async function (request, accessToken, refreshToken, profile, done) {
 
         const token = generateToken(profileDoc);
 
-        // request.res.cookie('token', token, { httpOnly: false });
         res.cookie("token", token, {
             httpOnly: true,
             secure: true,

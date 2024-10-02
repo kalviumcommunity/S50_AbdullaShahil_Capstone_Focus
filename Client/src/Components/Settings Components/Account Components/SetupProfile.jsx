@@ -27,7 +27,7 @@ function SetupProfile({ setLoading }) {
 
     useEffect(() => {
         const fetchProfileID = async () => {
-            const id = await getId('profileID');
+            const {id} = await getId('profileID');
             setProfileID(id);
         };
 

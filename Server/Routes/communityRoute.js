@@ -146,8 +146,6 @@ router.get("/:id", async (req, res) => {
       .populate('members', 'name profile_img')  
       .lean();
 
-      console.log("jjjjjjj------>",community)
-
     if (!community) {
       return res.status(404).json({ error: "Community not found" });
     }

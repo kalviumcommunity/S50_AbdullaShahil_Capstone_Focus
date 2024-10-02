@@ -27,7 +27,7 @@ function SetupProfile() {
         toast.success("Account creation successful");
 
         const fetchProfileID = async () => {
-            const id = await getId('profileID');
+            const {id} = await getId('profileID');
             setProfileID(id);
         };
   

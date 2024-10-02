@@ -29,8 +29,8 @@ function UserProfile() {
                 console.log("first")
             } else {
                 console.log("second")
-                const fetchedID = await getId('profileID');
-                setProfileID(fetchedID);
+                const {id} = await getId('profileID');
+                setProfileID(id);
             }
         };
 
