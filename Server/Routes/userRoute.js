@@ -201,7 +201,7 @@ router.get("/profile/get/:id", async (req, res) => {
 
 
 const decodetoken = (req, res, next) => {
-    const token = req.body.token || req.query.token || req.headers["x-access-token"];
+    const token = req.cookies.token || req.headers["x-access-token"] || req.body.token;
 
     if (!token) {
         return res.status(401).json({ error: "Unauthorized: Token is not provided" });
@@ -210,6 +210,7 @@ const decodetoken = (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.SECRET_KEY);
         req.decoded = decoded.id;
+        
         console.log("decoded userid", decoded)
         next();
     } catch (error) {

@@ -1,14 +1,14 @@
 import axios from 'axios';
-import Cookies from 'js-cookie';
+// import Cookies from 'js-cookie';
 
-const token = Cookies.get("token")
+// const token = Cookies.get("token")
 
 export const getId = async (idType) => {
     console.log(token)
     try {
         const response = await axios.post(
             `https://s50-abdullashahil-capstone-focus.onrender.com/users/token/getId/${idType}`,
-            { token },
+            { },
             { withCredentials: true }
           );
         console.log(response.data);
