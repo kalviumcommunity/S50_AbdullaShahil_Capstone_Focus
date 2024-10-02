@@ -50,7 +50,7 @@ app.use(cors(
   }
   
   setupSocket(server);
-  router.get(
+  app.get(
     "/auth/google/callback",
     passport.authenticate("google", { failureRedirect: "http://localhost:5173/signup" }),
     (req, res) => {
