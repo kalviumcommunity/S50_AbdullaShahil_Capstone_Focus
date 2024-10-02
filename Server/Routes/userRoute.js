@@ -85,8 +85,16 @@ const verifyToken = (req, res, next) => {
         return res.status(401).json({ error: "Unauthorized: Token is not provided" });
     }
 
-    console.log("Token on login present")
-    next();
+    try {
+        const decoded = jwt.verify(token, process.env.SECRET_KEY);
+        req.decoded = decoded.id;
+
+        console.log("Token on login present")
+        next();
+    } catch (error) {
+        return res.status(401).json({ error: "Unauthorized: Invalid token" });
+    }
+
 };
 
 // VALIDATE TOKEN
