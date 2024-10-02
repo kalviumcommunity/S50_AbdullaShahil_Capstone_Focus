@@ -3,7 +3,6 @@ import { formatDistanceToNow, parseISO } from 'date-fns';
 import { Toaster, toast } from 'sonner';
 import { getId } from "./Utils/ApiUtils";
 import axios from "axios";
-import Cookies from "js-cookie";
 
 import NoProfile from "../assets/noprofile.png";
 import postComment from '../assets/post-comment.png';
@@ -12,7 +11,7 @@ import more from '../assets/more.png';
 function CommentBox({ entity, onClose, type }) {
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState("");
-    const username = Cookies.get("name") ? Cookies.get("name").replace(/\"/g, '') : '';
+    const [username, setUsername] = useState("");
 
     const [showOptionsIndex, setShowOptionsIndex] = useState(null);
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
@@ -22,8 +21,9 @@ function CommentBox({ entity, onClose, type }) {
 
     useEffect(() => {
         const fetchProfileID = async () => {
-            const id = await getId('profileID');
+            const {id, name} = await getId('profileID');
             setProfileID(id);
+            setUsername(name);
         };
   
         fetchProfileID();

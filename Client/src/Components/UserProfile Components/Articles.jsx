@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Cookies from 'js-cookie';
 import NoProfile from "../../assets/noprofile.png";
 import { getId } from '../Utils/ApiUtils';
 import CommentBox from '../CommentBox';
@@ -23,15 +22,17 @@ function Articles({ articles, likedArticles, toggleLike }) {
     const [deleteArticleId, setDeleteArticleId] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [activeCommentPost, setActiveCommentPost] = useState(null);
+    const [username, setUsername] = useState();
+
     const navigate = useNavigate();
-    const username = Cookies.get("name") ? Cookies.get("name").replace(/\"/g, '') : '';
     const [profileID, setProfileID] = useState(null);
 
 
     useEffect(() => {
         const fetchProfileID = async () => {
-            const id = await getId('profileID');
+            const {id, name} = await getId('profileID');
             setProfileID(id);
+            setUsername(name);
         };
 
         fetchProfileID();

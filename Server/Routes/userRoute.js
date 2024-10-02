@@ -108,12 +108,12 @@ router.get("/", async (req, res) => {
 // GET all profiles
 router.get("/profiles", async (req, res) => {
     try {
-        const users = await userModel.find({}, 'profile'); 
+        const users = await userModel.find({}, 'profile');
         const profileIds = users.map(user => user.profile);
 
         const profiles = await profileModel.find({ _id: { $in: profileIds } })
-        .select('_id name profile_img ')
-        .lean();
+            .select('_id name profile_img ')
+            .lean();
 
         res.json(profiles);
     } catch (error) {
@@ -190,8 +190,8 @@ router.get("/profile/get/:id", async (req, res) => {
     try {
 
         const profile = await profileModel.findById(id)
-        .select('_id name about interests profile_img')
-        .lean();
+            .select('_id name about interests profile_img')
+            .lean();
 
         res.json(profile);
     } catch (error) {
@@ -210,7 +210,7 @@ const decodetoken = (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.SECRET_KEY);
         req.decoded = decoded.id;
-        
+
         console.log("decoded userid", decoded)
         next();
     } catch (error) {
@@ -222,30 +222,43 @@ const decodetoken = (req, res, next) => {
 router.post('/token/getId/:idType', decodetoken, async (req, res) => {
     try {
         const { idType } = req.params;
+        const userId = req.decoded;
+
+        if (!userId) {
+            return res.status(400).json({ error: 'User ID not found in token' });
+        }
+
+        // Fetch user once and reuse
+        const user = await userModel.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
 
         if (idType === 'userID') {
-            const userId = req.decoded;
-            if (!userId) {
-                return res.status(400).json({ error: 'User ID not found' });
+            if (!user.name) {
+                return res.status(400).json({ error: 'User name not found' });
             }
-            return res.status(200).json({ id: userId });
+
+            return res.status(200).json({ id: userId, name: user.name });
 
         } else if (idType === 'profileID') {
-            const user = await userModel.findById(req.decoded);
-            if (!user || !user.profile) {
+            if (!user.profile) {
                 return res.status(400).json({ error: 'Profile ID not found' });
             }
-            const profileId = user.profile;
-            return res.status(200).json({ id: profileId });
-            
+
+            return res.status(200).json({ id: user.profile, name: user.name });
+
         } else {
             return res.status(400).json({ error: 'Invalid ID type' });
         }
+
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        return res.status(500).json({ message: 'Internal server error' });
     }
 });
+
 
 // POST a new user
 router.post("/", validateUser, async (req, res) => {
@@ -282,7 +295,7 @@ router.post("/", validateUser, async (req, res) => {
             secure: true,
             sameSite: "none",
             maxAge: 7 * 24 * 60 * 60 * 1000,
-          });
+        });
 
         res.status(201).json({ message: "Signup successful" });
     } catch (error) {
@@ -322,7 +335,7 @@ router.post("/login", async (req, res) => {
             secure: true,
             sameSite: "none",
             maxAge: 7 * 24 * 60 * 60 * 1000,
-          });
+        });
 
         // res.status(201).json({ message: "Signup successful" })
 
@@ -461,12 +474,12 @@ router.delete("/delete/:id", async (req, res) => {
 
         const profileId = user.profile;
         const profile = await profileModel.findById(profileId).session(session);
-        
+
         if (profile) {
             await postModel.deleteMany({ _id: { $in: profile.posts } }).session(session);
-            
+
             await articleModel.deleteMany({ _id: { $in: profile.articles } }).session(session);
-            
+
             await Promise.all(profile.communities.map(async (communityId) => {
                 await communityModel.updateOne(
                     { _id: communityId },

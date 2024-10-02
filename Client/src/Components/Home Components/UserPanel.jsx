@@ -11,15 +11,13 @@ function UserPanel() {
     const [profileImg, setProfileImg] = useState(null);
     const [username, setUsername] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
-    const [profileID, setProfileID] = useState(null);
 
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchProfileIDAndUserData = async () => {
             try {
-                const id = await getId('profileID');
-                setProfileID(id);
+                const {id} = await getId('profileID');
 
                 if (id) {
                     const response = await axios.get(`https://s50-abdullashahil-capstone-focus.onrender.com/users/profile/get/${id}`);

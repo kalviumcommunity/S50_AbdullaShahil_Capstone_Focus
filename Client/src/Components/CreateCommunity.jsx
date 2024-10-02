@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import Cookies from 'js-cookie';
 import axios from 'axios';
 import { v4 } from 'uuid';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -27,7 +26,7 @@ function CreateCommunity() {
 
   useEffect(() => {
     const fetchProfileID = async () => {
-      const id = await getId('profileID');
+      const {id} = await getId('profileID');
       setProfileID(id);
     };
 

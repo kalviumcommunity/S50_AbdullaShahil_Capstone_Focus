@@ -2,7 +2,6 @@ import { useForm } from "react-hook-form";
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
-import Cookies from 'js-cookie';
 import { getId } from "../Utils/ApiUtils";
 import SetupProfile from "./Account Components/SetupProfile";
 import showPass from '../../assets/showpass.png';
@@ -25,15 +24,22 @@ function Account() {
 
   useEffect(() => {
     const fetchProfileID = async () => {
-      const profileId = await getId('profileID');
-      setProfileID(profileId);
-
-      const userId = await getId('userID');
-      setId(userId);
+      try {
+        // Fetch the profile ID
+        const { id: profileID } = await getId('profileID');
+        setProfileID(profileID);
+  
+        // Fetch the user ID
+        const { id: userID } = await getId('userID');
+        setId(userID);
+      } catch (error) {
+        console.error("Error fetching IDs:", error);
+      }
     };
-
+  
     fetchProfileID();
   }, []);
+  
 
   useEffect(() => {
     if (profileID) {
@@ -62,8 +68,6 @@ function Account() {
 
     axios.put(`https://s50-abdullashahil-capstone-focus.onrender.com/users/password/change/${id}`, { password, newPassword })
       .then(response => {
-        // const token = response.data.token;
-        // Cookies.set('token', token, { expires: 7 });
         setPasswordStatus('success');
         formRef.current.reset();
       })
@@ -84,7 +88,6 @@ function Account() {
     setLoading(true);
     try {
       await axios.delete(`https://s50-abdullashahil-capstone-focus.onrender.com/users/delete/${id}`, { withCredentials: true });
-      Cookies.remove('token'); 
       console.log("success")
       navigate("/");
     } catch (error) {
