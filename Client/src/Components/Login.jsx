@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom';
 import bg from '../assets/blurleaf-bg.png'
 import WhiteLogo from '../assets/focus-white.png'
-import Cookies from 'js-cookie';
+import { getId } from './Utils/ApiUtils';
 import axios from 'axios';
 
 
@@ -11,25 +11,35 @@ function Login() {
 
     const { register, handleSubmit, formState: { errors } } = useForm();
     const navigate = useNavigate();
+
     const [signupStatus, setSignupStatus] = useState(null);
+    const [profileID, setProfileID] = useState(null);
 
     const toLogin = (event) => {
         event.preventDefault(); 
         window.location.href = 'https://s50-abdullashahil-capstone-focus.onrender.com/auth/google';
     }
+
+    useEffect(() => {
+        const fetchProfileID = async () => {
+          const { id } = await getId('profileID');
+          setProfileID(id);
+    };
     
+        fetchProfileID();
+      }, []);
+
     useEffect(() => {
         const fetchData = async () => {
-            const token = Cookies.get("token");
-            if (token) {
             try {
               await axios.post(
-                "https://s50-abdullashahil-capstone-focus.onrender.com/users/tokenvalidate", { token });
+                "https://s50-abdullashahil-capstone-focus.onrender.com/users/tokenvalidate",
+                {}, { withCredentials: true }
+            );
               navigate("/home");
             } catch (error) {
-              console.error("Error in post request", error.response.data.error);
+              console.error("Token invalid", response.data.error);
             }
-          }
         };
     
         fetchData();
@@ -39,8 +49,6 @@ function Login() {
         const { email, password } = data;
         axios.post('https://s50-abdullashahil-capstone-focus.onrender.com/users/login', { email, password }, {withCredentials: true})
             .then(response => {
-                // const { name } = response.data;
-                // Cookies.set('name', name, { httpOnly: true, secure: true });
                 setSignupStatus('success');
 
                 setTimeout(() => {
