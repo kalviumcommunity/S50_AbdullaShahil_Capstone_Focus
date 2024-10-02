@@ -175,6 +175,7 @@ const ChatApp = () => {
                         setActiveChat={setActiveChat} 
                         onCommunityJoin={handleCommunityJoin} 
                         isJoined={isJoined} setIsJoined={setIsJoined} />
+                        
                     ) : (
                         <div className='flex justify-center items-center h-full'>
                             <h1 className='poppins text-xl text-gray-600'>Select a chat to start messaging</h1>

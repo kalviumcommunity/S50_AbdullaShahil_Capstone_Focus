@@ -79,19 +79,20 @@ function validatePatchUser(req, res, next) {
 }
 
 const verifyToken = (req, res, next) => {
-    const token = req.body.token || req.query.token || req.headers["x-access-token"];
+    const token = req.cookies.token || req.headers["x-access-token"] || req.body.token;
+
     if (!token) {
         return res.status(401).json({ error: "Unauthorized: Token is not provided" });
     }
-    try {
-        const decoded = jwt.verify(token, process.env.SECRET_KEY);
-        req.decoded = decoded;
-        next();
-    } catch (error) {
-        console.log(error)
-        return res.status(403).json({ error1: "Forbidden: Failed to authenticate token", error });
-    }
+
+    console.log("Token on login present")
+    next();
 };
+
+// VALIDATE TOKEN
+router.post("/tokenvalidate", verifyToken, (req, res) => {
+    res.status(200).json({ valid: true });
+});
 
 
 // GET all users
@@ -308,10 +309,6 @@ router.post("/", validateUser, async (req, res) => {
 
 
 
-// VALIDATE TOKEN
-router.post("/tokenvalidate", verifyToken, (req, res) => {
-    res.status(200).json({ valid: true, user: req.decoded });
-});
 
 
 // POST REQUEST FOR LOGIN - TO CHECK IF THE EMAIL AND PASSWORD MATCHES

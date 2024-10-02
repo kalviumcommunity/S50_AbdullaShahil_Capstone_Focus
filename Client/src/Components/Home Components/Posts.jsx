@@ -17,20 +17,20 @@ function Posts({ postCategory }) {
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [likedPosts, setLikedPosts] = useState({});
-  const [activeCommentPost, setActiveCommentPost] = useState(null);  
-  
+  const [activeCommentPost, setActiveCommentPost] = useState(null);
+
   const initialLikedPosts = {};
   const [profileID, setProfileID] = useState(null);
 
 
   useEffect(() => {
-      const fetchProfileID = async () => {
-          const {id} = await getId('profileID');
-          setProfileID(id);
-      };
+    const fetchProfileID = async () => {
+      const { id } = await getId('profileID');
+      setProfileID(id);
+    };
 
-      fetchProfileID();
-  }, []);  
+    fetchProfileID();
+  }, []);
 
   useEffect(() => {
     axios.get(`https://s50-abdullashahil-capstone-focus.onrender.com/posts`)
@@ -41,7 +41,7 @@ function Posts({ postCategory }) {
           const isLikedByUser = post.likes.includes(profileID);
           initialLikedPosts[post._id] = isLikedByUser;
         });
-        setPosts(fetchedPosts);
+        setPosts(fetchedPosts.reverse());
         setLikedPosts(initialLikedPosts);
         setIsLoading(false);
       })
@@ -55,18 +55,18 @@ function Posts({ postCategory }) {
     try {
       const response = await axios.patch(`https://s50-abdullashahil-capstone-focus.onrender.com/posts/like/${postId}`, { action: !likedPosts[postId] ? 'like' : 'unlike', profileID });
       const updatedPost = response.data;
-  
+
       // Preserve the profile_img by merging the updated post data with the original post data
-      setPosts(posts.map(post => 
+      setPosts(posts.map(post =>
         post._id === updatedPost._id ? { ...post, ...updatedPost } : post
       ));
-      
+
       setLikedPosts({ ...likedPosts, [postId]: !likedPosts[postId] });
     } catch (error) {
       console.error(error);
     }
   };
-  
+
 
   const handleCommentClick = (post) => {
     setActiveCommentPost(post);
@@ -92,7 +92,7 @@ function Posts({ postCategory }) {
               <div className="posts border border-gray-400 rounded-md flex flex-col mb-10 p-5  lg:w-[35vw] shadow-[0px_0px_8px_rgba(0,0,0,0.08)]" key={index}>
                 <div className='top-opt flex justify-between items-center mb-5'>
                   <div className='flex items-center w-[15vw]'>
-                    <img className='h-12 w-12 rounded-full overflow-hidden' src={ post.profile_img ? (post.profile_img):(NoProfile) } alt="" />
+                    <img className='h-12 w-12 rounded-full overflow-hidden' src={post.profile_img ? (post.profile_img) : (NoProfile)} alt="" />
                     <h3 className='post-username pl-4 font-light poppins'>{post.name}</h3>
                   </div>
                   <h1 className='font-light'>{post.category}</h1>
@@ -133,7 +133,7 @@ function Posts({ postCategory }) {
       </div>
 
       {activeCommentPost && (
-        <CommentBox entity={activeCommentPost} onClose={handleCloseCommentBox} type="posts"/>
+        <CommentBox entity={activeCommentPost} onClose={handleCloseCommentBox} type="posts" />
       )}
     </center>
   );

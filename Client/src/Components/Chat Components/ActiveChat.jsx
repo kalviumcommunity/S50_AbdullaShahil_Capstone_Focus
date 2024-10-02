@@ -11,6 +11,9 @@ import NoProfile from "../../assets/noprofile.png";
 const socket = io('https://s50-abdullashahil-capstone-focus.onrender.com');
 
 const ActiveChat = ({ id, chatType, setActiveChat, onCommunityJoin, isJoined, setIsJoined }) => {
+
+    if(chatType==='personal') setIsJoined(true);
+    
     const chatId = id;
     const navigate = useNavigate();
 
@@ -226,7 +229,7 @@ const ActiveChat = ({ id, chatType, setActiveChat, onCommunityJoin, isJoined, se
                 <div className="chat-info p-4 rounded-lg h-[65vh] overflow-scroll">
                     <img
                         className="w-32 h-32 border rounded-full mx-auto my-4"
-                        src={community?.profileImg || profilePic}
+                        src={community?.profileImg || NoProfile}
                         alt="Profile"
                     />
                     <center className="poppins text-xl font-semibold">{community?.name || userData.name}</center>
@@ -325,8 +328,6 @@ const ActiveChat = ({ id, chatType, setActiveChat, onCommunityJoin, isJoined, se
                     </div>
 
 
-
-
                     {(chatType === 'personal' || (chatType === 'community' && isJoined)) && (
                         <div className="send-message lg:h-[7vh] mt-2 flex justify-between items-center">
                             <input
@@ -352,6 +353,7 @@ const ActiveChat = ({ id, chatType, setActiveChat, onCommunityJoin, isJoined, se
                             </button>
                         </div>
                     )}
+                    
 
 
                 </>
