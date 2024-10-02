@@ -94,7 +94,6 @@ const verifyToken = (req, res, next) => {
     } catch (error) {
         return res.status(401).json({ error: "Unauthorized: Invalid token" });
     }
-
 };
 
 // VALIDATE TOKEN
