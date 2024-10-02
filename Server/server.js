@@ -50,27 +50,45 @@ app.use(cors(
   }
   
   setupSocket(server);
+  router.get(
+    "/auth/google/callback",
+    passport.authenticate("google", { failureRedirect: "http://localhost:5173/signup" }),
+    (req, res) => {
+      console.log(" request ",req);
+      const { token } = req.user;
+  
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+  
+      res.redirect("http://localhost:5173/home");
+    }
+  );
+
   app.get('/auth/google',
   passport.authenticate('google', { scope: ['email', 'profile'] })
   );
   
-  app.get('/auth/google/callback',
-  passport.authenticate('google', 
-  (req, res) =>{
-    const { token } = req.user;
+  // app.get('/auth/google/callback',
+  // passport.authenticate('google', 
+  // (req, res) =>{
+  //   const { token } = req.user;
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+  //   res.cookie("token", token, {
+  //     httpOnly: true,
+  //     secure: true,
+  //     sameSite: "none",
+  //     maxAge: 7 * 24 * 60 * 60 * 1000,
 
-    });
-  },{
-    successRedirect: 'http://localhost:5173/home',
-    failureRedirect: 'http://localhost:5173/signup'
-  })
-  );
+  //   });
+  // },{
+  //   successRedirect: 'http://localhost:5173/home',
+  //   failureRedirect: 'http://localhost:5173/signup'
+  // })
+  // );
   
   app.get("/auth/failure", (req, res) => {
     res.send('Signup failed')
