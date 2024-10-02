@@ -56,7 +56,7 @@ app.use(cors(
   
   app.get('/auth/google/callback',
   passport.authenticate('google', 
-  () =>{
+  (req, res) =>{
     const { token } = req.user;
 
     res.cookie("token", token, {
