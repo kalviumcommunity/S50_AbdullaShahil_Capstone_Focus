@@ -37,6 +37,8 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(express.json())
+app.use(cookieParser());
 
 app.use(cors(
   {
@@ -154,8 +156,7 @@ app.get("/logout", (req, res) => {
 
 
 
-app.use(express.json())
-app.use(cookieParser());
+
 
 app.use("/users", userRouter);
 app.use("/posts", postRouter);
