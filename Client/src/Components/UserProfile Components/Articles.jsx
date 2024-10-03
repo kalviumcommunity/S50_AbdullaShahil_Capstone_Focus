@@ -141,7 +141,7 @@ function Articles({ articles, likedArticles, toggleLike }) {
                                         </div>
                                         <div className='flex items-center justify-end'>
                                             <h2 className='mr-2 text-lg'>{article.likes.length}</h2>
-                                            <img className='h-10 w-10 mr-1 rounded-full overflow-hidden cursor-pointer' src={likedArticles[article._id] ? HeartActive : Heart} alt="" onClick={() => toggleLike(article._id)} />
+                                            <img className='hh-[2.6rem] w-[2.6rem] mr-1 rounded-full overflow-hidden cursor-pointer' src={likedArticles[article._id] ? HeartActive : Heart} alt="" onClick={() => toggleLike(article._id)} />
                                             <img className='h-[2.1rem] w-[2.1rem] mb-[3px] overflow-hidden cursor-pointer' src={Comment} alt="" onClick={() => handleCommentClick(article)} />
                                         </div>
                                     </div>

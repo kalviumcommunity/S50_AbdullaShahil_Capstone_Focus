@@ -105,7 +105,7 @@ function Posts({ postCategory }) {
                   <div className='flex justify-between items-center'>
                     <h2 className='mr-2 text-lg'>{post.likes.length}</h2>
                     <img
-                      className='h-10 w-10 mr-1 rounded-full overflow-hidden cursor-pointer'
+                      className='h-[2.6rem] w-[2.6rem] mr-1 rounded-full overflow-hidden cursor-pointer'
                       src={likedPosts[post._id] ? HeartActive : Heart}
                       alt=""
                       onClick={() => handleLikeClick(post._id)}
