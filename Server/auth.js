@@ -11,7 +11,7 @@ const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
 const generateToken = (user) => {
-    return jwt.sign({ user: user }, process.env.SECRET_KEY, { expiresIn: "5h" });
+    return jwt.sign({ id: user._id, name: user.name }, process.env.SECRET_KEY, { expiresIn: "5h" });
 }
 
 passport.use(new GoogleStrategy({
@@ -47,7 +47,7 @@ async function (request, accessToken, refreshToken, profile, done) {
             userDoc = await User.findOne({ profile: profileDoc._id });
         }
 
-        const token = generateToken(userDoc._id);
+        const token = generateToken(userDoc);
 
         return done(null, token);
     } catch (err) {
