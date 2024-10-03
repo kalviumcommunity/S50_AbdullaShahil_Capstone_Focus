@@ -109,7 +109,7 @@ function Articles({ articleCategory }) {
                       </div>
                       <div className='flex items-center justify-end mt-2'>
                         <h2 className='mr-2 text-lg'>{Array.isArray(article.likes) ? article.likes.length : 0}</h2>
-                        <img className='h-10 w-10 mr-1 rounded-full overflow-hidden cursor-pointer' src={likedArticles[article._id] ? HeartActive : Heart} alt="" onClick={() => handleLikeClick(article._id)} />
+                        <img className='h-[2.6rem] w-[2.6rem] mr-1 rounded-full overflow-hidden cursor-pointer' src={likedArticles[article._id] ? HeartActive : Heart} alt="" onClick={() => handleLikeClick(article._id)} />
                         <img className='h-[2.1rem] w-[2.1rem] mb-[3px] overflow-hidden cursor-pointer' src={Comment} alt="" onClick={() => handleCommentClick(article)} />
                       </div>
                     </div>
