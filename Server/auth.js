@@ -43,11 +43,20 @@ async function (request, accessToken, refreshToken, profile, done) {
             
             await profileDoc.save();
             await userDoc.save();
+
+            
         } else {
             userDoc = await User.findOne({ profile: profileDoc._id });
         }
 
         const token = generateToken(userDoc);
+
+        request.res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
 
         return done(null, token);
     } catch (err) {
