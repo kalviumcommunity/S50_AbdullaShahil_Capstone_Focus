@@ -52,8 +52,8 @@ async function (request, accessToken, refreshToken, profile, done) {
         const token = generateToken(userDoc);
 
         request.res.cookie("token", token, {
-            httpOnly: true,
-            secure: true,
+            httpOnly: false,
+            secure: false,
             sameSite: "none",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
