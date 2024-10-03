@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const { createServer } = require("http");
 const passport = require("passport");
 const dotenv = require('dotenv');
+require('./auth')
 
 // Database connection
 const connectDb = require("../Server/config/connect");
