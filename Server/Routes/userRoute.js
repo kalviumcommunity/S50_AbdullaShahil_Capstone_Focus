@@ -209,6 +209,7 @@ router.get("/profile/get/:id", async (req, res) => {
 
 
 const decodetoken = (req, res, next) => {
+    console.log(req.cookies)
     const token = req.cookies.token || req.headers["x-access-token"] || req.body.token;
 
     if (!token) {
