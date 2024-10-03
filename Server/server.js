@@ -35,7 +35,7 @@ app.use(express.static('public'));
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "https://focus-community.netlify.app",
   credentials: true
 }));
 
@@ -59,23 +59,11 @@ function isLoggedIn(req, res, next) {
 
 // Google authentication routes
 app.get('/auth/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
-// app.get("/auth/google/callback", passport.authenticate("google", { failureRedirect: "http://localhost:5173/signup" }), (req, res) => {
-//   console.log(" request ", req.user);
-//   const token = req.user;
 
-//   res.cookie("token", token, {
-//     httpOnly: true,
-//     secure: true,
-//     sameSite: "none",
-//     maxAge: 7 * 24 * 60 * 60 * 1000,
-//   });
-
-//   res.redirect("http://localhost:5173/home");
-// });
 app.get('/auth/google/callback',
   passport.authenticate('google', {
-    successRedirect: 'http://localhost:5173/home',
-    failureRedirect: '/auth/failure'
+    successRedirect: 'https://focus-community.netlify.app/home',
+    failureRedirect: 'https://focus-community.netlify.app/login'
   })
 );
 

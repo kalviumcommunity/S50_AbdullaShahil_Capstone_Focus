@@ -5,7 +5,7 @@ const PersonalMessage = require('./Models/personalMessageModel');
 const setupSocket = (server) => {
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: "https://focus-community.netlify.app",
       methods: ["GET", "POST"],
     },
   });
