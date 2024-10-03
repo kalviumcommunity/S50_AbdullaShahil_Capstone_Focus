@@ -54,7 +54,7 @@ app.use(cors(
     "/auth/google/callback",
     passport.authenticate("google", { failureRedirect: "http://localhost:5173/signup" }),
     (req, res) => {
-      console.log(" request ",req);
+      console.log(" request ",req.user);
       const token = req.user;
   
       res.cookie("token", token, {
