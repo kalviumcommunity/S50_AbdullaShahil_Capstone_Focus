@@ -26,7 +26,7 @@ function Posts({ posts, likedPosts, toggleLike }) {
 
   useEffect(() => {
     const fetchProfileID = async () => {
-      const {id, name} = await getId('profileID');
+      const { id, name } = await getId('profileID');
       setProfileID(id);
       setUsername(name);
     };
@@ -85,65 +85,66 @@ function Posts({ posts, likedPosts, toggleLike }) {
         </div>
       )}
 
-      <div className="pt-12 grid grid-cols-1 lg:grid-cols-3">
-        {isLoading ? (
-          <PostShimmer scaleValue="80%" />
-        ) : posts.length === 0 ? (
-          <div className='important'>
-            <p className='poppins text-xl textgray'>No posts</p>
-          </div>
-        ) : (
-          posts.map((post, index) => (
-            <center key={index} className='flex'>
-              <div className="posts bg-white border border-gray-300 rounded-md flex flex-col mb-10 p-5 w-[85vw] md:w-[55vw] lg:w-[35vw] scale-90 shadow-[0px_0px_8px_rgba(0,0,0,0.08)]">
-                <div className='top-opt flex justify-between items-center mb-5'>
-                  <div className='flex items-center w-[25vw] sm:w-[20vw] md:w-[15vw]'>
-                    <img className='md:h-12 md:w-12 rounded-full overflow-hidden' src={post.profile_img ? (post.profile_img) : (NoProfile)} alt="" />
-                    <h3 className='post-username pl-4 font-light poppins'>{username}</h3>
-                  </div>
+      <div
+        className={` ${posts.length === 0 ? 'flex flex-col items-center justify-center min-h-[30vh]' : 'pt-12 grid grid-cols-1 lg:grid-cols-3'}`}
+      >        {isLoading ? (
+        <PostShimmer scaleValue="80%" />
+      ) : posts.length === 0 ? (
+        <div className=''>
+          <p className='poppins text-xl textgray'>No posts</p>
+        </div>
+      ) : (
+        posts.map((post, index) => (
+          <center key={index} className='flex'>
+            <div className="posts bg-white border border-gray-300 rounded-md flex flex-col mb-10 p-5 w-[85vw] md:w-[55vw] lg:w-[35vw] scale-90 shadow-[0px_0px_8px_rgba(0,0,0,0.08)]">
+              <div className='top-opt flex justify-between items-center mb-5'>
+                <div className='flex items-center w-[25vw] sm:w-[20vw] md:w-[15vw]'>
+                  <img className='md:h-12 md:w-12 rounded-full overflow-hidden' src={post.profile_img ? (post.profile_img) : (NoProfile)} alt="" />
+                  <h3 className='post-username pl-4 font-light poppins'>{username}</h3>
+                </div>
 
-                  <div className="flex items-center">
-                    <h1 className='font-light'>{post.category}</h1>
-                    {post.profileID === profileID && (
-                      <Menu
-                        animate={{
-                          mount: { y: 0 },
-                          unmount: { y: 25 },
-                        }}
-                      >
-                        <MenuHandler>
-                          <img className='h-9 p-1 ml-5 cursor-pointer hover:bg-gray-100 rounded-full' src={more} alt="more options" />
-                        </MenuHandler>
-                        <MenuList>
-                          <MenuItem className='mb-2 text-white bg-gray-800' onClick={() => EditPost(post._id)}>Edit</MenuItem>
-                          <MenuItem onClick={() => {
-                            console.log(post._id);
-                            setShowDeleteConfirmation(true);
-                            setDeletePostId(post._id);
-                          }} className='text-white bg-red-500'>Delete</MenuItem>
-                        </MenuList>
-                      </Menu>
-                    )}
-                  </div>
-                </div>
-                <div className="image-wrapper image-wrapper-4x3 rounded-md">
-                  <img src={post.image} alt="Image 4x3" className='rounded-md' />
-                </div>
-                <div className="post-options rounded p-3 flex items-center justify-between mt-1">
-                  <h1 className='font-semibold text-xl textgray poppins'>{post.title}</h1>
-                  <div className='flex justify-between items-center'>
-                    <h2 className='mr-2 text-lg'>{post.likes.length}</h2>
-                    <img className='h-[2.6rem] w-[2.6rem] mr-1 rounded-full overflow-hidden cursor-pointer' src={likedPosts[post._id] ? HeartActive : Heart} alt="" onClick={() => toggleLike(post._id)} />
-                    <img className='h-[2.1rem] w-[2.1rem] mb-[3px] overflow-hidden cursor-pointer' src={Comment} alt="" onClick={() => handleCommentClick(post)} />
-                  </div>
-                </div>
-                <div className='pl-3'>
-                  <p className='text-left font-light text-gray-700 poppins text-sm'>{post.description}</p>
+                <div className="flex items-center">
+                  <h1 className='font-light'>{post.category}</h1>
+                  {post.profileID === profileID && (
+                    <Menu
+                      animate={{
+                        mount: { y: 0 },
+                        unmount: { y: 25 },
+                      }}
+                    >
+                      <MenuHandler>
+                        <img className='h-9 p-1 ml-5 cursor-pointer hover:bg-gray-100 rounded-full' src={more} alt="more options" />
+                      </MenuHandler>
+                      <MenuList>
+                        <MenuItem className='mb-2 text-white bg-gray-800' onClick={() => EditPost(post._id)}>Edit</MenuItem>
+                        <MenuItem onClick={() => {
+                          console.log(post._id);
+                          setShowDeleteConfirmation(true);
+                          setDeletePostId(post._id);
+                        }} className='text-white bg-red-500'>Delete</MenuItem>
+                      </MenuList>
+                    </Menu>
+                  )}
                 </div>
               </div>
-            </center>
-          ))
-        )}
+              <div className="image-wrapper image-wrapper-4x3 rounded-md">
+                <img src={post.image} alt="Image 4x3" className='rounded-md' />
+              </div>
+              <div className="post-options rounded p-3 flex items-center justify-between mt-1">
+                <h1 className='font-semibold text-xl textgray poppins'>{post.title}</h1>
+                <div className='flex justify-between items-center'>
+                  <h2 className='mr-2 text-lg'>{post.likes.length}</h2>
+                  <img className='h-[2.6rem] w-[2.6rem] mr-1 rounded-full overflow-hidden cursor-pointer' src={likedPosts[post._id] ? HeartActive : Heart} alt="" onClick={() => toggleLike(post._id)} />
+                  <img className='h-[2.1rem] w-[2.1rem] mb-[3px] overflow-hidden cursor-pointer' src={Comment} alt="" onClick={() => handleCommentClick(post)} />
+                </div>
+              </div>
+              <div className='pl-3'>
+                <p className='text-left font-light text-gray-700 poppins text-sm'>{post.description}</p>
+              </div>
+            </div>
+          </center>
+        ))
+      )}
       </div>
 
       {activeCommentPost && (
