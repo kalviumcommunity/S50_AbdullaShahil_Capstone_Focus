@@ -1,5 +1,5 @@
 ## S50_AbdullaShahil_Capstone_Focus
-
+## [Deployed link](https://focus-community.netlify.app/)
 ## Table of Contents
 1. [Focus](#focus)
 2. [Problem Statement](#problem-statement)
